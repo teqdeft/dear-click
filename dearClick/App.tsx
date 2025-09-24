@@ -8,26 +8,30 @@ import CreatePasswordScreen from './src/screens/auth/SignUp/CreatePasswordScreen
 import InterestScreen from './src/screens/auth/SignUp/InterestScreen';
 import CongratsScreen from './src/screens/auth/SignUp/CongratsScreen';
 import RegisterPhoneScreen from './src/screens/auth/SignUp/RegisterPhoneScreen';
-import SignIn from './src/screens/auth/SIgnIn/SignIn';
-import SignInEmail from './src/screens/auth/SIgnIn/SignInEmail';
-import SignInScreen from './src/screens/auth/SIgnIn/SIgnInScreen';
+import SignInScreen from './src/screens/auth/SignIn/SignInScreen'; // Fixed typo in path
 import HomeScreen from './src/screens/home/HomeScreen';
+import Toast from 'react-native-toast-message';
+import { toastConfig } from './src/components/utils/ToastConfig';
 
 export type RootStackParamList = {
   RegisterStartScreen: undefined;
   RegisterEmailScreen: undefined;
-  VerifyOtpScreen: undefined;
+  VerifyOtpScreen: { email: string };
   DetailsScreen: undefined;
   CreatePasswordScreen: undefined;
+  RegisterPhoneScreen: undefined;
+  InterestScreen: undefined;
+  CongratsScreen: undefined;
+  SignIn: undefined;
+  Home: undefined;
 };
- 
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="SignIn"
+        initialRouteName="SignIn" // Matches a defined screen
         screenOptions={{ headerShown: false }}
       >
         <Stack.Screen name="SignIn" component={SignInScreen} />
@@ -54,6 +58,7 @@ function App() {
         <Stack.Screen name="InterestScreen" component={InterestScreen} />
         <Stack.Screen name="CongratsScreen" component={CongratsScreen} />
       </Stack.Navigator>
+      <Toast config={toastConfig} />
     </NavigationContainer>
   );
 }
