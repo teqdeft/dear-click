@@ -8,18 +8,18 @@ import CreatePasswordScreen from './src/screens/auth/SignUp/CreatePasswordScreen
 import InterestScreen from './src/screens/auth/SignUp/InterestScreen';
 import CongratsScreen from './src/screens/auth/SignUp/CongratsScreen';
 import RegisterPhoneScreen from './src/screens/auth/SignUp/RegisterPhoneScreen';
-import SignInScreen from './src/screens/auth/SignIn/SignInScreen'; // Fixed typo in path
 import HomeScreen from './src/screens/home/HomeScreen';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from './src/components/utils/ToastConfig';
+import SignInScreen from './src/screens/auth/SIgnIn/SIgnInScreen';
 
 export type RootStackParamList = {
   RegisterStartScreen: undefined;
-  RegisterEmailScreen: undefined;
-  VerifyOtpScreen: { email: string };
-  DetailsScreen: undefined;
-  CreatePasswordScreen: undefined;
-  RegisterPhoneScreen: undefined;
+  RegisterEmailScreen: { email: string };
+  VerifyOtpScreen: { email: string; phone: string };
+  DetailsScreen: { email: string; phone: string };
+  CreatePasswordScreen: { email: string; phone: string };
+  RegisterPhoneScreen: { phone: string };
   InterestScreen: undefined;
   CongratsScreen: undefined;
   SignIn: undefined;

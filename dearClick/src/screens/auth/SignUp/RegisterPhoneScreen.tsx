@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -6,13 +6,41 @@ import {
   TouchableOpacity,
   TextInput,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import BackButton from '../../../assets/svgs/Auth svg/BackButton';
+import toast from '../../../components/utils/Toast';
+import { sendOtp } from '../services/userAuth';
 
 export default function RegisterPhoneScreen() {
   const navigation = useNavigation();
+  const [phone, setPhone] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async () => {
+    if (!phone) {
+      toast.error('Please enter your phone number');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const data = await sendOtp({ phone }); // call API with phone
+      if (data?.success) {
+        toast.success(data.data.otp, data.message, { visibilityTime: 10000 });
+        navigation.navigate('VerifyOtpScreen', { phone });
+      } else {
+        toast.error(data?.error?.message || 'Something went wrong');
+      }
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to send OTP');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
@@ -20,8 +48,6 @@ export default function RegisterPhoneScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* Progress Bar */}
-
-        {/* Header Progress */}
         <View style={styles.progressContainer}>
           <View style={[styles.progressDot, styles.activeDot]} />
           <View style={[styles.progressDot, styles.activeDot]} />
@@ -30,6 +56,7 @@ export default function RegisterPhoneScreen() {
           <View style={styles.progressDot} />
           <View style={styles.progressDot} />
         </View>
+
         {/* Back Button */}
         <TouchableOpacity
           style={styles.backBtn}
@@ -46,7 +73,7 @@ export default function RegisterPhoneScreen() {
           </Text>
         </View>
 
-        {/* Options */}
+        {/* Phone Input */}
         <View style={styles.optionsContainer}>
           <Text style={styles.emaillabel}>Phone No</Text>
           <TextInput
@@ -54,15 +81,22 @@ export default function RegisterPhoneScreen() {
             placeholder="123-456-7890"
             placeholderTextColor="grey"
             keyboardType="phone-pad"
+            value={phone}
+            onChangeText={setPhone}
           />
         </View>
 
         {/* Continue Button */}
         <TouchableOpacity
           style={styles.continueBtn}
-          onPress={() => navigation.navigate('VerifyOtpScreen' as never)}
+          onPress={handleSubmit}
+          disabled={loading}
         >
-          <Text style={styles.continueText}>Continue</Text>
+          {loading ? (
+            <ActivityIndicator color="#000" />
+          ) : (
+            <Text style={styles.continueText}>Continue</Text>
+          )}
         </TouchableOpacity>
 
         {/* Footer */}
@@ -100,14 +134,6 @@ const styles = StyleSheet.create({
   activeDot: {
     backgroundColor: '#F5A623',
   },
-  progressBar: {
-    height: 3,
-    backgroundColor: '#FBC213',
-    width: '40%',
-    marginBottom: 20,
-    borderRadius: 5,
-  },
-
   backBtn: {
     marginBottom: '20%',
     backgroundColor: '#262626',
@@ -116,11 +142,6 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  backText: {
-    color: '#fff',
-    fontSize: 22,
-    fontWeight: '600',
   },
   header: {
     marginBottom: 30,
@@ -141,7 +162,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     fontSize: 15,
   },
-
   optionsContainer: {
     marginBottom: 30,
   },
@@ -155,7 +175,6 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderColor: 'grey',
   },
-
   continueBtn: {
     backgroundColor: '#FBC213',
     paddingVertical: 15,

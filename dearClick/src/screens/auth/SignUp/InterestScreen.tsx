@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -26,6 +26,32 @@ import Sports from '../../../assets/svgs/interest/Sports';
 
 export default function InterestScreen() {
   const navigation = useNavigation();
+  const [selected, setSelected] = useState<string[]>([]);
+
+  const toggleSelect = (interest: string) => {
+    setSelected(prev =>
+      prev.includes(interest)
+        ? prev.filter(item => item !== interest)
+        : [...prev, interest],
+    );
+  };
+
+  const interests = [
+    { name: 'Music', icon: <Music /> },
+    { name: 'Fashion', icon: <Fashion /> },
+    { name: 'Games', icon: <Game /> },
+    { name: 'Pet', icon: <Pet /> },
+    { name: 'Travelling', icon: <Travel /> },
+    { name: 'Technology', icon: <Technology /> },
+    { name: 'Beauty', icon: <Beauty /> },
+    { name: 'Food', icon: <Food /> },
+    { name: 'Comedy', icon: <Comedy /> },
+    { name: 'Skincare', icon: <Skincare /> },
+    { name: 'Wellness', icon: <Wellness /> },
+    { name: 'Bag', icon: <Bag /> },
+    { name: 'Accessories', icon: <Accessories /> },
+    { name: 'Sports', icon: <Sports /> },
+  ];
 
   return (
     <SafeAreaView style={styles.container}>
@@ -60,99 +86,28 @@ export default function InterestScreen() {
 
         {/* Options */}
         <View style={styles.optionsContainer}>
-          <TouchableOpacity style={styles.input}>
-            <View style={styles.optionContent}>
-              <Music />
-              <Text style={styles.optionText}>Music</Text>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.input}>
-            <View style={styles.optionContent}>
-              <Fashion />
-              <Text style={styles.optionText}>Fashion</Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.input}>
-            <View style={styles.optionContent}>
-              <Game />
-              <Text style={styles.optionText}>Games</Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.input}>
-            <View style={styles.optionContent}>
-              <Pet />
-              <Text style={styles.optionText}>Pet</Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.input}>
-            <View style={styles.optionContent}>
-              <Travel />
-              <Text style={styles.optionText}>Travelling</Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.input}>
-            <View style={styles.optionContent}>
-              <Technology />
-              <Text style={styles.optionText}>Technology</Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.input}>
-            <View style={styles.optionContent}>
-              <Beauty />
-              <Text style={styles.optionText}>Beauty</Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.input}>
-            <View style={styles.optionContent}>
-              <Food />
-              <Text style={styles.optionText}>Food</Text>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.input}>
-            <View style={styles.optionContent}>
-              <Comedy />
-              <Text style={styles.optionText}>Comedy</Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.input}>
-            <View style={styles.optionContent}>
-              <Skincare />
-              <Text style={styles.optionText}>Skincare</Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.input}>
-            <View style={styles.optionContent}>
-              <Wellness />
-              <Text style={styles.optionText}>Wellness</Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.input}>
-            <View style={styles.optionContent}>
-              <Bag />
-              <Text style={styles.optionText}>Bag</Text>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.input}>
-            <View style={styles.optionContent}>
-              <Accessories />
-              <Text style={styles.optionText}>Accessories</Text>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.input}>
-            <View style={styles.optionContent}>
-              <Sports />
-              <Text style={styles.optionText}>Sports</Text>
-            </View>
-          </TouchableOpacity>
+          {interests.map((item, index) => (
+            <TouchableOpacity
+              key={index}
+              style={[
+                styles.input,
+                selected.includes(item.name) && styles.selectedInput,
+              ]}
+              onPress={() => toggleSelect(item.name)}
+            >
+              <View style={styles.optionContent}>
+                {item.icon}
+                <Text
+                  style={[
+                    styles.optionText,
+                    selected.includes(item.name) && styles.selectedText,
+                  ]}
+                >
+                  {item.name}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          ))}
         </View>
         {/* Continue Button */}
         <TouchableOpacity
@@ -243,6 +198,13 @@ const styles = StyleSheet.create({
     color: '#fff',
     width: 'auto',
     borderRadius: 30,
+  },
+  selectedInput: {
+    backgroundColor: 'white',
+  },
+  selectedText: {
+    color: '#000',
+    fontWeight: '600',
   },
   continueBtn: {
     backgroundColor: '#FBC213',

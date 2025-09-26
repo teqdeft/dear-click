@@ -7,42 +7,37 @@ import {
   TextInput,
   ScrollView,
   ActivityIndicator,
-  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
 import BackButton from '../../../assets/svgs/Auth svg/BackButton';
-import axios from 'axios';
-import Toast from 'react-native-toast-message';
+import toast from '../../../components/utils/Toast';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../../../App';
+import { sendOtp } from '../services/userAuth';
 
-export default function RegisterEmailScreen() {
+type Props = NativeStackScreenProps<RootStackParamList, 'SignIn'>;
+
+export default function RegisterEmailScreen({ navigation }: Props) {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
-  const navigation = useNavigation();
 
   const handleSubmit = async () => {
     if (!email) {
-      Alert.alert('Email Required', 'Please enter your email address');
+      toast.error('Please enter your email');
       return;
     }
 
     setLoading(true);
     try {
-      const response = await axios.post(
-        'http://192.168.1.19:5050/api/auth/send-otp',
-        { email },
-      );
-      console.log(response);
-      if (response.data.success) {
-        Toast.show({
-          type: 'success',
-          text1: `${response.data.data}`, // fallback message
-        });
-
-        // navigation.navigate('verifyOtpScreen' as never);
+      const data = await sendOtp({ email }); // call API function
+      if (data?.success) {
+        toast.success(data.message || 'OTP sent! Check your inbox');
+        navigation.navigate('VerifyOtpScreen', { email });
+      } else {
+        toast.error(data?.error?.message || 'Something went wrong');
       }
-    } catch (err) {
-      Alert.alert('Error', 'Something went wrong');
+    } catch (err: any) {
+      toast.error(err); // error from API
     } finally {
       setLoading(false);
     }

@@ -36,7 +36,7 @@ const sendOtp = async (req, res) => {
     if (email) {
       const user = await db("users").where({ email }).first();
       if (user) {
-        return error(res, "User Already Exists", null, 400);
+        return error(res, "Email Already Exists", null, 400);
       }
 
       // store OTP
@@ -49,47 +49,81 @@ const sendOtp = async (req, res) => {
         html: verificationEmailTemplate({ otp }),
       });
 
-      return success(res, "Otp sent!, check your inbox", 200);
+      return success(res, null, 200, "Otp sent!, check your inbox");
     }
 
     // for phone later
     if (phone) {
-      return error(res, "Service not available yet! use email", null, 404);
+      const user = await db("users").where({ phone }).first();
+      if (user) {
+        return error(res, "Phone No Already Exists", null, 400);
+      }
+      // store OTP
+      await db("otps").insert({ phone, otp, expiresAt });
+
+      return success(res, { otp }, 200, "Use this OTP");
     }
   } catch (err) {
-    return error(res, "Something went wrong", err.message, 500);
+    return error(res, "Something went wrong......", err.message, 500);
   }
 };
 
 //verify user
 const verifyEmail = async (req, res) => {
-  const { email, otp } = req.body;
+  const { email, phone, otp } = req.body;
 
   try {
     // Validation
-    if (!email || !otp) {
-      return error(res, "Email and OTP are required", null, 403);
+    if (email && otp) {
+      if (!email || !otp) {
+        return error(res, "Email and OTP are required", null, 403);
+      }
+
+      // Find OTP record
+      const otpEntry = await db("otps")
+        .where({ email, otp })
+        .andWhere("expiresAt", ">", new Date()) // check expiry
+        .first();
+
+      if (!otpEntry) {
+        return error(res, "Invalid or expired OTP", null, 400);
+      }
+
+      // OTP verified -- cleanup (delete OTP so it can’t be reused)
+      await db("otps").where({ id: otpEntry.id }).del();
+
+      await db("users").insert({
+        email,
+        emailOtp: otpEntry.otp,
+        emailVerified: true,
+      });
+      return success(res, null, 200, "OTP verified!");
     }
+    if (phone && otp) {
+      if (!phone || !otp) {
+        return error(res, "Phone and OTP are required", null, 403);
+      }
 
-    // Find OTP record
-    const otpEntry = await db("otps")
-      .where({ email, otp })
-      .andWhere("expiresAt", ">", new Date()) // check expiry
-      .first();
+      // Find OTP record
+      const otpEntry = await db("otps")
+        .where({ phone, otp })
+        .andWhere("expiresAt", ">", new Date()) // check expiry
+        .first();
 
-    if (!otpEntry) {
-      return error(res, "Invalid or expired OTP", null, 400);
+      if (!otpEntry) {
+        return error(res, "Invalid or expired OTP", null, 400);
+      }
+
+      // OTP verified -- cleanup (delete OTP so it can’t be reused)
+      await db("otps").where({ id: otpEntry.id }).del();
+
+      await db("users").insert({
+        phone,
+        phoneOtp: otpEntry.otp,
+        mobileVerified: true,
+      });
+      return success(res, null, 200, "OTP verified!");
     }
-
-    // OTP verified -- cleanup (delete OTP so it can’t be reused)
-    await db("otps").where({ id: otpEntry.id }).del();
-
-    await db("users").insert({
-      email,
-      emailOtp: otpEntry.otp,
-      emailVerified: true,
-    });
-    return success(res, "OTP verified!", 200);
   } catch (err) {
     return error(res, "Something went wrong", err.message, 500);
   }
@@ -98,10 +132,10 @@ const verifyEmail = async (req, res) => {
 // complete user profile
 const createProfile = async (req, res) => {
   try {
-    const { name, username, email } = req.body;
+    const { name, username, email, phone } = req.body;
 
     // validation
-    if (!name || !username || !email) {
+    if (!name || !username || (!email && !phone)) {
       return error(res, "Name, username and email are required", null, 403);
     }
 
@@ -119,14 +153,25 @@ const createProfile = async (req, res) => {
     if (existing) {
       return error(res, "Username already taken", null, 400);
     }
+    if (email) {
+      // update user profile (assuming user already has a row after OTP verification)
+      await db("users").where({ email }).update({
+        name,
+        username,
+        profile_pic: filename,
+        updated_at: new Date(),
+      });
+    }
+    if (phone) {
+      // update user profile (assuming user already has a row after OTP verification)
+      await db("users").where({ phone }).update({
+        name,
+        username,
+        profile_pic: filename,
+        updated_at: new Date(),
+      });
+    }
 
-    // update user profile (assuming user already has a row after OTP verification)
-    await db("users").where({ email }).update({
-      name,
-      username,
-      profile_pic: filename,
-      updated_at: new Date(),
-    });
     return success(res, "Profile created", 201);
   } catch (err) {
     return error(res, "something went wrong!", err.message, 500);
@@ -136,15 +181,21 @@ const createProfile = async (req, res) => {
 // create password
 const setPassword = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, phone } = req.body;
 
     // validation
-    if (!email || !password) {
-      return error(res, "Email and password are required", null, 400);
+    if ((!email && !phone) || !password) {
+      return error(res, "Email, Phone and password are required", null, 400);
     }
 
     // check if user exists
-    const userExists = await db("users").where({ email }).first();
+    const userExists = await db("users")
+      .where(function () {
+        if (email) this.orWhere({ email });
+        if (phone) this.orWhere({ phone });
+      })
+      .first();
+
     if (!userExists) {
       return error(res, "User not found", null, 404);
     }
@@ -157,16 +208,25 @@ const setPassword = async (req, res) => {
     // hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // update user with password
-    await db("users").where({ email }).update({
-      password: hashedPassword,
-      status: true,
-      updated_at: new Date(),
-    });
-
+    if (email) {
+      // update user with password
+      await db("users").where({ email }).update({
+        password: hashedPassword,
+        status: true,
+        updated_at: new Date(),
+      });
+    }
+    if (phone) {
+      // update user with password
+      await db("users").where({ phone }).update({
+        password: hashedPassword,
+        status: true,
+        updated_at: new Date(),
+      });
+    }
     // creating the token with user details without passsword
     const user = await db("users")
-      .where({ email })
+      .where({ id: userExists.id })
       .select(
         "id",
         "role",
@@ -314,25 +374,24 @@ const changePassword = async (req, res) => {
 // signIn
 const signIn = async (req, res) => {
   try {
-    const { email, phone, username, password } = req.body;
+    const { input, password } = req.body;
 
-    // validation
-    if (!email && !phone && !username) {
-      return error(res, "Choose email, phoneNo or username", null, 400);
-    }
     if (!password) {
       return error(res, "Password required!", null, 400);
     }
 
     let user;
 
-    // signing in from any option
-    if (email) {
-      user = await db("users").where({ email }).first();
-    } else if (phone) {
-      user = await db("users").where({ phone }).first();
-    } else if (username) {
-      user = await db("users").where({ userName: username }).first();
+    // Detect type of input
+    if (/^\S+@\S+\.\S+$/.test(input)) {
+      // check if input is email
+      user = await db("users").where({ email: input }).first();
+    } else if (/^\d{10}$/.test(input)) {
+      // check if input is phone (here assuming 10 digits,
+      user = await db("users").where({ phone: input }).first();
+    } else {
+      // otherwise treat it as username
+      user = await db("users").where({ userName: input }).first();
     }
 
     if (!user) {
@@ -347,7 +406,7 @@ const signIn = async (req, res) => {
 
     // creating the token with user details without passsword
     const UserToken = await db("users")
-      .where({ email: user.email })
+      .where({ id: user.id })
       .select(
         "id",
         "role",
@@ -498,7 +557,7 @@ const getUserDetails = async (req, res) => {
         "user_account_settings.userId",
         "users.id"
       )
-      .select(  
+      .select(
         "users.name",
         "users.email",
         "users.phone",

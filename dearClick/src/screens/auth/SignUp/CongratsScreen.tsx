@@ -17,7 +17,12 @@ export default function CongratsScreen() {
         </Text>
         <TouchableOpacity
           style={styles.continueBtn}
-          onPress={() => navigation.navigate('Home' as never)}
+          onPress={() =>
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'Home' as never }],
+            })
+          }
         >
           <Text style={styles.continueText}>Done</Text>
         </TouchableOpacity>

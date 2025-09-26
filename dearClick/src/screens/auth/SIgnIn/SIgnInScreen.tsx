@@ -7,16 +7,21 @@ import {
   TextInput,
   Animated,
   Easing,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import DearClickLogo from '../../../assets/svgs/DearClick logo/DearClickLogo';
 import UnHideEyes from '../../../assets/svgs/Auth svg/UnHideEyes';
 import HideEyes from '../../../assets/svgs/Auth svg/HideEyes';
+import toast from '../../../components/utils/Toast'; // if you have a toast component
 
 export default function SignInScreen() {
   const navigation = useNavigation();
   const [showPassword, setShowPassword] = useState(false);
+  const [input, setInput] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
   // Animations
   const logoScale = useRef(new Animated.Value(0.3)).current;
@@ -120,6 +125,37 @@ export default function SignInScreen() {
     });
   });
 
+  // API call for Sign In
+  const handleSignIn = async () => {
+    if (!input || !password) {
+      return toast.error('All fields are required');
+    }
+
+    try {
+      setLoading(true);
+      const response = await fetch('http://192.168.1.19:5050/api/auth/signin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ input, password }),
+      });
+
+      const data = await response.json();
+      setLoading(false);
+
+      if (!response.ok) {
+        return toast.error(data.error.message || 'Failed to sign in');
+      }
+
+      toast.success(data.message || 'Signed in successfully');
+      // Navigate to home screen
+      navigation.navigate('Home' as never);
+    } catch (err) {
+      setLoading(false);
+      console.log(err);
+      toast.error('Something went wrong');
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Logo */}
@@ -164,6 +200,8 @@ export default function SignInScreen() {
               placeholder="Email, Phone or Username"
               placeholderTextColor="grey"
               keyboardType="email-address"
+              value={input}
+              onChangeText={setInput}
             />
           </View>
         </Animated.View>
@@ -184,6 +222,8 @@ export default function SignInScreen() {
               placeholder="Password"
               placeholderTextColor="grey"
               secureTextEntry={!showPassword}
+              value={password}
+              onChangeText={setPassword}
             />
             <TouchableOpacity
               style={styles.eyeIcon}
@@ -196,6 +236,7 @@ export default function SignInScreen() {
 
         {/* Button */}
         <Animated.View
+          // eslint-disable-next-line react-native/no-inline-styles
           style={{
             opacity: buttonOpacity,
             transform: [{ translateY: buttonY }],
@@ -204,17 +245,21 @@ export default function SignInScreen() {
         >
           <TouchableOpacity
             style={styles.continueBtn}
-            onPress={() => navigation.navigate('Home' as never)}
+            onPress={handleSignIn}
+            disabled={loading}
           >
-            <Text style={styles.continueText}>Sign In</Text>
+            {loading ? (
+              <ActivityIndicator color="#000" />
+            ) : (
+              <Text style={styles.continueText}>Continue</Text>
+            )}
           </TouchableOpacity>
 
           <Text
             onPress={() => navigation.navigate('RegisterStartScreen' as never)}
             style={styles.footer}
           >
-            Already have an account?{' '}
-            <Text style={styles.signInText}>SignUp</Text>
+            Don't have an account? <Text style={styles.signInText}>SignUp</Text>
           </Text>
         </Animated.View>
       </Animated.View>
@@ -241,6 +286,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginBottom: 6,
     textAlign: 'center',
+    fontFamily: 'Poppins-Medium',
   },
   subtitle: {
     fontSize: 14,
@@ -248,6 +294,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     textAlign: 'center',
     marginBottom: 20,
+    fontFamily: 'Poppins-Regular',
   },
   inputContainer: {
     flexDirection: 'row',

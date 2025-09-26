@@ -29,13 +29,15 @@ const styles = StyleSheet.create({
     borderLeftColor: 'green',
     borderLeftWidth: 5,
     width: '80%',
-    height: 50,
+    height: 40,
   },
   errorContainer: {
     borderLeftColor: 'red',
     borderLeftWidth: 5,
     width: '80%',
-    height: 50,
+    height: 40,
+    borderRadius: 20,
+    boxShadow: '2px 2px 10px rgba(238, 45, 45, 1)',
   },
   contentContainer: {
     paddingHorizontal: 15,

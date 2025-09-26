@@ -60,14 +60,14 @@ const createStorage = (folderName) =>
 const uploadProfilePic = multer({
   storage: createStorage("profilePicture"),
   fileFilter: profileFileFilter,
-  limits: { fileSize: 5 * 1024 * 1024 },
+  // limits: { fileSize: 5 * 1024 * 1024 },
 });
 
 // Post media upload (images + videos, 20MB max)
 const uploadPostMedia = multer({
   storage: createStorage("posts"),
   fileFilter: postFileFilter,
-  limits: { fileSize: 20 * 1024 * 1024 },
+  // limits: { fileSize: 20 * 1024 * 1024 },
 });
 
 // Story media upload (images + videos, 20MB max)

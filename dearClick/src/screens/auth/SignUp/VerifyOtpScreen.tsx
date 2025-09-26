@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import {
   StyleSheet,
   Text,
@@ -6,13 +6,79 @@ import {
   TouchableOpacity,
   TextInput,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import BackButton from '../../../assets/svgs/Auth svg/BackButton';
+import toast from '../../../components/utils/Toast';
+import { RootStackParamList } from '../../../../App';
+import { sendOtp, verifyEmail } from '../services/userAuth';
+
+type VerifyOtpScreenRouteProp = RouteProp<
+  RootStackParamList,
+  'VerifyOtpScreen'
+>;
 
 export default function VerifyOtpScreen() {
   const navigation = useNavigation();
+  const route = useRoute<VerifyOtpScreenRouteProp>();
+  const { email, phone } = route.params;
+
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const [loading, setLoading] = useState(false);
+
+  const inputsRef = useRef<Array<TextInput | null>>([]);
+
+  const handleChange = (text: string, index: number) => {
+    const newOtp = [...otp];
+    newOtp[index] = text;
+    setOtp(newOtp);
+
+    if (text && index < 5) {
+      inputsRef.current[index + 1]?.focus(); // optional chaining handles null
+    }
+  };
+  const resendOTP = async () => {
+    setOtp(['', '', '', '', '', '']); // clear inputs
+    setLoading(true); // optional, if you want a spinner
+
+    try {
+      const data = await sendOtp({ email, phone });
+      if (data?.success) {
+        toast.success(data.message || 'OTP resent successfully!');
+      } else {
+        toast.error(data?.error?.message || 'Failed to resend OTP');
+      }
+    } catch (err: any) {
+      toast.error(err || 'Something went wrong while resending OTP');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerify = async () => {
+    const otpCode = otp.join('');
+    if (otpCode.length < 6) {
+      toast.error('Please enter complete OTP');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const data = await verifyEmail({ phone, email, otp: otpCode });
+      if (data?.success) {
+        toast.success(data.message || 'Email verified successfully!');
+        navigation.navigate('DetailsScreen', { email, phone }); // next screen
+      } else {
+        toast.error(data?.error?.message || 'Invalid OTP');
+      }
+    } catch (err: any) {
+      toast.error(err || 'Something went wrong');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -29,6 +95,7 @@ export default function VerifyOtpScreen() {
           <View style={styles.progressDot} />
           <View style={styles.progressDot} />
         </View>
+
         {/* Back Button */}
         <TouchableOpacity
           style={styles.backBtn}
@@ -41,54 +108,41 @@ export default function VerifyOtpScreen() {
         <View style={styles.header}>
           <Text style={styles.title}>Enter 6 Digit Code</Text>
           <Text style={styles.subtitle}>
-            To verify your email address we have sent a code to
-            johndoe@gmail.com
+            To verify your email address we have sent a code to {email}
           </Text>
         </View>
 
-        {/* Options */}
+        {/* OTP Inputs */}
         <View style={styles.optionsContainer}>
           <Text style={styles.emaillabel}>OTP code</Text>
           <View style={styles.innerOptionsContainer}>
-            <TextInput
-              keyboardType="numeric"
-              style={styles.optionCard}
-              maxLength={1}
-            />
-            <TextInput
-              keyboardType="numeric"
-              style={styles.optionCard}
-              maxLength={1}
-            />
-            <TextInput
-              keyboardType="numeric"
-              style={styles.optionCard}
-              maxLength={1}
-            />
-            <TextInput
-              keyboardType="numeric"
-              style={styles.optionCard}
-              maxLength={1}
-            />
-            <TextInput
-              keyboardType="numeric"
-              style={styles.optionCard}
-              maxLength={1}
-            />
-            <TextInput
-              keyboardType="numeric"
-              style={styles.optionCard}
-              maxLength={1}
-            />
+            {otp.map((value, index) => (
+              <TextInput
+                key={index}
+                ref={ref => (inputsRef.current[index] = ref)}
+                keyboardType="numeric"
+                style={styles.optionCard}
+                maxLength={1}
+                value={value}
+                onChangeText={text => handleChange(text, index)}
+              />
+            ))}
           </View>
         </View>
-
+        <Text onPress={resendOTP} style={styles.resendOTP}>
+          Resend OTP
+        </Text>
         {/* Continue Button */}
         <TouchableOpacity
           style={styles.continueBtn}
-          onPress={() => navigation.navigate('DetailsScreen' as never)}
+          onPress={handleVerify}
+          disabled={loading}
         >
-          <Text style={styles.continueText}>Continue</Text>
+          {loading ? (
+            <ActivityIndicator color="#000" />
+          ) : (
+            <Text style={styles.continueText}>Continue</Text>
+          )}
         </TouchableOpacity>
 
         {/* Footer */}
@@ -167,11 +221,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 10,
     flexWrap: 'wrap',
-    marginBottom: 20,
   },
   optionsContainer: {
-    marginBottom: 30,
-    height: 100,
+    height: 80,
   },
   optionCard: {
     fontSize: 15,
@@ -184,7 +236,12 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderColor: 'grey',
   },
-
+  resendOTP: {
+    color: 'grey',
+    textDecorationLine: 'underline',
+    textAlign: 'right',
+    marginBottom: 30,
+  },
   continueBtn: {
     backgroundColor: '#FBC213',
     paddingVertical: 15,

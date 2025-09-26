@@ -1,12 +1,22 @@
-import { View, Text } from 'react-native';
+import { ScrollView, StyleSheet, Text } from 'react-native';
 import React from 'react';
 
-const HomeScreen = () => {
+export default function HomeScreen() {
   return (
-    <View>
-      <Text>HomeScreen</Text>
-    </View>
+    <ScrollView style={styles.container}>
+      <Text style={styles.text}>HomeScreen</Text>
+    </ScrollView>
   );
-};
+}
 
-export default HomeScreen;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  text: {
+    fontSize: 25,
+    letterSpacing: 1,
+  },
+});

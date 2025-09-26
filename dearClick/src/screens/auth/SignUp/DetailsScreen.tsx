@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -6,15 +6,65 @@ import {
   TouchableOpacity,
   TextInput,
   ScrollView,
+  Image,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { launchImageLibrary } from 'react-native-image-picker';
+import { RootStackParamList } from '../../../../App';
 import BackButton from '../../../assets/svgs/Auth svg/BackButton';
 import CameraLogo from '../../../assets/svgs/Auth svg/CameraLogo';
 import Profile from '../../../assets/svgs/Auth svg/Profile';
+import { completeProfile } from '../services/userAuth';
+import toast from '../../../components/utils/Toast';
+
+type DetailsScreenRouteProp = RouteProp<RootStackParamList, 'DetailsScreen'>;
 
 export default function DetailsScreen() {
   const navigation = useNavigation();
+  const route = useRoute<DetailsScreenRouteProp>();
+  const { email, phone } = route.params;
+  const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
+  const [photo, setPhoto] = useState<any>(null);
+
+  const pickImage = async () => {
+    const result = await launchImageLibrary({
+      mediaType: 'photo',
+      quality: 1,
+    });
+
+    if (result.assets && result.assets.length > 0) {
+      setPhoto(result.assets[0]);
+    }
+  };
+
+  const handleContinue = async () => {
+    if (!name || !username || !photo) {
+      Alert.alert('Error', 'All fields including photo are required!');
+      return;
+    }
+
+    try {
+      const res = await completeProfile({
+        name,
+        username,
+        email,
+        photo,
+        phone,
+      });
+
+      if (res?.success) {
+        toast.success(res.data);
+        navigation.navigate('CreatePasswordScreen', { email, phone });
+      } else {
+        toast.error(res.error.message);
+      }
+    } catch (err: any) {
+      toast.error(err.message);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -31,6 +81,7 @@ export default function DetailsScreen() {
           <View style={styles.progressDot} />
           <View style={styles.progressDot} />
         </View>
+
         {/* Back Button */}
         <TouchableOpacity
           style={styles.backBtn}
@@ -47,39 +98,53 @@ export default function DetailsScreen() {
           </Text>
         </View>
 
-        {/* Options */}
+        {/* Name */}
         <View style={styles.optionsContainer}>
           <Text style={styles.emaillabel}>Name</Text>
           <TextInput
             style={styles.optionCard}
-            placeholder="john Doe"
+            placeholder="John Doe"
             placeholderTextColor="grey"
+            value={name}
+            onChangeText={setName}
           />
         </View>
 
+        {/* Username */}
         <View style={styles.optionsContainer}>
           <Text style={styles.emaillabel}>User Name</Text>
           <TextInput
             style={styles.optionCard}
             placeholder="johndoe123"
             placeholderTextColor="grey"
+            value={username}
+            onChangeText={setUsername}
           />
         </View>
 
+        {/* Profile Photo */}
         <View style={styles.optionsContainer}>
           <Text style={styles.emaillabel}>Profile Photo</Text>
           <View style={styles.inputWrapper}>
-            <Profile />
-            <TouchableOpacity style={styles.optionCard2} />
+            {photo ? (
+              <Image
+                source={{ uri: photo.uri }}
+                style={{ width: 40, height: 40, borderRadius: 20 }}
+              />
+            ) : (
+              <Profile />
+            )}
+            <TouchableOpacity style={styles.optionCard2} onPress={pickImage}>
+              <Text style={{ color: 'grey' }}>
+                {photo ? photo.fileName : 'Choose Image'}
+              </Text>
+            </TouchableOpacity>
             <CameraLogo />
           </View>
         </View>
 
         {/* Continue Button */}
-        <TouchableOpacity
-          style={styles.continueBtn}
-          onPress={() => navigation.navigate('CreatePasswordScreen' as never)}
-        >
+        <TouchableOpacity style={styles.continueBtn} onPress={handleContinue}>
           <Text style={styles.continueText}>Continue</Text>
         </TouchableOpacity>
 
@@ -92,7 +157,6 @@ export default function DetailsScreen() {
     </SafeAreaView>
   );
 }
-
 const styles = StyleSheet.create({
   profileWrapper: {
     flexDirection: 'row',
