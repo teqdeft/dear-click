@@ -1,4 +1,10 @@
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  useColorScheme,
+} from 'react-native';
 import React from 'react';
 import Music from '../../assets/svgs/interest/Music';
 import Fashion from '../../assets/svgs/interest/Fashion';
@@ -17,6 +23,9 @@ import Sports from '../../assets/svgs/interest/Sports';
 import All from '../../assets/svgs/interest/All';
 
 export default function Interests() {
+  const scheme = useColorScheme();
+  const isDarkMode = scheme === 'dark';
+
   const interests = [
     { name: 'All', icon: <All /> },
     { name: 'Music', icon: <Music /> },
@@ -37,15 +46,31 @@ export default function Interests() {
 
   return (
     <ScrollView
-      style={styles.mainContainer}
-      horizontal={true}
-      showsHorizontalScrollIndicator={true}
+      style={[
+        styles.mainContainer,
+        { backgroundColor: isDarkMode ? '#1F1F1F' : '#FFFFFF' },
+      ]}
+      horizontal
+      showsHorizontalScrollIndicator={false}
     >
       <View style={styles.container}>
         {interests.map((interest, idx) => (
-          <View style={styles.inner} key={idx}>
+          <View
+            style={[
+              styles.inner,
+              { borderColor: isDarkMode ? '#FFFFFF1A' : '#0000001A' },
+            ]}
+            key={idx}
+          >
             {interest.icon}
-            <Text style={styles.innerText}>{interest.name}</Text>
+            <Text
+              style={[
+                styles.innerText,
+                { color: isDarkMode ? '#FFFFFF' : '#000000' },
+              ]}
+            >
+              {interest.name}
+            </Text>
           </View>
         ))}
       </View>
@@ -56,7 +81,6 @@ export default function Interests() {
 const styles = StyleSheet.create({
   mainContainer: {
     padding: 14,
-    backgroundColor: '#1F1F1F',
   },
   container: {
     flexDirection: 'row',
@@ -66,7 +90,6 @@ const styles = StyleSheet.create({
   },
   inner: {
     borderWidth: 1,
-    borderColor: '#FFFFFF1A',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
@@ -75,7 +98,6 @@ const styles = StyleSheet.create({
     paddingVertical: 7,
   },
   innerText: {
-    color: '#fff',
     fontSize: 12,
     fontFamily: 'Poppins-Regular',
   },

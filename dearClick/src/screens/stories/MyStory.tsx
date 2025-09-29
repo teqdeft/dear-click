@@ -1,8 +1,11 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View, useColorScheme } from 'react-native';
 import React from 'react';
 import PlusIcon from '../../assets/svgs/icons/PlusIcon';
 
 export default function MyStory() {
+  const scheme = useColorScheme();
+  const isDarkMode = scheme === 'dark';
+
   return (
     <View style={styles.yourStory}>
       <View style={styles.outerContainer}>
@@ -12,13 +15,26 @@ export default function MyStory() {
             source={require('../../assets/posts/profile.jpg')}
           />
         </View>
-        <View style={styles.plusIconContainer}>
+        <View
+          style={[
+            styles.plusIconContainer,
+            { backgroundColor: isDarkMode ? '#1F1F1F' : '#FFFFFF' },
+          ]}
+        >
           <TouchableOpacity style={styles.innerplusIconContainer}>
-            <PlusIcon style={styles.plusIcon} />
+            {/* Pass theme-based fill color to SVG */}
+            <PlusIcon fill={isDarkMode ? '#FFFFFF' : '#000000'} />
           </TouchableOpacity>
         </View>
       </View>
-      <Text style={styles.username}>Your Story</Text>
+      <Text
+        style={[
+          styles.username,
+          { color: isDarkMode ? '#CCCCCC' : '#555555' },
+        ]}
+      >
+        Your Story
+      </Text>
     </View>
   );
 }
@@ -42,7 +58,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
-    borderColor: '#FBC213',
+    borderColor: '#FBC213', // brand color stays fixed
   },
   image: {
     width: 78,
@@ -54,10 +70,8 @@ const styles = StyleSheet.create({
     marginTop: 5,
     fontSize: 12,
     textAlign: 'center',
-    color: 'grey',
   },
   plusIconContainer: {
-    backgroundColor: '#1F1F1F',
     padding: 5,
     width: 33,
     height: 30,
@@ -70,7 +84,7 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   innerplusIconContainer: {
-    backgroundColor: '#FBC213',
+    backgroundColor: '#FBC213', // brand yellow
     padding: 5,
     borderRadius: 20,
   },

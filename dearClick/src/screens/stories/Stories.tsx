@@ -1,8 +1,19 @@
-import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+/* eslint-disable react-native/no-inline-styles */
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  useColorScheme,
+} from 'react-native';
 import React from 'react';
 import MyStory from './MyStory';
 
 export default function Stories() {
+  const scheme = useColorScheme();
+  const isDarkMode = scheme === 'dark';
+
   const stories = [
     {
       id: 1,
@@ -43,7 +54,10 @@ export default function Stories() {
 
   return (
     <ScrollView
-      style={styles.container}
+      style={[
+        styles.container,
+        { backgroundColor: isDarkMode ? '#1F1F1F' : '#FFFFFF' },
+      ]}
       horizontal
       showsHorizontalScrollIndicator={false}
     >
@@ -54,7 +68,14 @@ export default function Stories() {
             <View style={styles.innerContainer}>
               <Image style={styles.image} source={story.image} />
             </View>
-            <Text style={styles.username}>{story.username}</Text>
+            <Text
+              style={[
+                styles.username,
+                { color: isDarkMode ? '#CCCCCC' : '#555555' },
+              ]}
+            >
+              {story.username}
+            </Text>
           </View>
         ))}
       </View>
@@ -65,15 +86,11 @@ export default function Stories() {
 const styles = StyleSheet.create({
   container: {
     padding: 14,
-    backgroundColor: '#1F1F1F',
   },
   mainContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-  },
-  yourStory: {
-    marginRight: 10,
   },
   innerContainer: {
     width: 82,
@@ -96,6 +113,5 @@ const styles = StyleSheet.create({
     marginTop: 5,
     fontSize: 12,
     textAlign: 'center',
-    color: 'grey',
   },
 });

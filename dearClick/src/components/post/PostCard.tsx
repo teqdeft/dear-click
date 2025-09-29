@@ -1,4 +1,4 @@
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { Image, StyleSheet, Text, View, useColorScheme } from 'react-native';
 import React from 'react';
 import ThreeDots from '../../assets/svgs/icons/ThreeDots';
 import Like from '../../assets/svgs/icons/Like';
@@ -7,9 +7,22 @@ import Share from '../../assets/svgs/icons/Share';
 import Save from '../../assets/svgs/icons/Save';
 
 export default function PostCard() {
+  const scheme = useColorScheme();
+  const isDark = scheme === 'dark';
+
   return (
-    <View style={styles.container}>
-      <View style={styles.innnercontainer}>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: isDark ? 'black' : '#F5F5F5' },
+      ]}
+    >
+      <View
+        style={[
+          styles.innnercontainer,
+          { backgroundColor: isDark ? '#1F1F1F' : '#FFFFFF' },
+        ]}
+      >
         {/* User Info Section */}
         <View style={styles.userinfo}>
           <View style={styles.profileDetails}>
@@ -20,8 +33,14 @@ export default function PostCard() {
               />
             </View>
             <View style={styles.textDetails}>
-              <Text style={styles.name}>John Doe</Text>
-              <Text style={styles.username}>@johndoerunner • 1 min ago</Text>
+              <Text style={[styles.name, { color: isDark ? '#fff' : '#000' }]}>
+                John Doe
+              </Text>
+              <Text
+                style={[styles.username, { color: isDark ? '#aaa' : '#555' }]}
+              >
+                @johndoerunner • 1 min ago
+              </Text>
             </View>
           </View>
           <ThreeDots />
@@ -33,29 +52,74 @@ export default function PostCard() {
             source={require('../../assets/posts/postimg.png')}
             style={styles.postMainImage}
           />
-          <Text style={styles.caption}>
+          <Text
+            style={[styles.caption, { color: isDark ? '#999999' : '#444' }]}
+          >
             😄 In 2025, fashion is all about blending sustainability with bold
             🎨 creativity.
           </Text>
         </View>
+
+        {/* Reactions */}
         <View style={styles.bottomContainer}>
           <View style={styles.reactions}>
-            <View style={styles.like}>
+            <View
+              style={[
+                styles.like,
+                { borderColor: isDark ? '#FFFFFF1A' : '#0000001A' },
+              ]}
+            >
               <Like />
-              <Text style={styles.reactionText}>385</Text>
+              <Text
+                style={[
+                  styles.reactionText,
+                  { color: isDark ? '#fff' : '#000' },
+                ]}
+              >
+                385
+              </Text>
             </View>
-            <View style={styles.like}>
+            <View
+              style={[
+                styles.like,
+                { borderColor: isDark ? '#FFFFFF1A' : '#0000001A' },
+              ]}
+            >
               <Comment />
-              <Text style={styles.reactionText}>162</Text>
+              <Text
+                style={[
+                  styles.reactionText,
+                  { color: isDark ? '#fff' : '#000' },
+                ]}
+              >
+                162
+              </Text>
             </View>
-            <View style={styles.like}>
+            <View
+              style={[
+                styles.like,
+                { borderColor: isDark ? '#FFFFFF1A' : '#0000001A' },
+              ]}
+            >
               <Share />
-              <Text style={styles.reactionText}>35</Text>
+              <Text
+                style={[
+                  styles.reactionText,
+                  { color: isDark ? '#fff' : '#000' },
+                ]}
+              >
+                35
+              </Text>
             </View>
           </View>
 
           <View>
-            <View style={styles.save}>
+            <View
+              style={[
+                styles.save,
+                { borderColor: isDark ? '#FFFFFF1A' : '#0000001A' },
+              ]}
+            >
               <Save />
             </View>
           </View>
@@ -68,11 +132,9 @@ export default function PostCard() {
 const styles = StyleSheet.create({
   container: {
     padding: 10,
-    backgroundColor: 'black',
   },
   innnercontainer: {
     padding: 10,
-    backgroundColor: '#1F1F1F',
     borderRadius: 15,
     overflow: 'hidden',
   },
@@ -102,12 +164,10 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
   name: {
-    color: '#fff',
     fontWeight: '600',
     fontSize: 14,
   },
   username: {
-    color: '#aaa',
     fontSize: 12,
   },
   postImage: {
@@ -122,7 +182,6 @@ const styles = StyleSheet.create({
   },
   caption: {
     fontFamily: 'Poppins-Regular',
-    color: '#999999',
     fontSize: 12,
     marginTop: 10,
   },
@@ -133,7 +192,6 @@ const styles = StyleSheet.create({
   },
   bottomContainer: {
     borderTopWidth: 1,
-    borderColor: '#FFFFFF1A',
     paddingTop: 15,
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -143,7 +201,6 @@ const styles = StyleSheet.create({
   },
   like: {
     borderWidth: 1,
-    borderColor: '#FFFFFF1A',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
@@ -152,13 +209,11 @@ const styles = StyleSheet.create({
     paddingVertical: 7,
   },
   reactionText: {
-    color: '#fff',
     fontSize: 12,
     fontFamily: 'Poppins-Regular',
   },
   save: {
     borderWidth: 1,
-    borderColor: '#FFFFFF1A',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
