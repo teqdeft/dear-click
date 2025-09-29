@@ -1,7 +1,14 @@
 import * as React from 'react';
 import Svg, { G, Path, Defs, ClipPath, Rect } from 'react-native-svg';
-const DearClickLogo = () => (
-  <Svg width={200} height={40} viewBox="0 0 270 40" fill="none">
+const DearClickLogo = (props: any) => (
+  <Svg
+    width={200}
+    height={40}
+    viewBox="0 0 270 40"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    {...props}
+  >
     <G clipPath="url(#clip0_127_2789)">
       <Path
         d="M9.56368 3.06384H5.86065C5.57079 3.06384 5.33582 3.29246 5.33582 3.57448V4.85108C5.33582 5.13309 5.57079 5.36172 5.86065 5.36172H9.56368C9.85354 5.36172 10.0885 5.13309 10.0885 4.85108V3.57448C10.0885 3.29246 9.85354 3.06384 9.56368 3.06384Z"

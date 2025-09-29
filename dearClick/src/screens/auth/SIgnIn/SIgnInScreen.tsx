@@ -141,7 +141,7 @@ export default function SignInScreen() {
 
       const data = await response.json();
       setLoading(false);
-
+      console.log('data', data);
       if (!response.ok) {
         return toast.error(data.error.message || 'Failed to sign in');
       }
@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginBottom: 6,
     textAlign: 'center',
-    fontFamily: 'Poppins-Medium',
+    fontFamily: 'Poppins-Regular',
   },
   subtitle: {
     fontSize: 14,
@@ -334,9 +334,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 14,
     color: 'grey',
+    fontFamily: 'Poppins-Regular',
   },
   signInText: {
     color: '#FBC213',
     fontWeight: '600',
+    fontFamily: 'Poppins-Regular',
   },
 });

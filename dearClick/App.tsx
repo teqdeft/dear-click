@@ -12,6 +12,8 @@ import HomeScreen from './src/screens/home/HomeScreen';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from './src/components/utils/ToastConfig';
 import SignInScreen from './src/screens/auth/SIgnIn/SIgnInScreen';
+import Stories from './src/screens/stories/Stories';
+import MyStory from './src/screens/stories/MyStory';
 
 export type RootStackParamList = {
   RegisterStartScreen: undefined;
@@ -24,6 +26,7 @@ export type RootStackParamList = {
   CongratsScreen: undefined;
   SignIn: undefined;
   Home: undefined;
+  Stories: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -57,6 +60,8 @@ function App() {
         />
         <Stack.Screen name="InterestScreen" component={InterestScreen} />
         <Stack.Screen name="CongratsScreen" component={CongratsScreen} />
+        <Stack.Screen name="Stories" component={Stories} />
+        <Stack.Screen name="MyStory" component={MyStory} />
       </Stack.Navigator>
       <Toast config={toastConfig} />
     </NavigationContainer>
