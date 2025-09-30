@@ -15,6 +15,7 @@ import DearClickLogo from '../../../assets/svgs/DearClick logo/DearClickLogo';
 import UnHideEyes from '../../../assets/svgs/Auth svg/UnHideEyes';
 import HideEyes from '../../../assets/svgs/Auth svg/HideEyes';
 import toast from '../../../components/utils/Toast'; // if you have a toast component
+import { SignIn } from '../services/userAuth';
 
 export default function SignInScreen() {
   const navigation = useNavigation();
@@ -133,16 +134,10 @@ export default function SignInScreen() {
 
     try {
       setLoading(true);
-      const response = await fetch('http://192.168.1.19:5050/api/auth/signin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ input, password }),
-      });
-
-      const data = await response.json();
+      const data = await SignIn({ input, password });
       setLoading(false);
-      console.log('data', data);
-      if (!response.ok) {
+
+      if (!data.success) {
         return toast.error(data.error.message || 'Failed to sign in');
       }
 

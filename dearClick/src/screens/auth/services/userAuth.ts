@@ -9,6 +9,7 @@ interface paramsType {
   username?: string;
   profilePic?: any;
   password?: string;
+  input?: string;
 }
 
 // enter email for verify
@@ -81,6 +82,19 @@ export const createPassword = async ({
     const { data } = await axios.post(`${API_URL}/auth/set-password`, {
       email,
       phone,
+      password,
+    });
+    return data;
+  } catch (error: any) {
+    return error?.response?.data;
+  }
+};
+
+// sign in
+export const SignIn = async ({ input, password }: paramsType) => {
+  try {
+    const { data } = await axios.post(`${API_URL}/auth/signin`, {
+      input,
       password,
     });
     return data;
