@@ -143,7 +143,7 @@ export default function SignInScreen() {
 
       toast.success(data.message || 'Signed in successfully');
       // Navigate to home screen
-      navigation.navigate('Home' as never);
+      navigation.replace('AppTabs');
     } catch (err) {
       setLoading(false);
       console.log(err);

@@ -27,6 +27,13 @@ export default function RegisterEmailScreen({ navigation }: Props) {
       return;
     }
 
+    // Simple email regex validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast.error('Please enter a valid email address');
+      return;
+    }
+
     setLoading(true);
     try {
       const data = await sendOtp({ email }); // call API function

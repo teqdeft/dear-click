@@ -25,6 +25,13 @@ export default function RegisterPhoneScreen() {
       return;
     }
 
+    // Simple phone number regex (10 digits)
+    const phoneRegex = /^\d{10}$/;
+    if (!phoneRegex.test(phone)) {
+      toast.error('PhoneNo must be 10 digits');
+      return;
+    }
+
     setLoading(true);
     try {
       const data = await sendOtp({ phone }); // call API with phone

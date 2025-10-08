@@ -1,4 +1,11 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View, useColorScheme } from 'react-native';
+import {
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  useColorScheme,
+} from 'react-native';
 import React from 'react';
 import PlusIcon from '../../assets/svgs/icons/PlusIcon';
 
@@ -28,10 +35,7 @@ export default function MyStory() {
         </View>
       </View>
       <Text
-        style={[
-          styles.username,
-          { color: isDarkMode ? '#CCCCCC' : '#555555' },
-        ]}
+        style={[styles.username, { color: isDarkMode ? '#CCCCCC' : '#555555' }]}
       >
         Your Story
       </Text>
@@ -61,8 +65,8 @@ const styles = StyleSheet.create({
     borderColor: '#FBC213', // brand color stays fixed
   },
   image: {
-    width: 78,
-    height: 78,
+    width: 70,
+    height: 70,
     borderRadius: 39,
     resizeMode: 'cover',
   },

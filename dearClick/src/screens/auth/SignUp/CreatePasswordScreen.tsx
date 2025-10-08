@@ -128,10 +128,10 @@ export default function CreatePasswordScreen() {
         </TouchableOpacity>
 
         {/* Footer */}
-        <Text style={styles.footer}>
+        {/* <Text style={styles.footer}>
           Already have an account?{' '}
           <Text style={styles.signInText}>Sign In</Text>
-        </Text>
+        </Text> */}
       </ScrollView>
     </SafeAreaView>
   );

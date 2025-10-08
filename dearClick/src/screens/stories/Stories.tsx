@@ -104,8 +104,8 @@ const styles = StyleSheet.create({
     borderColor: '#FBC213',
   },
   image: {
-    width: 78,
-    height: 78,
+    width: 70,
+    height: 70,
     borderRadius: 39,
     resizeMode: 'cover',
   },
