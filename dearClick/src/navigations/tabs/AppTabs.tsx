@@ -74,7 +74,7 @@ export default function AppTabs() {
 
 const styles = StyleSheet.create({
   tabBar: {
-    height: 6TT0,
+    height: 60,
     justifyContent: 'center',
     borderWidth: 0,
     borderTopColor: '#1F1F1F',
