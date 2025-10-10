@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -16,9 +16,11 @@ import UnHideEyes from '../../../assets/svgs/Auth svg/UnHideEyes';
 import HideEyes from '../../../assets/svgs/Auth svg/HideEyes';
 import toast from '../../../components/utils/Toast'; // if you have a toast component
 import { SignIn } from '../services/userAuth';
+import { AuthContext } from '../../../context/AuthContext';
 
 export default function SignInScreen() {
   const navigation = useNavigation();
+  const { login } = useContext(AuthContext);
   const [showPassword, setShowPassword] = useState(false);
   const [input, setInput] = useState('');
   const [password, setPassword] = useState('');
@@ -140,10 +142,8 @@ export default function SignInScreen() {
       if (!data.success) {
         return toast.error(data.error.message || 'Failed to sign in');
       }
-
+      await login(data.data.token);
       toast.success(data.message || 'Signed in successfully');
-      // Navigate to home screen
-      navigation.replace('AppTabs');
     } catch (err) {
       setLoading(false);
       console.log(err);

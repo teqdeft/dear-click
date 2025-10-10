@@ -11,15 +11,16 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import BackButton from '../../../assets/svgs/Auth svg/BackButton';
 import toast from '../../../components/utils/Toast';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../../../../App';
+
 import { sendOtp } from '../services/userAuth';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'SignIn'>;
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-export default function RegisterEmailScreen({ navigation }: Props) {
+export default function RegisterEmailScreen() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
+  const navigation = useNavigation<NativeStackNavigationProp<any>>();
 
   const handleSubmit = async () => {
     if (!email) {

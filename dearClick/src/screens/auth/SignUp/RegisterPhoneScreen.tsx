@@ -10,15 +10,16 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
 import BackButton from '../../../assets/svgs/Auth svg/BackButton';
 import toast from '../../../components/utils/Toast';
 import { sendOtp } from '../services/userAuth';
 
 export default function RegisterPhoneScreen() {
-  const navigation = useNavigation();
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
-
+  const navigation = useNavigation<NativeStackNavigationProp<any>>();
   const handleSubmit = async () => {
     if (!phone) {
       toast.error('Please enter your phone number');

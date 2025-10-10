@@ -3,19 +3,19 @@ import { StyleSheet, useColorScheme } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 // Screens
-import HomeScreen from '../../screens/home/HomeScreen';
-import SearchScreen from '../../screens/search/SearchScreen';
-import ProfileScreen from '../../screens/profile/ProfileScreen';
-import NotificationScreen from '../../screens/notifications/NotificationScreen';
-import CreatePost from '../../screens/post/CreatePost';
-import ReelsScreen from '../../screens/reels/ReelsScreen';
+import HomeScreen from '../screens/home/HomeScreen';
+import SearchScreen from '../screens/search/SearchScreen';
+import ProfileScreen from '../screens/profile/ProfileScreen';
+import NotificationScreen from '../screens/notifications/NotificationScreen';
+import CreatePost from '../screens/post/CreatePost';
+import ReelsScreen from '../screens/reels/ReelsScreen';
 
 // Custom SVG Icons
-import Homeicon from '../../assets/svgs/home/Homeicon';
-import Searchicon from '../../assets/svgs/home/Searchicon';
-import Profileicon from '../../assets/svgs/home/Profileicon';
-import Reelsicon from '../../assets/svgs/home/Reelsicon';
-import PlusIcon from '../../assets/svgs/home/Plusicon';
+import Homeicon from '../assets/svgs/home/Homeicon';
+import Searchicon from '../assets/svgs/home/Searchicon';
+import Profileicon from '../assets/svgs/home/Profileicon';
+import Reelsicon from '../assets/svgs/home/Reelsicon';
+import PlusIcon from '../assets/svgs/home/Plusicon';
 
 const Tab = createBottomTabNavigator();
 

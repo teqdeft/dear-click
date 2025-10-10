@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -14,7 +14,8 @@ import HideEyes from '../../../assets/svgs/Auth svg/HideEyes';
 import UnHideEyes from '../../../assets/svgs/Auth svg/UnHideEyes';
 import { createPassword } from '../services/userAuth';
 import toast from '../../../components/utils/Toast';
-
+import { AuthContext } from '../../../context/AuthContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function CreatePasswordScreen() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -22,9 +23,12 @@ export default function CreatePasswordScreen() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const navigation = useNavigation();
-  const route = useRoute<RouteProp<{ params: { email: string } }, 'params'>>();
-  const { email, phone } = route.params; // email comes from previous screen
 
+  const route =
+    useRoute<
+      RouteProp<{ params: { email: string; phone: string } }, 'params'>
+    >();
+  const { email, phone } = route.params;
   const handleContinue = async () => {
     if (!password || !confirmPassword) {
       toast.error('Please enter both password fields');
@@ -39,6 +43,7 @@ export default function CreatePasswordScreen() {
       const res = await createPassword({ phone, email, password });
       if (res?.success) {
         toast.success(res?.message);
+        await AsyncStorage.setItem('userToken', res?.data?.token);
         navigation.navigate('InterestScreen' as never);
       } else {
         toast.error(res?.error?.message || 'Something went wrong');
