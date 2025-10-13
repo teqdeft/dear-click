@@ -498,7 +498,7 @@ const getUserDetails = async (req, res) => {
         "user_account_settings.userId",
         "users.id"
       )
-      .select(  
+      .select(
         "users.name",
         "users.email",
         "users.phone",

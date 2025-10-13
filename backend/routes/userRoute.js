@@ -31,4 +31,33 @@ router.post(
   authMiddleware,
   storyController.uploadStory
 );
+
+// user hide for stories
+router.post(
+  "/hide-story/:storyId",
+  authMiddleware,
+  storyController.storyHide
+);
+
+// user close friend list for stories
+router.post(
+  "/close-friend-story/:storyId",
+  authMiddleware,
+  storyController.closeFriendStory
+);
+
+// story delete
+router.post(
+  "/story-delete/:storyId",
+  authMiddleware,
+  storyController.deleteStory
+);
+
+// share delete
+router.post(
+  "/story-share",
+  authMiddleware,
+  storyController.shareStory
+);
+
 module.exports = router;

@@ -14,6 +14,7 @@ exports.up = function (knex) {
     table.enu("type", ["image", "video", "other"]).nullable();
     table.text("caption").nullable();
     table.timestamp("expiry_at").notNullable(); // auto expire in 24 hrs
+    table.boolean("status").defaultTo(false);
     table.timestamp("created_at").defaultTo(knex.fn.now());
   });
 };
