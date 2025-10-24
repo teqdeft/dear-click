@@ -1,11 +1,35 @@
-import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import React, { useContext } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { AuthContext } from '../../../context/AuthContext';
+
 
 export default function CongratsScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
+  const { login } = useContext(AuthContext);
+
+  const handleDone = async () => {
+    try {
+      // Replace with your actual token (e.g., from API response or passed as prop/state)
+      const token = 'your-jwt-token-here'; // TODO: Get this from signup API flow
+
+      if (!token) {
+        Alert.alert(
+          'Error',
+          'No auth token available. Please check signup flow.',
+        );
+        return;
+      }
+
+      await login(token);
+      // No need for navigation.navigate here—the context will switch to AppStack automatically
+    } catch (error) {
+      console.error('Login failed:', error);
+      Alert.alert('Error', 'Failed to complete signup. Please try again.');
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -16,17 +40,12 @@ export default function CongratsScreen() {
           Welcome to Dear Click — start exploring and connect with the world
           around you
         </Text>
-        <TouchableOpacity
-          style={styles.continueBtn}
-          onPress={() => navigation.navigate('Stories')}
-        >
+        <TouchableOpacity style={styles.continueBtn} onPress={handleDone}>
           <Text style={styles.continueText}>Done</Text>
         </TouchableOpacity>
       </View>
 
       {/* Options */}
-
-      {/* Continue Button */}
     </SafeAreaView>
   );
 }

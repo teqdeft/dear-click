@@ -6,7 +6,6 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomeScreen from '../screens/home/HomeScreen';
 import SearchScreen from '../screens/search/SearchScreen';
 import ProfileScreen from '../screens/profile/ProfileScreen';
-import NotificationScreen from '../screens/notifications/NotificationScreen';
 import CreatePost from '../screens/post/CreatePost';
 import ReelsScreen from '../screens/reels/ReelsScreen';
 
@@ -74,7 +73,7 @@ export default function AppTabs() {
 
 const styles = StyleSheet.create({
   tabBar: {
-    height: 60,
+    height: 70,
     justifyContent: 'center',
     borderWidth: 0,
     borderTopColor: '#1F1F1F',

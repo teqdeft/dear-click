@@ -41,12 +41,18 @@ export default function VerifyOtpScreen() {
   };
   const resendOTP = async () => {
     setOtp(['', '', '', '', '', '']); // clear inputs
-    setLoading(true); // optional, if you want a spinner
+    setLoading(true); 
 
     try {
       const data = await sendOtp({ email, phone });
       if (data?.success) {
-        toast.success(data.message || 'OTP resent successfully!');
+        const message = phone
+          ? `${data.message || 'OTP resent successfully!'} , ${
+              data.data?.otp
+            }`
+          : data.message || 'OTP resent successfully!';
+
+        toast.success(message);
       } else {
         toast.error(data?.error?.message || 'Failed to resend OTP');
       }
@@ -69,7 +75,7 @@ export default function VerifyOtpScreen() {
       const data = await verifyEmail({ phone, email, otp: otpCode });
       if (data?.success) {
         toast.success(data.message || 'Email verified successfully!');
-        navigation.navigate('DetailsScreen', { email, phone }); // next screen
+        navigation.navigate('DetailsScreen', { email, phone });     
       } else {
         toast.error(data?.error?.message || 'Invalid OTP');
       }

@@ -1,4 +1,11 @@
-import { Image, StyleSheet, Text, View, useColorScheme } from 'react-native';
+import {
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  useColorScheme,
+} from 'react-native';
 import React from 'react';
 import ThreeDots from '../../assets/svgs/icons/ThreeDots';
 import Like from '../../assets/svgs/icons/Like';
@@ -63,7 +70,7 @@ export default function PostCard() {
         {/* Reactions */}
         <View style={styles.bottomContainer}>
           <View style={styles.reactions}>
-            <View
+            <TouchableOpacity
               style={[
                 styles.like,
                 { borderColor: isDark ? '#FFFFFF1A' : '#0000001A' },
@@ -78,8 +85,8 @@ export default function PostCard() {
               >
                 385
               </Text>
-            </View>
-            <View
+            </TouchableOpacity>
+            <TouchableOpacity
               style={[
                 styles.like,
                 { borderColor: isDark ? '#FFFFFF1A' : '#0000001A' },
@@ -94,8 +101,8 @@ export default function PostCard() {
               >
                 162
               </Text>
-            </View>
-            <View
+            </TouchableOpacity>
+            <TouchableOpacity
               style={[
                 styles.like,
                 { borderColor: isDark ? '#FFFFFF1A' : '#0000001A' },
@@ -110,18 +117,18 @@ export default function PostCard() {
               >
                 35
               </Text>
-            </View>
+            </TouchableOpacity>
           </View>
 
           <View>
-            <View
+            <TouchableOpacity
               style={[
                 styles.save,
                 { borderColor: isDark ? '#FFFFFF1A' : '#0000001A' },
               ]}
             >
               <Save />
-            </View>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
