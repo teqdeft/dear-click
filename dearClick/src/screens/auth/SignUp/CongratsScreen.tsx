@@ -18,7 +18,7 @@ export default function CongratsScreen() {
         </Text>
         <TouchableOpacity
           style={styles.continueBtn}
-          onPress={() => navigation.navigate('Stories')}
+          onPress={() => navigation.navigate('AppStack', { screen: 'Stories'})}
         >
           <Text style={styles.continueText}>Done</Text>
         </TouchableOpacity>

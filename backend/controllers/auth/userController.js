@@ -436,11 +436,31 @@ const signIn = async (req, res) => {
 // update user details
 const addUserDetails = async (req, res) => {
   try {
-    const { bio, website, gender, dob, phone, email } = req.body;
+    const { bio, website, gender, date_of_birth, phone, email, name, action } = req.body;
+    console.log("req.bodyreq.bodyreq.bodyreq.body", req.body)
+
     // validation
-    if (!bio && !website && !gender && !dob && !phone && !email) {
-      return error(res, "Please provide at least one field!", null, 403);
+    if (action === "Profile-info") {
+      if (!name) {
+        return error(res, "Name is required!", null, 403);
+      }
     }
+
+    if (action === "Contact-info") {
+      if (!gender) {
+        return error(res, "Gender is required!", null, 403);
+      }
+      if (!date_of_birth) {
+        return error(res, "Birthday is required!", null, 403);
+      }
+      if (!phone && !email) {
+        return error(res, "Please Provide one from phone or email!", null, 403);
+      }
+      if (phone && phone.length < 10) {
+        return error(res, "Please enter a valid Contact!", null, 403);
+      }
+    }
+
     // get the user from middleware
     const userId = req.user.id;
     const user = await db("users").where({ id: userId }).first();
@@ -457,18 +477,27 @@ const addUserDetails = async (req, res) => {
         bio,
         website,
         gender,
-        date_of_birth: dob,
+        date_of_birth
       });
+      if (name) {
+        await db('users').where({ id: userId }).update({
+          name
+        })
+      }
     } else {
       await db("user_details").where({ userId }).update({
         userId,
         bio,
         website,
         gender,
-        date_of_birth: dob,
+        date_of_birth
       });
+      if (name) {
+        await db('users').where({ id: userId }).update({
+          name
+        })
+      }
     }
-
     // update email or phone  only if data not entered before
     if (user.phone == null && phone) {
       await db("users").where({ id: userId }).update({
@@ -484,6 +513,7 @@ const addUserDetails = async (req, res) => {
 
     return success(res, " ", 200, "Details Updated!");
   } catch (err) {
+    console.log((err))
     return error(res, "Something went wrong", err.message, 500);
   }
 };
@@ -492,6 +522,14 @@ const addUserDetails = async (req, res) => {
 const UserAccountSetting = async (req, res) => {
   try {
     const { account_type, account_privacy, language } = req.body;
+
+    if (!account_type) {
+      return error(res, "Account Type is required!", null, 403);
+    }
+
+    if (!account_privacy) {
+      return error(res, "Account Privacy is required!", null, 403);
+    }
 
     // get the user from middleware
     const userId = req.user.id;
@@ -539,7 +577,7 @@ const UserAccountSetting = async (req, res) => {
 const getUserDetails = async (req, res) => {
   try {
     const userId = req.user.id;
-
+    console.log("userId", userId)
     if (!userId) {
       return error(res, "Id is required!", null, 403);
     }
@@ -561,6 +599,7 @@ const getUserDetails = async (req, res) => {
         "users.name",
         "users.email",
         "users.phone",
+        "users.profile_pic",
         "users.userName",
         "user_details.bio",
         "user_details.website",

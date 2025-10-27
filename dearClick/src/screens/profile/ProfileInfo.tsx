@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -7,11 +7,73 @@ import {
   StyleSheet,
   ScrollView,
   TextInput,
+  ActivityIndicator,
 } from 'react-native';
 import BackButton from '../../assets/svgs/Auth svg/BackButton';
 import { useNavigation } from '@react-navigation/core';
+import { AuthContext } from '../../context/AuthContext';
+import toast from '../../components/utils/Toast';
+import { updateProfile } from './services';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
 export default function ProfileInfo() {
-  const navigation = useNavigation();
+  const { apiData, apiLoading, apiError, fetchApiData } =
+    useContext(AuthContext);
+  const [loading, setLoading] = useState(false);
+  const navigation = useNavigation<NativeStackNavigationProp<any>>();
+  const [formData, setFormData] = useState({
+    name: '',
+    userName: '',
+    bio: '',
+    website: '',
+  });
+
+  useEffect(() => {
+    if (apiData) {
+      setFormData({
+        name: apiData?.name || '',
+        userName: apiData?.userName || '',
+        bio: apiData?.bio || '',
+        website: apiData?.website || '',
+      });
+    }
+  }, [apiData]);
+
+  useEffect(() => {
+    if (!apiData) {
+      fetchApiData();
+    }
+  }, []);
+
+  const handleUpdateProfile = async () => {
+    if (!formData.name) {
+      return toast.error('Name is required!');
+    }
+    if (!formData.userName) {
+      return toast.error('Username is required!');
+    }
+
+    try {
+      setLoading(true);
+      let action = 'Profile-info';
+      const data = await updateProfile(formData, action);
+      setLoading(false);
+
+      if (!data.success) {
+        return toast.error(data.error.message);
+      }
+      toast.success(data.message);
+      navigation.navigate('AppTabs', { screen: 'Profile' });
+    } catch (err) {
+      setLoading(false);
+      toast.error('Something went wrong');
+    }
+  };
+
+  if (apiLoading) return <ActivityIndicator size="large" color="#000" />;
+
+  if (apiError) return <Text>Error: {apiError}</Text>;
+
   return (
     <ScrollView style={styles.container}>
       {/* Header */}
@@ -31,8 +93,10 @@ export default function ProfileInfo() {
           <Text style={styles.emaillabel}>Full Name</Text>
           <TextInput
             style={styles.optionCard}
-            placeholder="John Doe"
+            placeholder="Enter Your Full Name"
             placeholderTextColor="#AFAFAF"
+            value={formData.name}
+            onChangeText={text => setFormData({ ...formData, name: text })}
           />
         </View>
         {/* Username */}
@@ -40,8 +104,11 @@ export default function ProfileInfo() {
           <Text style={styles.emaillabel}>User Name</Text>
           <TextInput
             style={styles.optionCard}
-            placeholder="johndoerunner"
+            placeholder="Enter Your User Name"
             placeholderTextColor="#AFAFAF"
+            value={formData.userName}
+            editable={false}
+            onChangeText={text => setFormData({ ...formData, userName: text })}
           />
         </View>
         {/* Bio */}
@@ -49,22 +116,35 @@ export default function ProfileInfo() {
           <Text style={styles.emaillabel}>Bio</Text>
           <TextInput
             style={styles.optionCard2}
-            placeholder="Artist | Art Instructor Based in Ireland"
+            placeholder="Enter Your Bio"
             placeholderTextColor="#AFAFAF"
+            value={formData.bio}
+            onChangeText={text => setFormData({ ...formData, bio: text })}
           />
         </View>
         {/* Website */}
         <View style={styles.optionsContainer}>
           <Text style={styles.emaillabel}>Website</Text>
           <TextInput
-            style={styles.optionCard}
-            placeholder="- - - - -"
+            style={styles.optionCard2}
+            placeholder="Enter Your Website"
             placeholderTextColor="#AFAFAF"
+            value={formData.website}
+            onChangeText={text => setFormData({ ...formData, website: text })}
           />
         </View>
         {/* Continue Button */}
-        <TouchableOpacity style={styles.continueBtn}>
-          <Text style={styles.continueText}>Save</Text>
+
+        <TouchableOpacity
+          style={styles.continueBtn}
+          onPress={handleUpdateProfile}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="#000" />
+          ) : (
+            <Text style={styles.continueText}>Save</Text>
+          )}
         </TouchableOpacity>
       </View>
     </ScrollView>

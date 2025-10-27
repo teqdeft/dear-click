@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -7,11 +7,82 @@ import {
   StyleSheet,
   ScrollView,
   TextInput,
+  ActivityIndicator,
 } from 'react-native';
 import BackButton from '../../assets/svgs/Auth svg/BackButton';
 import { useNavigation } from '@react-navigation/core';
+import toast from '../../components/utils/Toast';
+import { updateProfile } from './services';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { AuthContext } from '../../context/AuthContext';
+import { Picker } from '@react-native-picker/picker';
 export default function ContactDetail() {
-  const navigation = useNavigation();
+  const { apiData, apiLoading, apiError, fetchApiData } =
+    useContext(AuthContext);
+  const [loading, setLoading] = useState(false);
+  const navigation = useNavigation<NativeStackNavigationProp<any>>();
+  const [formData, setFormData] = useState({
+    email: '',
+    phone: '',
+    gender: '',
+    date_of_birth: '',
+  });
+
+  useEffect(() => {
+    if (apiData) {
+      setFormData({
+        email: apiData?.email || '',
+        phone: apiData?.phone || '',
+        gender: apiData?.gender || '',
+        date_of_birth: apiData?.date_of_birth || '',
+      });
+    }
+  }, [apiData]);
+
+  useEffect(() => {
+    if (!apiData) {
+      fetchApiData();
+    }
+  }, []);
+
+  const handleUpdateProfile = async () => {
+    if (!formData.email && !formData.phone) {
+      toast.error('Please provide atleast one from email or phone!');
+      return;
+    }
+
+    // Simple email regex validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (formData.email && !emailRegex.test(formData.email)) {
+      toast.error('Please enter a valid email address');
+      return;
+    }
+
+    if (formData.phone.length && formData.phone.length !== 10) {
+      toast.error('Please enter a valid Contact');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      let action="Contact-info"
+      const data = await updateProfile(formData,action);
+      setLoading(false);
+      if (!data.success) {
+        return toast.error(data.error.message);
+      }
+      toast.success(data.message);
+      navigation.navigate('AppTabs', { screen: 'Profile' });
+    } catch (err) {
+      setLoading(false);
+      console.log(err);
+      toast.error('Something went wrong');
+    }
+  };
+
+  if (apiLoading) return <ActivityIndicator size="large" color="#000" />;
+
+  if (apiError) return <Text>Error: {apiError}</Text>;
   return (
     <ScrollView style={styles.container}>
       {/* Header */}
@@ -31,8 +102,11 @@ export default function ContactDetail() {
           <Text style={styles.emaillabel}>Email</Text>
           <TextInput
             style={styles.optionCard}
-            placeholder="John@example.com"
+            placeholder="Enter Your Email"
             placeholderTextColor="#AFAFAF"
+            value={formData.email}
+            editable={apiData?.email ? false : true}
+            onChangeText={text => setFormData({ ...formData, email: text })}
           />
         </View>
         {/* Username */}
@@ -42,15 +116,26 @@ export default function ContactDetail() {
             style={styles.optionCard}
             placeholder="81658-48566"
             placeholderTextColor="#AFAFAF"
+            editable={apiData?.phone  ? false : true}
+            value={formData.phone}
+            onChangeText={text => setFormData({ ...formData, phone: text })}
           />
         </View>
         <View style={styles.optionsContainer}>
           <Text style={styles.emaillabel}>Gender</Text>
-          <TextInput
-            style={styles.optionCard}
-            placeholder="Male"
-            placeholderTextColor="#AFAFAF"
-          />
+
+          <View style={styles.pickerWrapper}>
+            <Picker
+              selectedValue={formData.gender}
+              style={styles.optionCardV2}
+              onValueChange={(itemValue, itemIndex) =>
+                setFormData({ ...formData, gender: itemValue })
+              }
+            >
+              <Picker.Item label="Male" value="Male" />
+              <Picker.Item label="Female" value="Female" />
+            </Picker>
+          </View>
         </View>
         {/* Bio */}
         <View style={styles.optionsContainer}>
@@ -59,12 +144,25 @@ export default function ContactDetail() {
             style={styles.optionCard2}
             placeholder="26 Oct 2001"
             placeholderTextColor="#AFAFAF"
+            value={formData.date_of_birth}
+            onChangeText={text =>
+              setFormData({ ...formData, date_of_birth: text })
+            }
           />
         </View>
 
+
         {/* Continue Button */}
-        <TouchableOpacity style={styles.continueBtn}>
-          <Text style={styles.continueText}>Save</Text>
+        <TouchableOpacity
+          style={styles.continueBtn}
+          onPress={handleUpdateProfile}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="#000" />
+          ) : (
+            <Text style={styles.continueText}>Save</Text>
+          )}
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -165,5 +263,16 @@ const styles = StyleSheet.create({
   signInText: {
     color: '#FBC213',
     fontWeight: '600',
+  },
+  pickerWrapper: {
+    height: 56,
+    borderWidth: 0.5,
+    borderColor: 'grey',
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  optionCardV2: {
+    height: 50,
+    width: '100%',
   },
 });

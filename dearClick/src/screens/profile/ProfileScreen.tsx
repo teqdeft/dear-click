@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useCallback } from 'react';
 import {
   View,
   Text,
@@ -6,16 +6,46 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import BackButton from '../../assets/svgs/Auth svg/BackButton';
 import EditIcon from '../../assets/svgs/icons/EditIcon';
 import { AuthContext } from '../../context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { IMAGE_BASE_URL } from '@env';
+import { formatDate } from '../../helpers/dateFormatter';
 
 export default function ProfileScreen() {
   const { logout } = useContext(AuthContext);
+  const { apiData, apiLoading, apiError, fetchApiData } =
+    useContext(AuthContext);
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchApiData();
+    }, []),
+  );
+
+  if (apiLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#000" />
+      </View>
+    );
+  }
+
+  if (apiError) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text>Error: {apiError}</Text>
+      </View>
+    );
+  }
+
 
   return (
     <ScrollView style={styles.container}>
@@ -28,7 +58,7 @@ export default function ProfileScreen() {
         >
           <BackButton />
         </TouchableOpacity>
-        <Text style={styles.notificationTitle}>Setting</Text>
+        <Text style={styles.notificationTitle}>Settings</Text>
       </View>
 
       {/* Profile Main */}
@@ -37,7 +67,11 @@ export default function ProfileScreen() {
           <View style={styles.proifleImage}>
             <View style={styles.usrImage}>
               <Image
-                source={require('../../assets/posts/profile.jpg')}
+                source={
+                  apiData?.profile_pic
+                    ? { uri:`${IMAGE_BASE_URL}/1760529042753-1000015336.jpg`} // 🔹 Load from API dynamically
+                    : require('../../assets/posts/profile.jpg') // 🔹 Fallback local image
+                }
                 style={styles.uploadUserImage}
               />
             </View>
@@ -46,8 +80,8 @@ export default function ProfileScreen() {
             </TouchableOpacity>
           </View>
           <View>
-            <Text style={styles.userName}>John Doe</Text>
-            <Text style={styles.userPhone}>+91 123 456 789</Text>
+            <Text style={styles.userName}>{apiData.name || '--'}</Text>
+            <Text style={styles.userPhone}>{apiData.phone || '--'}</Text>
           </View>
         </View>
         <TouchableOpacity style={styles.signOutButton} onPress={logout}>
@@ -72,18 +106,27 @@ export default function ProfileScreen() {
         >
           <EditIcon />
         </TouchableOpacity>
+
         <View style={styles.information}>
-          {[
-            ['Full name', 'John Doe'],
-            ['Username', 'johndoerunner'],
-            ['Bio', 'Artist | Art Instructor Based in Ireland'],
-            ['Website', '--'],
-          ].map(([name, value], index) => (
-            <View key={index} style={styles.infoGroup}>
-              <Text style={styles.infoName}>{name}</Text>
-              <Text style={styles.infoValue}>{value}</Text>
-            </View>
-          ))}
+          <View style={styles.infoGroup}>
+            <Text style={styles.infoName}>Full Name</Text>
+            <Text style={styles.infoValue}>{apiData.name || '--'}</Text>
+          </View>
+
+          <View style={styles.infoGroup}>
+            <Text style={styles.infoName}>Username</Text>
+            <Text style={styles.infoValue}>{apiData.userName || '--'}</Text>
+          </View>
+
+          <View style={styles.infoGroup}>
+            <Text style={styles.infoName}>Bio</Text>
+            <Text style={styles.infoValue}>{apiData.bio || '--'}</Text>
+          </View>
+
+          <View style={styles.infoGroup}>
+            <Text style={styles.infoName}>Website</Text>
+            <Text style={styles.infoValue}>{apiData.website || '--'}</Text>
+          </View>
         </View>
       </View>
 
@@ -96,18 +139,27 @@ export default function ProfileScreen() {
         >
           <EditIcon />
         </TouchableOpacity>
+
         <View style={styles.information}>
-          {[
-            ['Email', 'johndoe@gmail.com'],
-            ['Phone Number', '+91 123456789'],
-            ['Gender', 'Male'],
-            ['Birthday', '24 April 2025'],
-          ].map(([name, value], index) => (
-            <View key={index} style={styles.infoGroup}>
-              <Text style={styles.infoName}>{name}</Text>
-              <Text style={styles.infoValue}>{value}</Text>
-            </View>
-          ))}
+          <View style={styles.infoGroup}>
+            <Text style={styles.infoName}>Email</Text>
+            <Text style={styles.infoValue}>{apiData.email || '--'}</Text>
+          </View>
+
+          <View style={styles.infoGroup}>
+            <Text style={styles.infoName}>Phone Number</Text>
+            <Text style={styles.infoValue}>{apiData.phone || '--'}</Text>
+          </View>
+
+          <View style={styles.infoGroup}>
+            <Text style={styles.infoName}>Gender</Text>
+            <Text style={styles.infoValue}>{apiData.gender || '--'}</Text>
+          </View>
+
+          <View style={styles.infoGroup}>
+            <Text style={styles.infoName}>Birthday</Text>
+            <Text style={styles.infoValue}>{apiData?.date_of_birth || '--'}</Text>
+          </View>
         </View>
       </View>
 
@@ -120,17 +172,24 @@ export default function ProfileScreen() {
         >
           <EditIcon />
         </TouchableOpacity>
+
         <View style={styles.information}>
-          {[
-            ['Account Type', 'Personal'],
-            ['Account Status', 'Public'],
-            ['Language', 'English'],
-          ].map(([name, value], index) => (
-            <View key={index} style={styles.infoGroup}>
-              <Text style={styles.infoName}>{name}</Text>
-              <Text style={styles.infoValue}>{value}</Text>
-            </View>
-          ))}
+          <View style={styles.infoGroup}>
+            <Text style={styles.infoName}>Account Type</Text>
+            <Text style={styles.infoValue}>{apiData.account_type == "1" ? "Personal":apiData.account_type =="2" ? "Business":apiData.account_type =="3" ? "Creator": '--'}</Text>
+          </View>
+
+          <View style={styles.infoGroup}>
+            <Text style={styles.infoName}>Account Status</Text>
+            <Text style={styles.infoValue}>
+              {apiData.account_privacy || '--'}
+            </Text>
+          </View>
+
+          <View style={styles.infoGroup}>
+            <Text style={styles.infoName}>Language</Text>
+            <Text style={styles.infoValue}>{apiData.language || '--'}</Text>
+          </View>
         </View>
       </View>
     </ScrollView>

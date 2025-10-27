@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -7,11 +7,72 @@ import {
   StyleSheet,
   ScrollView,
   TextInput,
+  ActivityIndicator,
 } from 'react-native';
 import BackButton from '../../assets/svgs/Auth svg/BackButton';
-import { useNavigation } from '@react-navigation/core';
+import { useFocusEffect, useNavigation } from '@react-navigation/core';
+import { AuthContext } from '../../context/AuthContext';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import toast from '../../components/utils/Toast';
+import { updateProfile, updateSettings } from './services';
+import { Picker } from '@react-native-picker/picker';
 export default function AccountSetings() {
-  const navigation = useNavigation();
+  const [selectedValue, setSelectedValue] = useState('travels');
+  const { apiData, apiLoading, apiError, fetchApiData } =
+    useContext(AuthContext);
+  const [loading, setLoading] = useState(false);
+  const navigation = useNavigation<NativeStackNavigationProp<any>>();
+  const [formData, setFormData] = useState({
+    account_type: '',
+    account_privacy: '',
+    language: '',
+  });
+
+  useEffect(() => {
+    if (apiData) {
+      setFormData({
+        account_type: apiData?.account_type || '',
+        account_privacy: apiData?.account_privacy || '',
+        language: apiData?.language || '',
+      });
+    }
+  }, [apiData]);
+
+  useEffect(() => {
+    if (!apiData) {
+      fetchApiData();
+    }
+  }, []);
+
+  const handleUpdateSettings = async () => {
+    if (!formData.account_type) {
+      return toast.error('account_type is required!');
+    }
+    if (!formData.account_privacy) {
+      return toast.error('account_privacy is required!');
+    }
+
+    try {
+      setLoading(true);
+      const data = await updateSettings(formData);
+      setLoading(false);
+
+      if (!data.success) {
+        return toast.error(data.error.message);
+      }
+      toast.success(data.message);
+      navigation.navigate('AppTabs', { screen: 'Profile' });
+    } catch (err) {
+      setLoading(false);
+      console.log(err);
+      toast.error('Something went wrong');
+    }
+  };
+
+  if (apiLoading) return <ActivityIndicator size="large" color="#000" />;
+
+  if (apiError) return <Text>Error: {apiError}</Text>;
+
   return (
     <ScrollView style={styles.container}>
       {/* Header */}
@@ -28,32 +89,66 @@ export default function AccountSetings() {
       <View style={styles.profileInformation}>
         <View style={styles.optionsContainer}>
           <Text style={styles.emaillabel}>Account Type</Text>
-          <TextInput
-            style={styles.optionCard}
-            placeholder="Personal"
-            placeholderTextColor="#AFAFAF"
-          />
+
+          <View style={styles.pickerWrapper}>
+            <Picker
+              selectedValue={formData.account_type}
+              style={styles.optionCardV2}
+              onValueChange={(itemValue, itemIndex) =>
+                setFormData({ ...formData, account_type: itemValue })
+              }
+            >
+              <Picker.Item label="Personal" value="1" />
+              <Picker.Item label="Business" value="2" />
+              <Picker.Item label="Creator" value="3" />
+            </Picker>
+          </View>
         </View>
+
         <View style={styles.optionsContainer}>
           <Text style={styles.emaillabel}>Account Status</Text>
-          <TextInput
-            style={styles.optionCard}
-            placeholder="Personal, Public, Private"
-            placeholderTextColor="#AFAFAF"
-          />
+
+          <View style={styles.pickerWrapper}>
+            <Picker
+              selectedValue={formData.account_privacy}
+              style={styles.optionCardV2}
+              onValueChange={(itemValue, itemIndex) =>
+                setFormData({ ...formData, account_privacy: itemValue })
+              }
+            >
+              <Picker.Item label="Public" value="public" />
+              <Picker.Item label="Private" value="private" />
+            </Picker>
+          </View>
         </View>
+
         <View style={styles.optionsContainer}>
           <Text style={styles.emaillabel}>Language</Text>
-          <TextInput
-            style={styles.optionCard}
-            placeholder="English"
-            placeholderTextColor="#AFAFAF"
-          />
+
+          <View style={styles.pickerWrapper}>
+            <Picker
+              selectedValue={formData.language}
+              style={styles.optionCardV2}
+              onValueChange={(itemValue, itemIndex) =>
+                setFormData({ ...formData, language: itemValue })
+              }
+            >
+              <Picker.Item label="English" value="English" />
+            </Picker>
+          </View>
         </View>
 
         {/* Continue Button */}
-        <TouchableOpacity style={styles.continueBtn}>
-          <Text style={styles.continueText}>Save</Text>
+        <TouchableOpacity
+          style={styles.continueBtn}
+          onPress={handleUpdateSettings}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="#000" />
+          ) : (
+            <Text style={styles.continueText}>Save</Text>
+          )}
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -154,5 +249,16 @@ const styles = StyleSheet.create({
   signInText: {
     color: '#FBC213',
     fontWeight: '600',
+  },
+  pickerWrapper: {
+    height: 56,
+    borderWidth: 0.5,
+    borderColor: 'grey',
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  optionCardV2: {
+    height: 50,
+    width: '100%',
   },
 });

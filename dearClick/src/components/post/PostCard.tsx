@@ -5,11 +5,15 @@ import Like from '../../assets/svgs/icons/Like';
 import Comment from '../../assets/svgs/icons/Comment';
 import Share from '../../assets/svgs/icons/Share';
 import Save from '../../assets/svgs/icons/Save';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function PostCard() {
   const scheme = useColorScheme();
   const isDark = scheme === 'dark';
-
+//  const myfun = async()=>{
+//   await AsyncStorage.removeItem("userToken")
+//  }
+//  myfun()
   return (
     <View
       style={[
