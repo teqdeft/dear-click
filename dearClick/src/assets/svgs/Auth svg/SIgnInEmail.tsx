@@ -8,7 +8,7 @@ const SignInEmail = () => (
       style={{
         maskType: 'luminance',
       }}
-      maskUnits="userSpaceOnUse"
+      maskUnits="userpaceOnUse"
       x={0}
       y={0}
       width={18}

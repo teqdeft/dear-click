@@ -30,7 +30,7 @@ export default function RegisterPhoneScreen() {
       const data = await sendOtp({ phone }); // call API with phone
       if (data?.success) {
         toast.success(data.data.otp, data.message, { visibilityTime: 10000 });
-        navigation.navigate('VerifyOtpScreen', { phone });
+        navigation.navigate('Verifyotpcreen', { phone });
       } else {
         toast.error(data?.error?.message || 'Something went wrong');
       }

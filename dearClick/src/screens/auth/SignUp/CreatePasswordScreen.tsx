@@ -8,7 +8,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { useNavigation, useroute, RouteProp } from '@react-navigation/native';
 import BackButton from '../../../assets/svgs/Auth svg/BackButton';
 import HideEyes from '../../../assets/svgs/Auth svg/HideEyes';
 import UnHideEyes from '../../../assets/svgs/Auth svg/UnHideEyes';
@@ -22,7 +22,7 @@ export default function CreatePasswordScreen() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const navigation = useNavigation();
-  const route = useRoute<RouteProp<{ params: { email: string } }, 'params'>>();
+  const route = useroute<RouteProp<{ params: { email: string } }, 'params'>>();
   const { email, phone } = route.params; // email comes from previous screen
 
   const handleContinue = async () => {

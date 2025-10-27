@@ -20,12 +20,12 @@ router.put("/change-password", authMiddleware, authController.changePassword);
 router.post("/signin", authController.signIn);
 
 // user profile routes
-router.put("/update-profile", authMiddleware, authController.addUserDetails);
-router.get("/profile-details", authMiddleware, authController.getUserDetails);
+router.put("/update-profile", authMiddleware, authController.adduserDetails);
+router.get("/profile-details", authMiddleware, authController.getuserDetails);
 router.put(
   "/update-profile-settings",
   authMiddleware,
-  authController.UserAccountSetting
+  authController.userAccountSetting
 );
 
 module.exports = router;

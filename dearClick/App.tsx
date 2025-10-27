@@ -2,7 +2,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import RegisterStartScreen from './src/screens/auth/SignUp/RegisterStartScreen';
 import RegisterEmailScreen from './src/screens/auth/SignUp/RegisterEmailScreen';
-import VerifyOtpScreen from './src/screens/auth/SignUp/VerifyOtpScreen';
+import Verifyotpcreen from './src/screens/auth/SignUp/Verifyotpcreen';
 import DetailsScreen from './src/screens/auth/SignUp/DetailsScreen';
 import CreatePasswordScreen from './src/screens/auth/SignUp/CreatePasswordScreen';
 import InterestScreen from './src/screens/auth/SignUp/InterestScreen';
@@ -18,7 +18,7 @@ import MyStory from './src/screens/stories/MyStory';
 export type RootStackParamList = {
   RegisterStartScreen: undefined;
   RegisterEmailScreen: { email: string };
-  VerifyOtpScreen: { email: string; phone: string };
+  Verifyotpcreen: { email: string; phone: string };
   DetailsScreen: { email: string; phone: string };
   CreatePasswordScreen: { email: string; phone: string };
   RegisterPhoneScreen: { phone: string };
@@ -52,7 +52,7 @@ function App() {
           name="RegisterPhoneScreen"
           component={RegisterPhoneScreen}
         />
-        <Stack.Screen name="VerifyOtpScreen" component={VerifyOtpScreen} />
+        <Stack.Screen name="Verifyotpcreen" component={Verifyotpcreen} />
         <Stack.Screen name="DetailsScreen" component={DetailsScreen} />
         <Stack.Screen
           name="CreatePasswordScreen"

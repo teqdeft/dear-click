@@ -4,7 +4,7 @@ const CameraLogo = () => (
   <Svg width={20} height={20} viewBox="0 0 20 20" fill="none">
     <Mask
       id="mask0_127_1954"
-      maskUnits="userSpaceOnUse"
+      maskUnits="userpaceOnUse"
       x={0}
       y={0}
       width={20}

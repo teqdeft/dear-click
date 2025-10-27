@@ -27,9 +27,9 @@ const sharePost = async (req, res) => {
     }
 
     // Check if receiver exists
-    const receiver = await db("users").where({ id: receiverId }).first();
+    const receiver = await db("user").where({ id: receiverId }).first();
     if (!receiver) {
-      return error(res, "Receiver not found", null, 404, "USER_NOT_FOUND");
+      return error(res, "Receiver not found", null, 404, "user_NOT_FOUND");
     }
 
     // Insert share record

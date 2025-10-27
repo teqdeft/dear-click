@@ -32,7 +32,7 @@ export default function RegisterEmailScreen({ navigation }: Props) {
       const data = await sendOtp({ email }); // call API function
       if (data?.success) {
         toast.success(data.message || 'OTP sent! Check your inbox');
-        navigation.navigate('VerifyOtpScreen', { email });
+        navigation.navigate('Verifyotpcreen', { email });
       } else {
         toast.error(data?.error?.message || 'Something went wrong');
       }

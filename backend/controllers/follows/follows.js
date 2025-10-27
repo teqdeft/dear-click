@@ -12,7 +12,7 @@ const toggleFollow = async (req, res) => {
       "Invalid userId",
       "userId must be a positive integer",
       400,
-      "INVALID_USER_ID"
+      "INVALID_user_ID"
     );
   }
 
@@ -42,11 +42,11 @@ const toggleFollow = async (req, res) => {
 
     await db.transaction(async (trx) => {
       // 1) Ensure target user exists
-      const target = await trx("users")
+      const target = await trx("user")
         .select("id", "account_privacy")
         .where({ id: followingId })
         .first();
-      if (!target) throw new Error("USER_NOT_FOUND");
+      if (!target) throw new Error("user_NOT_FOUND");
 
       // 2) Check if already following
       const existing = await trx("follows")
@@ -59,13 +59,13 @@ const toggleFollow = async (req, res) => {
 
         if (existing.status === "accepted") {
           // decrement counters only if already accepted
-          await trx("users")
+          await trx("user")
             .where({ id: followerId })
             .update({
               following_count: trx.raw("GREATEST(following_count - 1, 0)"),
             });
 
-          await trx("users")
+          await trx("user")
             .where({ id: followingId })
             .update({
               followers_count: trx.raw("GREATEST(followers_count - 1, 0)"),
@@ -93,11 +93,11 @@ const toggleFollow = async (req, res) => {
             status: "accepted",
           });
 
-          await trx("users")
+          await trx("user")
             .where({ id: followerId })
             .update({ following_count: trx.raw("following_count + 1") });
 
-          await trx("users")
+          await trx("user")
             .where({ id: followingId })
             .update({ followers_count: trx.raw("followers_count + 1") });
 
@@ -106,10 +106,10 @@ const toggleFollow = async (req, res) => {
       }
     });
 
-    return success(res, { action, status }, 200, `User successfully ${action}`);
+    return success(res, { action, status }, 200, `user successfully ${action}`);
   } catch (err) {
-    if (err.message === "USER_NOT_FOUND") {
-      return error(res, "User not found", null, 404, "USER_NOT_FOUND");
+    if (err.message === "user_NOT_FOUND") {
+      return error(res, "user not found", null, 404, "user_NOT_FOUND");
     }
     return error(
       res,
@@ -144,11 +144,11 @@ const respondToFollowRequest = async (req, res) => {
             .where({ id: requestId })
             .update({ status: "accepted" });
 
-          await trx("users")
+          await trx("user")
             .where({ id: request.followerId })
             .update({ following_count: trx.raw("following_count + 1") });
 
-          await trx("users")
+          await trx("user")
             .where({ id: userId })
             .update({ followers_count: trx.raw("followers_count + 1") });
 

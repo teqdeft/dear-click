@@ -18,7 +18,7 @@ exports.up = function (knex) {
     table
       .foreign("userId")
       .references("id")
-      .inTable("users")
+      .inTable("user")
       .onDelete("CASCADE");
   });
 };

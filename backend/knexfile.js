@@ -6,7 +6,7 @@ require("dotenv").config();
 // below is for production database setup
 
 let Database = process.env.DATABASE_NAME;
-let user = process.env.DATABASE_USER_NAME;
+let user = process.env.DATABASE_user_NAME;
 let password = process.env.DATABASE_PASSWORD;
 
 module.exports = {

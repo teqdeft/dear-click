@@ -3,7 +3,6 @@ const db = require("../../db/db");
 
 const uploadStory = async (req, res) => {
   try {
-    
     const userId = req.user.id; // from auth middleware
     const { caption } = req.body;
 

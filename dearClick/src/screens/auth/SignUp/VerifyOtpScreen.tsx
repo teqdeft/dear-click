@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useref } from 'react';
 import {
   StyleSheet,
   Text,
@@ -9,26 +9,26 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { useNavigation, useroute, RouteProp } from '@react-navigation/native';
 import BackButton from '../../../assets/svgs/Auth svg/BackButton';
 import toast from '../../../components/utils/Toast';
 import { RootStackParamList } from '../../../../App';
 import { sendOtp, verifyEmail } from '../services/userAuth';
 
-type VerifyOtpScreenRouteProp = RouteProp<
+type VerifyotpcreenRouteProp = RouteProp<
   RootStackParamList,
-  'VerifyOtpScreen'
+  'Verifyotpcreen'
 >;
 
-export default function VerifyOtpScreen() {
+export default function Verifyotpcreen() {
   const navigation = useNavigation();
-  const route = useRoute<VerifyOtpScreenRouteProp>();
+  const route = useroute<VerifyotpcreenRouteProp>();
   const { email, phone } = route.params;
 
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [loading, setLoading] = useState(false);
 
-  const inputsRef = useRef<Array<TextInput | null>>([]);
+  const inputsRef = useref<Array<TextInput | null>>([]);
 
   const handleChange = (text: string, index: number) => {
     const newOtp = [...otp];

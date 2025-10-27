@@ -60,8 +60,8 @@ const createComment = async (req, res) => {
 
       // 4) Fetch the newly created comment with user info
       newComment = await trx("comments")
-        .select("comments.*", "users.username", "users.profile_pic")
-        .leftJoin("users", "comments.userId", "users.id")
+        .select("comments.*", "user.username", "user.profile_pic")
+        .leftJoin("user", "comments.userId", "user.id")
         .where("comments.id", id)
         .first();
     });

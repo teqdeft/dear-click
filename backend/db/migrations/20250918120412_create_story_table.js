@@ -1,5 +1,5 @@
 exports.up = function (knex) {
-  return knex.schema.createTable("stories", (table) => {
+  return knex.schema.createTable("story", (table) => {
     table.increments("id").primary();
 
     table
@@ -19,5 +19,5 @@ exports.up = function (knex) {
 };
 
 exports.down = function (knex) {
-  return knex.schema.dropTableIfExists("stories");
+  return knex.schema.dropTableIfExists("story");
 };

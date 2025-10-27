@@ -21,7 +21,7 @@ router.get("/get-interest", interestController.getInterests);
 router.post(
   "/post-interest/:id",
   authMiddleware,
-  interestController.createUserInterests
+  interestController.createuserInterests
 );
 
 // user stories

@@ -10,7 +10,7 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { useNavigation, useroute, RouteProp } from '@react-navigation/native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { RootStackParamList } from '../../../../App';
 import BackButton from '../../../assets/svgs/Auth svg/BackButton';
@@ -23,10 +23,10 @@ type DetailsScreenRouteProp = RouteProp<RootStackParamList, 'DetailsScreen'>;
 
 export default function DetailsScreen() {
   const navigation = useNavigation();
-  const route = useRoute<DetailsScreenRouteProp>();
+  const route = useroute<DetailsScreenRouteProp>();
   const { email, phone } = route.params;
   const [name, setName] = useState('');
-  const [username, setUsername] = useState('');
+  const [username, setusername] = useState('');
   const [photo, setPhoto] = useState<any>(null);
 
   const pickImage = async () => {
@@ -110,15 +110,15 @@ export default function DetailsScreen() {
           />
         </View>
 
-        {/* Username */}
+        {/* username */}
         <View style={styles.optionsContainer}>
-          <Text style={styles.emaillabel}>User Name</Text>
+          <Text style={styles.emaillabel}>user Name</Text>
           <TextInput
             style={styles.optionCard}
             placeholder="johndoe123"
             placeholderTextColor="grey"
             value={username}
-            onChangeText={setUsername}
+            onChangeText={setusername}
           />
         </View>
 

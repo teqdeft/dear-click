@@ -23,7 +23,7 @@ export default function PostCard() {
           { backgroundColor: isDark ? '#1F1F1F' : '#FFFFFF' },
         ]}
       >
-        {/* User Info Section */}
+        {/* user Info Section */}
         <View style={styles.userinfo}>
           <View style={styles.profileDetails}>
             <View style={styles.imageContainer}>

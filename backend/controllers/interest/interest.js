@@ -16,7 +16,7 @@ const getInterests = async (req, res) => {
 };
 
 // post all the interests selected by user
-const createUserInterests = async (req, res) => {
+const createuserInterests = async (req, res) => {
   try {
     const { interestIds } = req.body;
     const userId = req.user.id;
@@ -26,7 +26,7 @@ const createUserInterests = async (req, res) => {
     }
 
     if (interestIds.length < 3) {
-      return error(res, "User must have at least 3 interests", null, 400);
+      return error(res, "user must have at least 3 interests", null, 400);
     }
 
     // Ensure all interest IDs are valid
@@ -51,11 +51,11 @@ const createUserInterests = async (req, res) => {
       await trx("user_interests").insert(rows);
     });
 
-    return success(res, null, 200, "User interests updated successfully");
+    return success(res, null, 200, "user interests updated successfully");
   } catch (err) {
     console.error(err);
     return error(res, "Failed to update user interests", err.message, 500);
   }
 };
 
-module.exports = { getInterests, createUserInterests };
+module.exports = { getInterests, createuserInterests };

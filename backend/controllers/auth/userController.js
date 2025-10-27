@@ -151,7 +151,7 @@ const createProfile = async (req, res) => {
     // check if username is unique
     const existing = await db("users").where({ username }).first();
     if (existing) {
-      return error(res, "Username already taken", null, 400);
+      return error(res, "username already taken", null, 400);
     }
     if (email) {
       // update user profile (assuming user already has a row after OTP verification)
@@ -197,7 +197,7 @@ const setPassword = async (req, res) => {
       .first();
 
     if (!userExists) {
-      return error(res, "User not found", null, 404);
+      return error(res, "user not found", null, 404);
     }
 
     // check if password already set
@@ -265,12 +265,12 @@ const forgotPassword = async (req, res) => {
     const { username } = req.body;
 
     if (!username) {
-      return error(res, "Username is required", null, 400);
+      return error(res, "username is required", null, 400);
     }
 
     const user = await db("users").where({ username }).first();
     if (!user) {
-      return error(res, "Username not found!", null, 404);
+      return error(res, "username not found!", null, 404);
     }
 
     const token = createResetToken(); // generate the secure random token
@@ -350,7 +350,7 @@ const changePassword = async (req, res) => {
     const user = await db("users").where({ id: userId }).first();
 
     if (!user) {
-      return error(res, "User not found!", null, 404);
+      return error(res, "user not found!", null, 404);
     }
 
     // camparing current password with old password
@@ -395,7 +395,7 @@ const signIn = async (req, res) => {
     }
 
     if (!user) {
-      return error(res, "User not found!", null, 404);
+      return error(res, "user not found!", null, 404);
     }
 
     // camparing the passwword with original password
@@ -405,7 +405,7 @@ const signIn = async (req, res) => {
     }
 
     // creating the token with user details without passsword
-    const UserToken = await db("users")
+    const userToken = await db("users")
       .where({ id: user.id })
       .select(
         "id",
@@ -426,7 +426,7 @@ const signIn = async (req, res) => {
       .first();
 
     // common function to create the token
-    const token = generateJwtToken(UserToken);
+    const token = generateJwtToken(userToken);
     return success(res, { token }, 200, `Welcome back! ${user.userName}`);
   } catch (err) {
     return error(res, "Something went wrong", err.message, 500);
@@ -434,7 +434,7 @@ const signIn = async (req, res) => {
 };
 
 // update user details
-const addUserDetails = async (req, res) => {
+const adduserDetails = async (req, res) => {
   try {
     const { bio, website, gender, dob, phone, email } = req.body;
     // validation
@@ -446,7 +446,7 @@ const addUserDetails = async (req, res) => {
     const user = await db("users").where({ id: userId }).first();
 
     if (!user) {
-      return error(res, "User not found!", null, 404);
+      return error(res, "user not found!", null, 404);
     }
 
     const userDetails = await db("user_details").where({ userId }).first();
@@ -489,7 +489,7 @@ const addUserDetails = async (req, res) => {
 };
 
 // update account settings
-const UserAccountSetting = async (req, res) => {
+const userAccountSetting = async (req, res) => {
   try {
     const { account_type, account_privacy, language } = req.body;
 
@@ -499,19 +499,19 @@ const UserAccountSetting = async (req, res) => {
     const user = await db("users").where({ id: userId }).first();
 
     if (!user) {
-      return error(res, "User not found!", null, 404);
+      return error(res, "user not found!", null, 404);
     }
 
     if (!account_type && !account_privacy && !language) {
       return error(res, "Please provide at least one field!", null, 403);
     }
 
-    const existUser = await db("user_account_settings")
+    const existuser = await db("user_account_settings")
       .where({ userId })
       .first();
 
     // update privacy status in both tables
-    if (!existUser) {
+    if (!existuser) {
       await db("users").where({ id: userId }).update({ account_privacy });
       await db("user_account_settings").insert({
         userId,
@@ -520,7 +520,7 @@ const UserAccountSetting = async (req, res) => {
         language,
       });
     } else {
-      await db("users").where({ id: userId }).update({ account_privacy });
+      await db("user").where({ id: userId }).update({ account_privacy });
       await db("user_account_settings").where({ userId }).update({
         userId,
         account_type,
@@ -536,7 +536,7 @@ const UserAccountSetting = async (req, res) => {
 };
 
 // fetch user details
-const getUserDetails = async (req, res) => {
+const getuserDetails = async (req, res) => {
   try {
     const userId = req.user.id;
 
@@ -544,24 +544,24 @@ const getUserDetails = async (req, res) => {
       return error(res, "Id is required!", null, 403);
     }
 
-    const existUser = await db("users").where({ id: userId }).first();
+    const existuser = await db("users").where({ id: userId }).first();
 
-    if (!existUser) {
-      return error(res, "User Not Found!", null, 403);
+    if (!existuser) {
+      return error(res, "user Not Found!", null, 403);
     }
 
     const user = await db("users")
-      .leftJoin("user_details", "user_details.userId", "users.id")
+      .leftJoin("user_details", "user_details.userId", "user.id")
       .leftJoin(
         "user_account_settings",
         "user_account_settings.userId",
-        "users.id"
+        "user.id"
       )
       .select(
-        "users.name",
-        "users.email",
-        "users.phone",
-        "users.userName",
+        "user.name",
+        "user.email",
+        "user.phone",
+        "user.userName",
         "user_details.bio",
         "user_details.website",
         "user_details.date_of_birth",
@@ -570,10 +570,10 @@ const getUserDetails = async (req, res) => {
         "user_account_settings.account_privacy",
         "user_account_settings.language"
       )
-      .where("users.id", userId)
+      .where("user.id", userId)
       .first();
 
-    return success(res, { user }, 200, "User Fetched!");
+    return success(res, { user }, 200, "user Fetched!");
   } catch (err) {
     return error(res, "Something went wrong", err.message, 500);
   }
@@ -589,7 +589,7 @@ module.exports = {
   verifyAndResetPassword,
   changePassword,
   signIn,
-  addUserDetails,
-  getUserDetails,
-  UserAccountSetting,
+  adduserDetails,
+  getuserDetails,
+  userAccountSetting,
 };

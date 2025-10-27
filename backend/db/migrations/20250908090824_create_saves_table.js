@@ -1,5 +1,5 @@
 exports.up = function (knex) {
-  return knex.schema.createTable("likes", (table) => {
+  return knex.schema.createTable("saves", (table) => {
     table.increments("id").primary();
     table
       .integer("postId")
@@ -13,13 +13,13 @@ exports.up = function (knex) {
       .unsigned()
       .notNullable()
       .references("id")
-      .inTable("users")
+      .inTable("user")
       .onDelete("CASCADE");
     table.timestamp("created_at").defaultTo(knex.fn.now());
-    table.unique(["postId", "userId"]); // prevent duplicate likes
+    table.unique(["postId", "userId"]); // prevent duplicate saves
   });
 };
 
 exports.down = function (knex) {
-  return knex.schema.dropTableIfExists("likes");
+  return knex.schema.dropTableIfExists("saves");
 };

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useref, useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -25,19 +25,19 @@ export default function SignInScreen() {
   const [loading, setLoading] = useState(false);
 
   // Animations
-  const logoScale = useRef(new Animated.Value(0.3)).current;
-  const logoOpacity = useRef(new Animated.Value(0)).current;
-  const logoY = useRef(new Animated.Value(0)).current;
+  const logoScale = useref(new Animated.Value(0.3)).current;
+  const logoOpacity = useref(new Animated.Value(0)).current;
+  const logoY = useref(new Animated.Value(0)).current;
 
-  const formOpacity = useRef(new Animated.Value(0)).current;
-  const formY = useRef(new Animated.Value(50)).current; // starts lower
+  const formOpacity = useref(new Animated.Value(0)).current;
+  const formY = useref(new Animated.Value(50)).current; // starts lower
 
-  const input1Opacity = useRef(new Animated.Value(0)).current;
-  const input1Y = useRef(new Animated.Value(20)).current;
-  const input2Opacity = useRef(new Animated.Value(0)).current;
-  const input2Y = useRef(new Animated.Value(20)).current;
-  const buttonOpacity = useRef(new Animated.Value(0)).current;
-  const buttonY = useRef(new Animated.Value(20)).current;
+  const input1Opacity = useref(new Animated.Value(0)).current;
+  const input1Y = useref(new Animated.Value(20)).current;
+  const input2Opacity = useref(new Animated.Value(0)).current;
+  const input2Y = useref(new Animated.Value(20)).current;
+  const buttonOpacity = useref(new Animated.Value(0)).current;
+  const buttonY = useref(new Animated.Value(20)).current;
 
   useEffect(() => {
     // Logo: Fade + Bounce
@@ -192,7 +192,7 @@ export default function SignInScreen() {
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.optionCard}
-              placeholder="Email, Phone or Username"
+              placeholder="Email, Phone or username"
               placeholderTextColor="grey"
               keyboardType="email-address"
               value={input}

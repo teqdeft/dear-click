@@ -13,14 +13,14 @@ exports.up = function (knex) {
       .unsigned()
       .notNullable()
       .references("id")
-      .inTable("users")
+      .inTable("user")
       .onDelete("CASCADE");
     table
       .integer("receiverId") // who receives
       .unsigned()
       .notNullable()
       .references("id")
-      .inTable("users")
+      .inTable("user")
       .onDelete("CASCADE");
     table.timestamp("created_at").defaultTo(knex.raw("CURRENT_TIMESTAMP"));
   });
