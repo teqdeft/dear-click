@@ -1,9 +1,5 @@
-/**
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
- */
 exports.up = function (knex) {
-  return knex.schema.createTable("user", function (table) {
+  return knex.schema.createTable("users", function (table) {
     table.increments("id").primary();
     table.tinyint("role").defaultTo(1).comment("1=user");
     table.string("name", 20);
@@ -32,10 +28,6 @@ exports.up = function (knex) {
   });
 };
 
-/**
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
- */
 exports.down = function (knex) {
-  return knex.schema.dropTable("user");
+  return knex.schema.dropTable("users");
 };

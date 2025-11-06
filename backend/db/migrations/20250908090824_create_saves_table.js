@@ -13,7 +13,7 @@ exports.up = function (knex) {
       .unsigned()
       .notNullable()
       .references("id")
-      .inTable("user")
+      .inTable("users")
       .onDelete("CASCADE");
     table.timestamp("created_at").defaultTo(knex.fn.now());
     table.unique(["postId", "userId"]); // prevent duplicate saves

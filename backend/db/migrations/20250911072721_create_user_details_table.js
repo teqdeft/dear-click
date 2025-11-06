@@ -13,7 +13,7 @@ exports.up = function (knex) {
     table
       .foreign("userId")
       .references("id")
-      .inTable("user")
+      .inTable("users")
       .onDelete("CASCADE");
   });
 };
