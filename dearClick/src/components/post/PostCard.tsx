@@ -1,19 +1,49 @@
-import { Image, StyleSheet, Text, View, useColorScheme } from 'react-native';
+import {
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  useColorScheme,
+} from 'react-native';
 import React from 'react';
 import ThreeDots from '../../assets/svgs/icons/ThreeDots';
 import Like from '../../assets/svgs/icons/Like';
 import Comment from '../../assets/svgs/icons/Comment';
 import Share from '../../assets/svgs/icons/Share';
 import Save from '../../assets/svgs/icons/Save';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { IMAGE_BASE_URL } from '@env';
+import { getPostDuration } from '../../helpers/common';
+import { useNavigation } from '@react-navigation/core';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-export default function PostCard() {
+type Post = {
+  id: number;
+  media_url: string;
+  caption: string;
+  like_count: number;
+  comment_count: number;
+  created_at: string;
+  userId: number;
+  name: string;
+  username: string;
+  profile_pic: string;
+  share_count: string;
+};
+
+type PostCardProps = {
+  item: Post;
+};
+
+export default function PostCard({ item }: PostCardProps) {
   const scheme = useColorScheme();
   const isDark = scheme === 'dark';
-//  const myfun = async()=>{
-//   await AsyncStorage.removeItem("userToken")
-//  }
-//  myfun()
+  const navigation = useNavigation<NativeStackNavigationProp<any>>();
+  //  const myfun = async()=>{
+  //   await AsyncStorage.removeItem("userToken")
+  //  }
+  //  myfun()
+
   return (
     <View
       style={[
@@ -27,44 +57,56 @@ export default function PostCard() {
           { backgroundColor: isDark ? '#1F1F1F' : '#FFFFFF' },
         ]}
       >
-        {/* User Info Section */}
+        {/* 🔹 User Info */}
         <View style={styles.userinfo}>
           <View style={styles.profileDetails}>
             <View style={styles.imageContainer}>
               <Image
-                source={require('../../assets/posts/profile.jpg')}
+                source={{
+                  uri: `${IMAGE_BASE_URL}/profilePicture/${item?.profile_pic}`,
+                }}
                 style={styles.profileImage}
               />
             </View>
+
             <View style={styles.textDetails}>
-              <Text style={[styles.name, { color: isDark ? '#fff' : '#000' }]}>
-                John Doe
-              </Text>
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate('FollowerScreen', { userId: item.userId })
+                }
+              >
+                <Text
+                  style={[styles.name, { color: isDark ? '#fff' : '#000' }]}
+                >
+                  {item.name}
+                </Text>
+              </TouchableOpacity>
               <Text
                 style={[styles.username, { color: isDark ? '#aaa' : '#555' }]}
               >
-                @johndoerunner • 1 min ago
+                @{item.username} • {getPostDuration(item.created_at)}
               </Text>
             </View>
           </View>
           <ThreeDots />
         </View>
 
-        {/* Post Image */}
+        {/* 🔹 Post Media */}
         <View style={styles.postImage}>
           <Image
-            source={require('../../assets/posts/postimg.png')}
+            source={{
+              uri: `${IMAGE_BASE_URL}/posts/${item?.media_url}`,
+            }}
             style={styles.postMainImage}
           />
           <Text
             style={[styles.caption, { color: isDark ? '#999999' : '#444' }]}
           >
-            😄 In 2025, fashion is all about blending sustainability with bold
-            🎨 creativity.
+            {item.caption}
           </Text>
         </View>
 
-        {/* Reactions */}
+        {/* 🔹 Reactions */}
         <View style={styles.bottomContainer}>
           <View style={styles.reactions}>
             <View
@@ -80,9 +122,10 @@ export default function PostCard() {
                   { color: isDark ? '#fff' : '#000' },
                 ]}
               >
-                385
+                {item.like_count}
               </Text>
             </View>
+
             <View
               style={[
                 styles.like,
@@ -96,9 +139,10 @@ export default function PostCard() {
                   { color: isDark ? '#fff' : '#000' },
                 ]}
               >
-                162
+                {item.comment_count}
               </Text>
             </View>
+
             <View
               style={[
                 styles.like,
@@ -112,7 +156,7 @@ export default function PostCard() {
                   { color: isDark ? '#fff' : '#000' },
                 ]}
               >
-                35
+                {item.share_count} Share
               </Text>
             </View>
           </View>
@@ -178,6 +222,7 @@ const styles = StyleSheet.create({
     width: '100%',
     borderRadius: 10,
     overflow: 'hidden',
+    resizeMode: 'contain',
   },
   postMainImage: {
     width: '100%',

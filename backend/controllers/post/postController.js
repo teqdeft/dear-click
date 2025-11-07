@@ -40,4 +40,48 @@ const createPost = async (req, res) => {
   }
 };
 
-module.exports = { createPost };
+// fetch users posts just for testing
+const getFeedPosts = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    // Step 1: Get the latest post for each user
+    const latestPosts = await db('posts as p1')
+      .join('users', 'users.id', 'p1.userId')
+      .select(
+        'p1.id',
+        'p1.media_url',
+        'p1.caption',
+        'p1.like_count',
+        'p1.comment_count',
+        'p1.share_count',
+        'p1.created_at',
+        'users.id as userId',
+        'users.name',
+        'users.username',
+        'users.profile_pic'
+      )
+      .whereRaw(`
+        p1.created_at = (
+          SELECT MAX(p2.created_at)
+          FROM posts p2
+          WHERE p2.userId = p1.userId
+        )
+      `);
+
+    // Step 2: Shuffle the posts randomly
+    const shuffledPosts = latestPosts.sort(() => Math.random() - 0.5);
+    console.log("shuffledPosts", shuffledPosts)
+    return success(res, shuffledPosts, 200, "Feed fetched successfully");
+  } catch (err) {
+    console.error('Error fetching feed:', err);
+    return error(
+      res,
+      "Something went wrong",
+      err.message,
+      500,
+      "Failed to fetch feed"
+    );
+  }
+};
+
+module.exports = { createPost, getFeedPosts };

@@ -15,8 +15,8 @@ interface paramsType {
 // enter email for verify
 export const sendOtp = async ({ email, phone }: paramsType) => {
   try {
-    const { data } = await axios.post(
-      'http://192.168.1.45:5050/api/auth/send-otp',
+    const { data } = await 
+    axios.post(`${API_URL}/auth/send-otp`,  
       { email, phone },
     );
     return data;

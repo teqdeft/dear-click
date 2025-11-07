@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
-import { launchImageLibrary } from 'react-native-image-picker';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { RootStackParamList } from '../../../../App';
 import BackButton from '../../../assets/svgs/Auth svg/BackButton';
 import CameraLogo from '../../../assets/svgs/Auth svg/CameraLogo';
@@ -29,7 +29,7 @@ export default function DetailsScreen() {
   const [username, setUsername] = useState('');
   const [photo, setPhoto] = useState<any>(null);
 
-  const pickImage = async () => {
+  const openGallery = async () => {
     const result = await launchImageLibrary({
       mediaType: 'photo',
       quality: 1,
@@ -38,6 +38,30 @@ export default function DetailsScreen() {
     if (result.assets && result.assets.length > 0) {
       setPhoto(result.assets[0]);
     }
+  };
+
+    const openCamera = async () => {
+    const result = await launchCamera({
+      mediaType: 'photo',
+      quality: 1,
+    });
+
+    if (result.assets && result.assets.length > 0) {
+      setPhoto(result.assets[0]);
+    }
+  };
+
+   const pickImage = () => {
+    Alert.alert(
+      'Select Image',
+      'Choose an option',
+      [
+        { text: 'Camera', onPress: openCamera },
+        { text: 'Gallery', onPress: openGallery },
+        { text: 'Cancel', style: 'cancel' },
+      ],
+      { cancelable: true }
+    );
   };
 
   const handleContinue = async () => {

@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useState } from 'react';
 import {
   View,
   Text,
-  Image,
   TouchableOpacity,
   StyleSheet,
   ScrollView,
@@ -16,11 +15,14 @@ import { updateProfile } from './services';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthContext } from '../../context/AuthContext';
 import { Picker } from '@react-native-picker/picker';
+import BirthdayPicker from '../../components/utils/DatePicker';
+
 export default function ContactDetail() {
   const { apiData, apiLoading, apiError, fetchApiData } =
     useContext(AuthContext);
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
+
   const [formData, setFormData] = useState({
     email: '',
     phone: '',
@@ -65,8 +67,8 @@ export default function ContactDetail() {
 
     try {
       setLoading(true);
-      let action="Contact-info"
-      const data = await updateProfile(formData,action);
+      let action = 'Contact-info';
+      const data = await updateProfile(formData, action);
       setLoading(false);
       if (!data.success) {
         return toast.error(data.error.message);
@@ -116,7 +118,7 @@ export default function ContactDetail() {
             style={styles.optionCard}
             placeholder="81658-48566"
             placeholderTextColor="#AFAFAF"
-            editable={apiData?.phone  ? false : true}
+            editable={apiData?.phone ? false : true}
             value={formData.phone}
             onChangeText={text => setFormData({ ...formData, phone: text })}
           />
@@ -137,20 +139,14 @@ export default function ContactDetail() {
             </Picker>
           </View>
         </View>
-        {/* Bio */}
+        {/* Birthday */}
         <View style={styles.optionsContainer}>
-          <Text style={styles.emaillabel}>Birthday</Text>
-          <TextInput
-            style={styles.optionCard2}
-            placeholder="26 Oct 2001"
-            placeholderTextColor="#AFAFAF"
+          <BirthdayPicker
             value={formData.date_of_birth}
-            onChangeText={text =>
-              setFormData({ ...formData, date_of_birth: text })
-            }
+            onChange={text => setFormData({ ...formData, date_of_birth: text })}
+            label="Birthday"
           />
         </View>
-
 
         {/* Continue Button */}
         <TouchableOpacity
@@ -254,6 +250,10 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     alignItems: 'center',
     marginBottom: '10%',
+    height: 53,
+    marginTop: 30,
+    fontFamily: 'Poppins-Regular',
+    fontSize: 16,
   },
   continueText: {
     color: '#000',

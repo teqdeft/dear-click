@@ -2,22 +2,19 @@ import React, { useCallback, useContext, useEffect, useState } from 'react';
 import {
   View,
   Text,
-  Image,
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  TextInput,
   ActivityIndicator,
 } from 'react-native';
 import BackButton from '../../assets/svgs/Auth svg/BackButton';
-import { useFocusEffect, useNavigation } from '@react-navigation/core';
+import {  useNavigation } from '@react-navigation/core';
 import { AuthContext } from '../../context/AuthContext';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import toast from '../../components/utils/Toast';
 import { updateProfile, updateSettings } from './services';
 import { Picker } from '@react-native-picker/picker';
 export default function AccountSetings() {
-  const [selectedValue, setSelectedValue] = useState('travels');
   const { apiData, apiLoading, apiError, fetchApiData } =
     useContext(AuthContext);
   const [loading, setLoading] = useState(false);
@@ -258,7 +255,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   optionCardV2: {
-    height: 50,
+    height: 53,
     width: '100%',
   },
 });

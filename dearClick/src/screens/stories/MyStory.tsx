@@ -1,17 +1,117 @@
+import React, { useState } from 'react';
 import {
+  Alert,
   Image,
+  PermissionsAndroid,
+  Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
   useColorScheme,
 } from 'react-native';
-import React from 'react';
+import {
+  launchCamera,
+  launchImageLibrary,
+  CameraOptions,
+  ImageLibraryOptions,
+} from 'react-native-image-picker';
 import PlusIcon from '../../assets/svgs/icons/PlusIcon';
+import { useNavigation } from '@react-navigation/core';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 export default function MyStory() {
   const scheme = useColorScheme();
   const isDarkMode = scheme === 'dark';
+  const [photo, setPhoto] = useState<string | null>(null);
+  const navigation = useNavigation<NativeStackNavigationProp<any>>();
+
+  // 📸 CAMERA PERMISSION
+  const requestCameraPermission = async () => {
+    try {
+      if (Platform.OS === 'android') {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.CAMERA,
+          {
+            title: 'Camera Permission',
+            message: 'This app needs access to your camera to upload stories.',
+            buttonNeutral: 'Ask Me Later',
+            buttonNegative: 'Cancel',
+            buttonPositive: 'OK',
+          },
+        );
+
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          openCamera();
+        } else {
+          Alert.alert('Permission Denied', 'Camera permission is required!');
+        }
+      } else {
+        openCamera();
+      }
+    } catch (err) {
+      console.warn(err);
+    }
+  };
+
+  // 📷 OPEN CAMERA
+  const openCamera = () => {
+    const options: CameraOptions = {
+      mediaType: 'photo',
+      cameraType: 'back',
+      saveToPhotos: true,
+      quality: 1,
+    };
+
+    launchCamera(options, response => {
+      if (response.didCancel) {
+        console.log('User cancelled camera');
+      } else if (response.errorCode) {
+        Alert.alert('Error', response.errorMessage || 'Camera error');
+      } else if (response.assets && response.assets.length > 0) {
+        const uri = response.assets[0].uri;
+        if (uri) {
+          setPhoto(uri); // ✅ Type-safe
+        }
+      }
+    });
+  };
+
+  // 🖼️ OPEN GALLERY
+  const openGallery = () => {
+    const options: ImageLibraryOptions = {
+      mediaType: 'photo',
+      selectionLimit: 1,
+      quality: 1,
+    };
+
+    launchImageLibrary(options, response => {
+      if (response.didCancel) {
+        console.log('User cancelled gallery picker');
+      } else if (response.errorCode) {
+        Alert.alert('Error', response.errorMessage || 'Gallery error');
+      } else if (response.assets && response.assets.length > 0) {
+        const uri = response.assets[0].uri;
+        if (uri) {
+          setPhoto(uri); // ✅ Type-safe
+        }
+      }
+    });
+  };
+
+  // 🧠 SHOW CHOICE (CAMERA OR GALLERY)
+  const chooseImageSource = () => {
+    Alert.alert(
+      'Upload Story',
+      'Choose an option',
+      [
+        { text: 'Camera', onPress: requestCameraPermission },
+        { text: 'Gallery', onPress: openGallery },
+        { text: 'Cancel', style: 'cancel' },
+      ],
+      { cancelable: true },
+    );
+  };
 
   return (
     <View style={styles.yourStory}>
@@ -19,7 +119,11 @@ export default function MyStory() {
         <View style={styles.innerContainer}>
           <Image
             style={styles.image}
-            source={require('../../assets/posts/profile.jpg')}
+            source={
+              photo
+                ? { uri: photo } // show captured photo
+                : require('../../assets/posts/profile.jpg')
+            }
           />
         </View>
         <View
@@ -28,8 +132,10 @@ export default function MyStory() {
             { backgroundColor: isDarkMode ? '#1F1F1F' : '#FFFFFF' },
           ]}
         >
-          <TouchableOpacity style={styles.innerplusIconContainer}>
-            {/* Pass theme-based fill color to SVG */}
+          <TouchableOpacity
+            style={styles.innerplusIconContainer}
+            onPress={() => navigation.navigate('UploadStory')}
+          >
             <PlusIcon fill={isDarkMode ? '#FFFFFF' : '#000000'} />
           </TouchableOpacity>
         </View>

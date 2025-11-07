@@ -1,4 +1,4 @@
-import React, { useContext, useCallback } from 'react';
+import React, { useContext, useCallback, useState } from 'react';
 import {
   View,
   Text,
@@ -17,6 +17,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { IMAGE_BASE_URL } from '@env';
 import { formatDate } from '../../helpers/dateFormatter';
+import { launchImageLibrary } from 'react-native-image-picker';
 
 export default function ProfileScreen() {
   const { logout } = useContext(AuthContext);
@@ -46,7 +47,6 @@ export default function ProfileScreen() {
     );
   }
 
-
   return (
     <ScrollView style={styles.container}>
       {/* Header */}
@@ -69,19 +69,19 @@ export default function ProfileScreen() {
               <Image
                 source={
                   apiData?.profile_pic
-                    ? { uri:`${IMAGE_BASE_URL}/1760529042753-1000015336.jpg`} // 🔹 Load from API dynamically
-                    : require('../../assets/posts/profile.jpg') // 🔹 Fallback local image
+                    ? { uri:`${IMAGE_BASE_URL}/profilePicture/${apiData?.profile_pic}`}
+                    : require('../../assets/posts/profile.jpg') 
                 }
                 style={styles.uploadUserImage}
               />
             </View>
-            <TouchableOpacity style={styles.editImage}>
-              <EditIcon width={10} fill="#0a0a0aff" />
+            <TouchableOpacity style={styles.editImage} onPress={() => navigation.navigate('UploadProfilePicture')}>
+              <EditIcon width={10} fill="#0a0a0aff"  />
             </TouchableOpacity>
           </View>
           <View>
-            <Text style={styles.userName}>{apiData.name || '--'}</Text>
-            <Text style={styles.userPhone}>{apiData.phone || '--'}</Text>
+            <Text style={styles.userName}>{apiData?.name || '--'}</Text>
+            <Text style={styles.userPhone}>{apiData?.phone || '--'}</Text>
           </View>
         </View>
         <TouchableOpacity style={styles.signOutButton} onPress={logout}>
@@ -110,22 +110,22 @@ export default function ProfileScreen() {
         <View style={styles.information}>
           <View style={styles.infoGroup}>
             <Text style={styles.infoName}>Full Name</Text>
-            <Text style={styles.infoValue}>{apiData.name || '--'}</Text>
+            <Text style={styles.infoValue}>{apiData?.name || '--'}</Text>
           </View>
 
           <View style={styles.infoGroup}>
             <Text style={styles.infoName}>Username</Text>
-            <Text style={styles.infoValue}>{apiData.userName || '--'}</Text>
+            <Text style={styles.infoValue}>{apiData?.userName || '--'}</Text>
           </View>
 
           <View style={styles.infoGroup}>
             <Text style={styles.infoName}>Bio</Text>
-            <Text style={styles.infoValue}>{apiData.bio || '--'}</Text>
+            <Text style={styles.infoValue}>{apiData?.bio || '--'}</Text>
           </View>
 
           <View style={styles.infoGroup}>
             <Text style={styles.infoName}>Website</Text>
-            <Text style={styles.infoValue}>{apiData.website || '--'}</Text>
+            <Text style={styles.infoValue}>{apiData?.website || '--'}</Text>
           </View>
         </View>
       </View>
@@ -143,17 +143,17 @@ export default function ProfileScreen() {
         <View style={styles.information}>
           <View style={styles.infoGroup}>
             <Text style={styles.infoName}>Email</Text>
-            <Text style={styles.infoValue}>{apiData.email || '--'}</Text>
+            <Text style={styles.infoValue}>{apiData?.email || '--'}</Text>
           </View>
 
           <View style={styles.infoGroup}>
             <Text style={styles.infoName}>Phone Number</Text>
-            <Text style={styles.infoValue}>{apiData.phone || '--'}</Text>
+            <Text style={styles.infoValue}>{apiData?.phone || '--'}</Text>
           </View>
 
           <View style={styles.infoGroup}>
             <Text style={styles.infoName}>Gender</Text>
-            <Text style={styles.infoValue}>{apiData.gender || '--'}</Text>
+            <Text style={styles.infoValue}>{apiData?.gender || '--'}</Text>
           </View>
 
           <View style={styles.infoGroup}>
@@ -176,19 +176,19 @@ export default function ProfileScreen() {
         <View style={styles.information}>
           <View style={styles.infoGroup}>
             <Text style={styles.infoName}>Account Type</Text>
-            <Text style={styles.infoValue}>{apiData.account_type == "1" ? "Personal":apiData.account_type =="2" ? "Business":apiData.account_type =="3" ? "Creator": '--'}</Text>
+            <Text style={styles.infoValue}>{apiData?.account_type == "1" ? "Personal":apiData?.account_type =="2" ? "Business":apiData?.account_type =="3" ? "Creator": '--'}</Text>
           </View>
 
           <View style={styles.infoGroup}>
             <Text style={styles.infoName}>Account Status</Text>
             <Text style={styles.infoValue}>
-              {apiData.account_privacy || '--'}
+              {apiData?.account_privacy || '--'}
             </Text>
           </View>
 
           <View style={styles.infoGroup}>
             <Text style={styles.infoName}>Language</Text>
-            <Text style={styles.infoValue}>{apiData.language || '--'}</Text>
+            <Text style={styles.infoValue}>{apiData?.language || '--'}</Text>
           </View>
         </View>
       </View>

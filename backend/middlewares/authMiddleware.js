@@ -12,7 +12,7 @@ const authMiddleware = (req, res, next) => {
 
     // Expected format: "Bearer <token>"
     const token = authHeader.split(" ")[1];
-    console.log("token", token)
+    console.log("tokentokentoken", token)
     if (!token) {
       return error(res, "Token missing", null, 401, "TOKEN_MISSING");
     }

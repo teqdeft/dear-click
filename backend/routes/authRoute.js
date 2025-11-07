@@ -20,7 +20,7 @@ router.put("/change-password", authMiddleware, authController.changePassword);
 router.post("/signin", authController.signIn);
 
 // user profile routes
-router.put("/update-profile", authMiddleware, authController.addUserDetails);
+router.put("/update-profile", uploadProfilePic.single("profilePic"), authMiddleware, authController.addUserDetails);
 router.get("/profile-details", authMiddleware, authController.getUserDetails);
 router.put(
   "/update-profile-settings",

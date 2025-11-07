@@ -5,6 +5,7 @@ const followsController = require("../controllers/follows/follows");
 const interestController = require("../controllers/interest/interest");
 const storyController = require("../controllers/stories/storyController");
 const { uploadStoryMedia } = require("../middlewares/imageUploadMiddleware");
+const authController = require("../controllers/auth/userController");
 
 // follow routes
 // Follow / Unfollow / Request / Cancel
@@ -31,4 +32,11 @@ router.post(
   authMiddleware,
   storyController.uploadStory
 );
+
+router.get(
+  "/fetch-follower-profile/:id",
+  authMiddleware,
+  authController.fetchFollowerProfile
+);
+
 module.exports = router;

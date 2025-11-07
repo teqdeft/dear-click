@@ -7,6 +7,9 @@ import MyStory from '../screens/stories/MyStory';
 import ProfileInfo from '../screens/profile/ProfileInfo';
 import AccountSetings from '../screens/profile/AccountSetings';
 import ContactDetail from '../screens/profile/ContactDetail';
+import UploadProfilePicture from '../components/uploadProfilePicture/uploadProfilePicture';
+import ProfilePicturePreview from '../components/uploadProfilePicture/ProfilePicturePreview';
+import FollowerScreen from '../screens/followeProfile/FollowerScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -19,6 +22,16 @@ export default function AppStack() {
       {/* Stack Screens */}
       <Stack.Screen name="Stories" component={Stories} />
       <Stack.Screen name="MyStory" component={MyStory} />
+      <Stack.Screen
+        name="UploadProfilePicture"
+        component={UploadProfilePicture}
+      />
+      <Stack.Screen
+        name="ProfilePicturePreview"
+        component={ProfilePicturePreview}
+      />
+      <Stack.Screen name="FollowerScreen" component={FollowerScreen} />
+
       <Stack.Screen name="ProfileInfo" component={ProfileInfo} />
       <Stack.Screen name="AccountSetings" component={AccountSetings} />
       <Stack.Screen name="ContactDetail" component={ContactDetail} />

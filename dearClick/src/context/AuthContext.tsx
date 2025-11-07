@@ -67,7 +67,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       });
       setApiData(data.data.user);
     } catch (error) {
-      console.log(error);
+      //
+      console.error(error);
     }
   };
 

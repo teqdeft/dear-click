@@ -131,7 +131,7 @@ const respondToFollowRequest = async (req, res) => {
     let updated = null;
 
     await db.transaction(async (trx) => {
-      const request = await trx("follows").where({ id: requestId }).first();
+      const request = await trx("follows").where({ followerId: requestId }).first();
       if (!request) throw new Error("REQUEST_NOT_FOUND");
 
       if (request.followingId !== userId) {
@@ -141,7 +141,7 @@ const respondToFollowRequest = async (req, res) => {
       if (action === "accept") {
         if (request.status === "pending") {
           await trx("follows")
-            .where({ id: requestId })
+            .where({ followerId: requestId })
             .update({ status: "accepted" });
 
           await trx("users")

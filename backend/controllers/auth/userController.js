@@ -437,7 +437,8 @@ const signIn = async (req, res) => {
 const addUserDetails = async (req, res) => {
   try {
     const { bio, website, gender, date_of_birth, phone, email, name, action } = req.body;
-    console.log("req.bodyreq.bodyreq.bodyreq.body", req.body)
+    const filename = req?.file?.filename;
+    console.log("filename", filename)
 
     // validation
     if (action === "Profile-info") {
@@ -511,6 +512,12 @@ const addUserDetails = async (req, res) => {
       });
     }
 
+    if (filename) {
+      await db("users").where({ id: userId }).update({
+        profile_pic: filename
+      });
+    }
+
     return success(res, " ", 200, "Details Updated!");
   } catch (err) {
     console.log((err))
@@ -521,8 +528,9 @@ const addUserDetails = async (req, res) => {
 // update account settings
 const UserAccountSetting = async (req, res) => {
   try {
-    const { account_type, account_privacy, language } = req.body;
 
+    const { account_type, account_privacy, language } = req.body;
+    console.log("object", req.body)
     if (!account_type) {
       return error(res, "Account Type is required!", null, 403);
     }
@@ -618,6 +626,82 @@ const getUserDetails = async (req, res) => {
   }
 };
 
+// fetch follower profile
+const fetchFollowerProfile = async (req, res) => {
+  try {
+    let { id } = req.params
+    let { media_type } = req.query
+    console.log("object", media_type)
+    if (!id) {
+      return error(res, "Id is required!", null, 403);
+    }
+
+    let existingUser = await db('users').where({ id }).first()
+
+    if (!existingUser) {
+      return error(res, "User Not Found!", null, 403)
+    }
+
+    const userDetails = await db("user_details")
+      .where({ userId: id })
+      .select("bio")
+      .first();
+
+    // Fetch all posts of that user
+    let userPosts = await db("posts")
+      .where("userId", id)
+      .select(
+        "id",
+        "caption",
+        "media_url",
+        "like_count",
+        "comment_count",
+        "share_count",
+        "save_count",
+        "location",
+        "save_count"
+      )
+
+    const [{ totalPosts }] = await db("posts")
+      .where("userId", id)
+      .count("id as totalPosts");
+
+
+    if (media_type === "images") {
+      console.log("media_type", media_type)
+      userPosts = userPosts.filter((post) =>
+        post.media_url.match(/\.(jpg|jpeg|png)$/i)
+      );
+    }
+
+    else if (media_type === "reels") {
+      userPosts = userPosts.filter((post) =>
+        post.media_url.match(/\.(mp4|mpeg|mov)$/i)
+      );
+    }
+    else if (media_type === "allMedia") {
+      userPosts
+    }
+
+    const userProfileData = {
+      id: existingUser.id,
+      name: existingUser.name,
+      userName: existingUser.userName,
+      profile_pic: existingUser.profile_pic,
+      following_count: existingUser.following_count,
+      followers_count: existingUser.followers_count,
+      post_count: totalPosts,
+      bio: userDetails?.bio || null,
+      posts: userPosts,
+    };
+    // console.log("userProfileData", userProfileData)
+    return success(res, userProfileData, 200, "follower profile fetch successfully")
+  } catch (err) {
+    return error(res, "Something went wrong", err.message, 500);
+  }
+}
+
+
 module.exports = {
   test,
   sendOtp,
@@ -631,4 +715,5 @@ module.exports = {
   addUserDetails,
   getUserDetails,
   UserAccountSetting,
+  fetchFollowerProfile
 };
