@@ -1,6 +1,7 @@
 const db = require("../../db/db");
 const { success, error } = require("../../helpers/response");
 
+// Create battle post
 const createBattle = async (req, res) => {
   try {
     const { caption, location, interestId } = req.body;
@@ -97,6 +98,7 @@ const fetchBattlePosts = async (req, res) => {
   }
 };
 
+// Get reels by category
 const getReelByCategory = async (req, res) => {
   try {
     const userId = Number(req.params.interestId); // using same route param name

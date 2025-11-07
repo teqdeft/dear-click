@@ -2,6 +2,7 @@ const { success, error } = require("../../../helpers/response");
 const dayjs = require("dayjs");
 const db = require("../../../db/db");
 
+// adjust to get week range (Monday to Saturday)
 function getCurrentWeekRange() {
   const today = dayjs();
   const weekStart = today.startOf("week").add(1, "day");
@@ -11,7 +12,7 @@ function getCurrentWeekRange() {
     weekEnd: weekEnd.format("YYYY-MM-DD"),
   };
 }
-
+// select weekly winners
 const selectWeeklyWinners = async (req, res) => {
   const trx = await db.transaction();
   try {
@@ -29,7 +30,7 @@ const selectWeeklyWinners = async (req, res) => {
         "p.like_count",
         "u.userName"
       )
-      
+
       .orderBy("b.userId", "asc")
       .orderBy("p.like_count", "desc");
 
@@ -75,7 +76,6 @@ const selectWeeklyWinners = async (req, res) => {
 
     await trx.commit();
 
-    // Step 6: Send response
     return success(
       res,
       {
@@ -105,6 +105,8 @@ const selectWeeklyWinners = async (req, res) => {
     );
   }
 };
+
+// get most liked battle post
 const getMostLikedBattlePost = async (req, res) => {
   try {
     const post = await db("battles as b")
@@ -144,6 +146,7 @@ const getMostLikedBattlePost = async (req, res) => {
   }
 };
 
+// get user battle history
 const getUserBattleHistory = async (req, res) => {
   try {
     const userId = Number(req.params.userId || req.user?.id);
@@ -172,7 +175,7 @@ const getUserBattleHistory = async (req, res) => {
         "i.name as interestName"
       )
       .where("b.userId", userId)
-      .whereNull("w.id") // Not yet in winners => live
+      .whereNull("w.id")
       .orderBy("p.created_at", "desc");
 
     // --- History Battles (Completed) ---
@@ -195,7 +198,6 @@ const getUserBattleHistory = async (req, res) => {
       .where("b.userId", userId)
       .orderBy("w.created_at", "desc");
 
-    // Combine both
     return res.json({
       success: true,
       totalBattles: liveBattles.length + historyBattles.length,

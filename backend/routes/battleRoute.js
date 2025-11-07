@@ -14,7 +14,7 @@ router.post(
   "/interest/battle",
   authMiddleware,
   uploadPostMedia.single("media"),
-  // validateReel,
+  validateReel,
   battleController.createBattle
 );
 
