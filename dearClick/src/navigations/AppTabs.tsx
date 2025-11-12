@@ -25,12 +25,12 @@ export default function AppTabs() {
   const colors = {
     dark: {
       tabBar: '#1F1F1F',
-      active: '#FF0000',
+      active: '#FBC213',
       inactive: '#888',
     },
     light: {
       tabBar: '#fff',
-      active: '#FF0000',
+      active: '#FBC213',
       inactive: '#555',
     },
   };
@@ -73,11 +73,13 @@ export default function AppTabs() {
 
 const styles = StyleSheet.create({
   tabBar: {
-    height: 70,
+    position: 'absolute',
+    height: 60,
+    paddingBottom: 9,
+    paddingTop: 9,
+    borderTopWidth: 0.5,
+    borderTopColor: '#333',
     justifyContent: 'center',
-    borderWidth: 0,
-    borderTopColor: '#1F1F1F',
     alignItems: 'center',
-    elevation: 0,
   },
 });

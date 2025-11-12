@@ -60,9 +60,10 @@ export default function DetailsScreen() {
         navigation.navigate('CreatePasswordScreen', { email, phone });
       } else {
         toast.error(res.error.message);
+        console.log(res.error.message);
       }
     } catch (err: any) {
-      toast.error(err.message);
+      toast.error('Choose different profile photo');
     }
   };
 
@@ -264,4 +265,3 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
-

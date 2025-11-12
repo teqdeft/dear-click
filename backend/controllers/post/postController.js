@@ -7,7 +7,7 @@ const { success, error } = require("../../helpers/response");
 const createPost = async (req, res) => {
   try {
     const { caption, location } = req.body;
-    const userId = req.user.id; // assuming auth middleware sets req.user
+    const userId = req.user.id;  
 
     // validation
     if (!caption && !req.filePath) {

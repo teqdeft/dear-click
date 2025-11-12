@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
   },
   postMainImage: {
     width: '100%',
-    height: 343,
+    height: 403,
     resizeMode: 'cover',
   },
   caption: {

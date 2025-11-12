@@ -49,21 +49,39 @@ export const completeProfile = async (params: {
 }) => {
   try {
     const formData = new FormData();
+
     formData.append('name', params.name);
     formData.append('username', params.username);
     formData.append('email', params.email);
     formData.append('phone', params.phone);
 
+    // --- FIX MIME TYPE ---
+    let mimeType = params.photo.type;
+
+    // Convert wrong types from React Native picker
+    if (mimeType === 'image/jpg') {
+      mimeType = 'image/jpeg';
+    }
+
+    // If missing (Android sometimes returns undefined)
+    if (!mimeType) {
+      mimeType = 'image/jpeg';
+    }
+
     formData.append('profilePic', {
       uri: params.photo.uri,
-      type: params.photo.type,
-      name: params.photo.fileName,
+      type: mimeType,
+      name: params.photo.fileName || 'profile.jpg',
     } as any);
 
     const { data } = await axios.post(
       `${API_URL}/auth/complete-profile`,
       formData,
-      { headers: { 'Content-Type': 'multipart/form-data' } },
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
     );
 
     return data;
@@ -71,6 +89,7 @@ export const completeProfile = async (params: {
     return error?.response?.data;
   }
 };
+
 
 //create password
 export const createPassword = async ({

@@ -6,7 +6,7 @@ import Svg, {
   LinearGradient,
   Stop,
 } from 'react-native-svg';
-const Plusicon = (props: any) => (
+const Plusicon = ({ fill = '#fff', ...props }: any) => (
   <Svg
     width={64}
     height={64}
@@ -18,7 +18,7 @@ const Plusicon = (props: any) => (
     <Circle cx={32} cy={32} r={32} fill="url(#paint0_linear_1337_319)" />
     <Path
       d="M31.9834 25.3003V38.6667"
-      stroke="#1F1F1F"
+      stroke="#fff"
       strokeWidth={2.5}
       strokeMiterlimit={10}
       strokeLinecap="round"
@@ -26,7 +26,7 @@ const Plusicon = (props: any) => (
     />
     <Path
       d="M25.3003 31.9834H38.6667"
-      stroke="#1F1F1F"
+      stroke="#fff"
       strokeWidth={2.5}
       strokeMiterlimit={10}
       strokeLinecap="round"
@@ -41,8 +41,8 @@ const Plusicon = (props: any) => (
         y2={2.32454}
         gradientUnits="userSpaceOnUse"
       >
-        <Stop stopColor="#FBC213" />
-        <Stop offset={1} stopColor="#FBB116" />
+        <Stop stopColor={fill} />
+        <Stop offset={1} stopColor={fill} />
       </LinearGradient>
     </Defs>
   </Svg>

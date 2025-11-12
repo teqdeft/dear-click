@@ -4,6 +4,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
   useColorScheme,
 } from 'react-native';
@@ -64,7 +65,7 @@ export default function Stories() {
       <MyStory />
       <View style={styles.mainContainer}>
         {stories.map(story => (
-          <View key={story.id}>
+          <TouchableOpacity key={story.id}>
             <View style={styles.innerContainer}>
               <Image style={styles.image} source={story.image} />
             </View>
@@ -76,7 +77,7 @@ export default function Stories() {
             >
               {story.username}
             </Text>
-          </View>
+          </TouchableOpacity>
         ))}
       </View>
     </ScrollView>

@@ -8,7 +8,7 @@ import ProfileSection from './ProfileSection';
 
 export default function HomeScreen() {
   return (
-    <SafeAreaView>
+    
       <ScrollView style={styles.container}>
         <ProfileSection />
         <Stories />
@@ -20,7 +20,7 @@ export default function HomeScreen() {
           <PostCard />
         </View>
       </ScrollView>
-    </SafeAreaView>
+    
   );
 }
 

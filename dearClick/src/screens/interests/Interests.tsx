@@ -2,6 +2,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
   useColorScheme,
 } from 'react-native';
@@ -55,7 +56,7 @@ export default function Interests() {
     >
       <View style={styles.container}>
         {interests.map((interest, idx) => (
-          <View
+          <TouchableOpacity
             style={[
               styles.inner,
               { borderColor: isDarkMode ? '#FFFFFF1A' : '#0000001A' },
@@ -71,7 +72,7 @@ export default function Interests() {
             >
               {interest.name}
             </Text>
-          </View>
+          </TouchableOpacity>
         ))}
       </View>
     </ScrollView>
