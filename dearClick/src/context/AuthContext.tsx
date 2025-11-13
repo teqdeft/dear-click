@@ -2,7 +2,7 @@ import React, { createContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { API_URL } from '@env';
-import api from "../helpers/axiosInstance"
+import api from '../helpers/axiosInstance';
 
 interface AuthContextType {
   userToken: string | null;
@@ -67,7 +67,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       });
       setApiData(data.data.user);
     } catch (error) {
-      //
       console.error(error);
     }
   };

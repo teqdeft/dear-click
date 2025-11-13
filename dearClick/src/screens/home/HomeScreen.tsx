@@ -1,12 +1,11 @@
 import { ScrollView, StyleSheet, View, FlatList } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Stories from '../stories/Stories';
 import PostCard from '../../components/post/PostCard';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Interests from '../interests/Interests';
 import ProfileSection from './ProfileSection';
 import { fetchPost } from '../post/services/services';
-
 
 type Post = {
   id: number;
@@ -24,6 +23,22 @@ type Post = {
 export default function HomeScreen() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [visiblePostId, setVisiblePostId] = useState<number | null>(null);
+
+  const viewabilityConfig = useRef({
+    itemVisiblePercentThreshold: 70, // must be at least 70% visible
+  }).current;
+
+  const onViewableItemsChanged = useCallback(({ viewableItems }: any) => {
+    if (viewableItems.length > 0) {
+      const firstVisible = viewableItems[0]?.item?.id;
+      setVisiblePostId(firstVisible);
+    }
+  }, []);
+
+  const viewabilityConfigCallbackPairs = useRef([
+    { viewabilityConfig, onViewableItemsChanged },
+  ]);
 
   useEffect(() => {
     const getPosts = async () => {
@@ -62,8 +77,11 @@ export default function HomeScreen() {
       <FlatList
         data={posts}
         keyExtractor={item => item.id.toString()}
-        renderItem={({ item }) => <PostCard item={item} />}
+        renderItem={({ item }) => (
+          <PostCard item={item} isVisible={visiblePostId === item.id} />
+        )}
         showsVerticalScrollIndicator={true}
+        // showsVerticalScrollIndicator={true}
         ListHeaderComponent={
           <>
             <ProfileSection />
@@ -71,6 +89,7 @@ export default function HomeScreen() {
             <Interests />
           </>
         }
+        viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
       />
     </SafeAreaView>
   );

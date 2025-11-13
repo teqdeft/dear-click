@@ -10,6 +10,7 @@ const {
 const moment = require("moment");
 const { forgotPasswordTemplate } = require("../../templates/forgotPassword");
 const { createResetToken } = require("../../services/createPasswordResetToken");
+const { getMediaCounts, applyMediaTypeFilter } = require("../../helpers/userPost");
 
 // test
 const test = async (req, res) => {
@@ -631,7 +632,7 @@ const fetchFollowerProfile = async (req, res) => {
   try {
     let { id } = req.params
     let { media_type } = req.query
-    console.log("object", media_type)
+
     if (!id) {
       return error(res, "Id is required!", null, 403);
     }
@@ -642,47 +643,34 @@ const fetchFollowerProfile = async (req, res) => {
       return error(res, "User Not Found!", null, 403)
     }
 
+    // user details
     const userDetails = await db("user_details")
       .where({ userId: id })
       .select("bio")
       .first();
 
+    let query = db("posts").where("userId", id);
+
+    // return count of user media 
+    const { images_count, reels_count, all_media_count } = await getMediaCounts(id);
+
+    // filter user posts based on their extensions
+    query = applyMediaTypeFilter(query, media_type);
+
     // Fetch all posts of that user
-    let userPosts = await db("posts")
-      .where("userId", id)
-      .select(
-        "id",
-        "caption",
-        "media_url",
-        "like_count",
-        "comment_count",
-        "share_count",
-        "save_count",
-        "location",
-        "save_count"
-      )
+    const userPosts = await query.select(
+      "id",
+      "caption",
+      "media_url",
+      "like_count",
+      "comment_count",
+      "share_count",
+      "save_count",
+      "location",
+      "thumbnail_url"
+    );
 
-    const [{ totalPosts }] = await db("posts")
-      .where("userId", id)
-      .count("id as totalPosts");
-
-
-    if (media_type === "images") {
-      console.log("media_type", media_type)
-      userPosts = userPosts.filter((post) =>
-        post.media_url.match(/\.(jpg|jpeg|png)$/i)
-      );
-    }
-
-    else if (media_type === "reels") {
-      userPosts = userPosts.filter((post) =>
-        post.media_url.match(/\.(mp4|mpeg|mov)$/i)
-      );
-    }
-    else if (media_type === "allMedia") {
-      userPosts
-    }
-
+    // create a sigle object
     const userProfileData = {
       id: existingUser.id,
       name: existingUser.name,
@@ -690,11 +678,13 @@ const fetchFollowerProfile = async (req, res) => {
       profile_pic: existingUser.profile_pic,
       following_count: existingUser.following_count,
       followers_count: existingUser.followers_count,
-      post_count: totalPosts,
+      images_count,
+      reels_count,
+      all_media_count,
       bio: userDetails?.bio || null,
       posts: userPosts,
     };
-    // console.log("userProfileData", userProfileData)
+
     return success(res, userProfileData, 200, "follower profile fetch successfully")
   } catch (err) {
     return error(res, "Something went wrong", err.message, 500);

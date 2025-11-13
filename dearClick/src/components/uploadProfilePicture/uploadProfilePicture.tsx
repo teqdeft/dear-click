@@ -36,7 +36,6 @@ export default function UploadProfilePicture() {
   }, []);
 
   const requestCameraPermission = async () => {
-
     try {
       if (Platform.OS === 'android') {
         const granted = await PermissionsAndroid.request(
@@ -85,8 +84,8 @@ export default function UploadProfilePicture() {
             : `file://${uri}`;
           setPhoto(formattedUri);
           navigation.navigate('ProfilePicturePreview', {
-            imageUri: formattedUri, 
-            photo:response.assets[0]
+            imageUri: formattedUri,
+            photo: response.assets[0],
           });
         }
       }
@@ -114,8 +113,8 @@ export default function UploadProfilePicture() {
             : `file://${uri}`;
           setPhoto(formattedUri);
           navigation.navigate('ProfilePicturePreview', {
-            imageUri: formattedUri, 
-            photo:response.assets[0]
+            imageUri: formattedUri,
+            photo: response.assets[0],
           });
         }
       }
@@ -145,7 +144,9 @@ export default function UploadProfilePicture() {
         <Image
           source={
             apiData?.profile_pic
-              ? { uri: `${IMAGE_BASE_URL}/${apiData?.profile_pic}` }
+              ? {
+                  uri: `${IMAGE_BASE_URL}/profilePicture/${apiData?.profile_pic}`,
+                }
               : require('../../assets/posts/profile.jpg')
           }
           style={styles.userProileImage}
@@ -156,7 +157,10 @@ export default function UploadProfilePicture() {
         <Text style={styles.uploadBtnText}>Upload A Photo</Text>
       </TouchableOpacity>
       {/* Take Photo Button */}
-      <TouchableOpacity style={styles.takePhotoButton} onPress={requestCameraPermission}>
+      <TouchableOpacity
+        style={styles.takePhotoButton}
+        onPress={requestCameraPermission}
+      >
         <Text style={styles.takePhotoText}>Take A Photo</Text>
       </TouchableOpacity>
       {/* Skip For Now Button */}

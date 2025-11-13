@@ -16,7 +16,10 @@ import ReelsIcon from '../../assets/svgs/profile/ReelsIcon';
 import ImageIcon from '../../assets/svgs/profile/ImageIcon';
 import { fetchFollowerProfile } from './services';
 import { IMAGE_BASE_URL } from '@env';
-import { getMediaType } from '../../helpers/common';
+import { formatCount, getMediaType } from '../../helpers/common';
+import Loader from '../../components/utils/Loader';
+import Highlights from '../../components/highlights/Highlights';
+import TabButton from '../../components/mediaTab/MediaTab';
 
 type Post = {
   id: number;
@@ -27,6 +30,7 @@ type Post = {
   share_count: number;
   save_count: number;
   location: string;
+  thumbnail_url: string;
 };
 
 type ProfileData = {
@@ -37,10 +41,14 @@ type ProfileData = {
   following_count: number;
   followers_count: number;
   bio: string;
-  post_count: number;
+  all_media_count: number;
+  images_count: number;
+  reels_count: number;
   posts: Post[];
 };
+
 type MediaType = 'AllMedia' | 'reels' | 'images';
+
 export default function FollowerScreen() {
   const [activeTab, setActiveTab] = useState<MediaType>('AllMedia');
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
@@ -57,7 +65,6 @@ export default function FollowerScreen() {
           id: userId,
           media_type: activeTab,
         });
-        console.log('API full response:', data);
         setProfileData(data);
       } catch (error) {
         console.log('Error fetching posts:', error);
@@ -68,7 +75,7 @@ export default function FollowerScreen() {
 
     getPosts();
   }, [activeTab]);
-
+  // if (loading) return <Loader />;
   return (
     <ScrollView style={styles.container}>
       {/* Profile Header */}
@@ -86,6 +93,7 @@ export default function FollowerScreen() {
       </View>
 
       {/* Profile Main */}
+
       <View style={styles.profileMain}>
         <View style={styles.profileInfo}>
           <View style={styles.proifleImage}>
@@ -115,18 +123,24 @@ export default function FollowerScreen() {
       {/* User Post Detail */}
       <View style={styles.userAllPost}>
         <View style={styles.userPostDetail}>
-          <Text style={styles.numberPost}>{profileData?.post_count}</Text>
+          <Text style={styles.numberPost}>
+            {formatCount(profileData?.all_media_count)}
+          </Text>
 
           <Text style={styles.postTypeTitle}>Posts</Text>
         </View>
 
         <View style={styles.userPostDetail}>
-          <Text style={styles.numberPost}>{profileData?.followers_count}</Text>
+          <Text style={styles.numberPost}>
+            {formatCount(profileData?.followers_count)}
+          </Text>
           <Text style={styles.postTypeTitle}>Followers</Text>
         </View>
 
         <View style={styles.userPostDetail}>
-          <Text style={styles.numberPost}>{profileData?.following_count}</Text>
+          <Text style={styles.numberPost}>
+            {formatCount(profileData?.following_count)}
+          </Text>
           <Text style={styles.postTypeTitle}>Following</Text>
         </View>
 
@@ -136,165 +150,34 @@ export default function FollowerScreen() {
         </View>
       </View>
 
-      {/* Mood Section */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.highlights}
-      >
-        <View style={styles.mainContainer}>
-          <View style={styles.moodCard}>
-            <View style={styles.moodImage}>
-              <Image
-                source={require('../../assets/posts/profile.jpg')}
-                style={styles.moodCardImage}
-              />
-            </View>
-            <Text style={styles.moodText}>Travels</Text>
-          </View>
-
-          <View style={styles.moodCard}>
-            <View style={styles.moodImage}>
-              <Image
-                source={require('../../assets/images/storyImage2.jpg')}
-                style={styles.moodCardImage}
-              />
-            </View>
-            <Text style={styles.moodText}>Cool</Text>
-          </View>
-          <View style={styles.moodCard}>
-            <View style={styles.moodImage}>
-              <Image
-                source={require('../../assets/images/storyImage2.jpg')}
-                style={styles.moodCardImage}
-              />
-            </View>
-            <Text style={styles.moodText}>Cool</Text>
-          </View>
-          <View style={styles.moodCard}>
-            <View style={styles.moodImage}>
-              <Image
-                source={require('../../assets/images/storyImage2.jpg')}
-                style={styles.moodCardImage}
-              />
-            </View>
-            <Text style={styles.moodText}>Cool</Text>
-          </View>
-          <View style={styles.moodCard}>
-            <View style={styles.moodImage}>
-              <Image
-                source={require('../../assets/images/storyImage2.jpg')}
-                style={styles.moodCardImage}
-              />
-            </View>
-            <Text style={styles.moodText}>Cool</Text>
-          </View>
-          <View style={styles.moodCard}>
-            <View style={styles.moodImage}>
-              <Image
-                source={require('../../assets/images/storyImage2.jpg')}
-                style={styles.moodCardImage}
-              />
-            </View>
-            <Text style={styles.moodText}>Cool</Text>
-          </View>
-          <View style={styles.moodCard}>
-            <View style={styles.moodImage}>
-              <Image
-                source={require('../../assets/images/storyImage2.jpg')}
-                style={styles.moodCardImage}
-              />
-            </View>
-
-            <Text style={styles.moodText}>Cool</Text>
-          </View>
-        </View>
-      </ScrollView>
-      {/* all story detail */}
+      {/* <Highlights /> */}
+      <Highlights />
 
       {/* Tab Buttons */}
       <View style={styles.tabRow}>
-        <TouchableOpacity
-          style={[
-            styles.tabButton,
-            activeTab === 'AllMedia' && styles.activeTab,
-          ]}
+        <TabButton
+          icon={AllImagesIcon}
+          label="AllMedia"
+          count={formatCount(profileData?.all_media_count)}
+          active={activeTab === 'AllMedia'}
           onPress={() => setActiveTab('AllMedia')}
-        >
-          <Text
-            style={[
-              styles.tabText,
-              activeTab === 'AllMedia' && styles.activeTabText,
-            ]}
-          >
-            <View style={styles.storyMenu}>
-              <AllImagesIcon
-                color={activeTab === 'AllMedia' ? '#FBC213' : '#3F3F3F'}
-              />
-              <Text
-                style={[
-                  styles.storyText,
-                  activeTab === 'AllMedia' && styles.storyTextActive,
-                ]}
-              >
-                185
-              </Text>
-            </View>
-          </Text>
-        </TouchableOpacity>
+        />
 
-        <TouchableOpacity
-          style={[styles.tabButton, activeTab === 'reels' && styles.activeTab]}
+        <TabButton
+          icon={ReelsIcon}
+          label="reels"
+          count={formatCount(profileData?.reels_count)}
+          active={activeTab === 'reels'}
           onPress={() => setActiveTab('reels')}
-        >
-          <Text
-            style={[
-              styles.tabText,
-              activeTab === 'reels' && styles.activeTabText,
-            ]}
-          >
-            <View style={styles.storyMenu}>
-              <ReelsIcon
-                color={activeTab === 'reels' ? '#FBC213' : '#3F3F3F'}
-              />
+        />
 
-              <Text
-                style={[
-                  styles.storyText,
-                  activeTab === 'reels' && styles.storyTextActive,
-                ]}
-              >
-                18
-              </Text>
-            </View>
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.tabButton, activeTab === 'images' && styles.activeTab]}
+        <TabButton
+          icon={ImageIcon}
+          label="images"
+          count={formatCount(profileData?.images_count)}
+          active={activeTab === 'images'}
           onPress={() => setActiveTab('images')}
-        >
-          <Text
-            style={[
-              styles.tabText,
-              activeTab === 'images' && styles.activeTabText,
-            ]}
-          >
-            <View style={styles.storyMenu}>
-              <ImageIcon
-                color={activeTab === 'images' ? '#FBC213' : '#3F3F3F'}
-              />
-              <Text
-                style={[
-                  styles.storyText,
-                  activeTab === 'images' && styles.storyTextActive,
-                ]}
-              >
-                105
-              </Text>
-            </View>
-          </Text>
-        </TouchableOpacity>
+        />
       </View>
 
       {/* Tab Content */}
@@ -311,12 +194,21 @@ export default function FollowerScreen() {
                   )}
                 </View>
                 <View style={styles.postCard}>
-                  <Image
-                    source={{
-                      uri: `${IMAGE_BASE_URL}/posts/${posts?.media_url}`,
-                    }}
-                    style={styles.postMediaContent}
-                  />
+                  {getMediaType(posts.media_url) == 'image' ? (
+                    <Image
+                      source={{
+                        uri: `${IMAGE_BASE_URL}/posts/${posts?.media_url}`,
+                      }}
+                      style={styles.postMediaContent}
+                    />
+                  ) : (
+                    <Image
+                      source={{
+                        uri: `${IMAGE_BASE_URL}/thumbnail/posts/${posts?.thumbnail_url}`,
+                      }}
+                      style={styles.postMediaContent}
+                    />
+                  )}
                 </View>
               </View>
             ))}
@@ -325,77 +217,25 @@ export default function FollowerScreen() {
 
         {activeTab === 'reels' && (
           <View style={styles.postStoryRow}>
-            <View style={styles.postStoryColl}>
-              <View style={styles.postType}>
-                <ReelsIcon />
+            {profileData?.posts?.map(posts => (
+              <View style={styles.postStoryColl} key={posts.id}>
+                <View style={styles.postType}>
+                  {getMediaType(posts.media_url) == 'image' ? (
+                    <ImageIcon color={'#FFFFFF'} />
+                  ) : (
+                    <ReelsIcon color={'#FFFFFF'} />
+                  )}
+                </View>
+                <View style={styles.postCard}>
+                  <Image
+                    source={{
+                      uri: `${IMAGE_BASE_URL}/thumbnail/posts/${posts?.thumbnail_url}`,
+                    }}
+                    style={styles.postMediaContent}
+                  />
+                </View>
               </View>
-              <View style={styles.postCard}>
-                <Image
-                  source={require('../../assets/posts/profile.jpg')}
-                  style={styles.postMediaContent}
-                />
-              </View>
-            </View>
-
-            <View style={styles.postStoryColl}>
-              <View style={styles.postType}>
-                <ReelsIcon />
-              </View>
-              <View style={styles.postCard}>
-                <Image
-                  source={require('../../assets/posts/profile.jpg')}
-                  style={styles.postMediaContent}
-                />
-              </View>
-            </View>
-
-            <View style={styles.postStoryColl}>
-              <View style={styles.postType}>
-                <ReelsIcon />
-              </View>
-              <View style={styles.postCard}>
-                <Image
-                  source={require('../../assets/posts/profile.jpg')}
-                  style={styles.postMediaContent}
-                />
-              </View>
-            </View>
-
-            <View style={styles.postStoryColl}>
-              <View style={styles.postType}>
-                <ReelsIcon />
-              </View>
-              <View style={styles.postCard}>
-                <Image
-                  source={require('../../assets/posts/profile.jpg')}
-                  style={styles.postMediaContent}
-                />
-              </View>
-            </View>
-
-            <View style={styles.postStoryColl}>
-              <View style={styles.postType}>
-                <ReelsIcon />
-              </View>
-              <View style={styles.postCard}>
-                <Image
-                  source={require('../../assets/posts/profile.jpg')}
-                  style={styles.postMediaContent}
-                />
-              </View>
-            </View>
-
-            <View style={styles.postStoryColl}>
-              <View style={styles.postType}>
-                <ReelsIcon />
-              </View>
-              <View style={styles.postCard}>
-                <Image
-                  source={require('../../assets/posts/profile.jpg')}
-                  style={styles.postMediaContent}
-                />
-              </View>
-            </View>
+            ))}
           </View>
         )}
         {activeTab === 'images' && (
@@ -425,6 +265,7 @@ export default function FollowerScreen() {
     </ScrollView>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -641,12 +482,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
 
-  storyMenu: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-  },
+  // storyMenu: {
+  //   flexDirection: 'row',
+  //   alignItems: 'center',
+  //   justifyContent: 'center',
+  //   gap: 8,
+  // },
 
   storyIcon: {
     width: 20,
@@ -654,15 +495,15 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
 
-  storyText: {
-    fontSize: 12,
-    color: '#555',
-  },
+  // storyText: {
+  //   fontSize: 12,
+  //   color: '#555',
+  // },
 
-  storyTextActive: {
-    color: '#FBC213',
-    fontWeight: '600',
-  },
+  // storyTextActive: {
+  //   color: '#FBC213',
+  //   fontWeight: '600',
+  // },
 
   tabContent: {
     paddingHorizontal: 16,
@@ -719,11 +560,11 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
 
-  tabButton: {
-    flex: 1,
-    paddingVertical: 15,
-    alignItems: 'center',
-  },
+  // tabButton: {
+  //   flex: 1,
+  //   paddingVertical: 15,
+  //   alignItems: 'center',
+  // },
 
   tabText: {
     color: '#333',
@@ -731,9 +572,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 
-  activeTab: {
-    position: 'relative',
-  },
+  // activeTab: {
+  //   position: 'relative',
+  // },
 
   activeTabText: {
     color: '#FBC213',

@@ -69,14 +69,19 @@ export default function ProfileScreen() {
               <Image
                 source={
                   apiData?.profile_pic
-                    ? { uri:`${IMAGE_BASE_URL}/profilePicture/${apiData?.profile_pic}`}
-                    : require('../../assets/posts/profile.jpg') 
+                    ? {
+                        uri: `${IMAGE_BASE_URL}/profilePicture/${apiData?.profile_pic}`,
+                      }
+                    : require('../../assets/posts/profile.jpg')
                 }
                 style={styles.uploadUserImage}
               />
             </View>
-            <TouchableOpacity style={styles.editImage} onPress={() => navigation.navigate('UploadProfilePicture')}>
-              <EditIcon width={10} fill="#0a0a0aff"  />
+            <TouchableOpacity
+              style={styles.editImage}
+              onPress={() => navigation.navigate('UploadProfilePicture')}
+            >
+              <EditIcon width={10} fill="#0a0a0aff" />
             </TouchableOpacity>
           </View>
           <View>
@@ -158,7 +163,9 @@ export default function ProfileScreen() {
 
           <View style={styles.infoGroup}>
             <Text style={styles.infoName}>Birthday</Text>
-            <Text style={styles.infoValue}>{apiData?.date_of_birth || '--'}</Text>
+            <Text style={styles.infoValue}>
+              {apiData?.date_of_birth || '--'}
+            </Text>
           </View>
         </View>
       </View>
@@ -176,7 +183,15 @@ export default function ProfileScreen() {
         <View style={styles.information}>
           <View style={styles.infoGroup}>
             <Text style={styles.infoName}>Account Type</Text>
-            <Text style={styles.infoValue}>{apiData?.account_type == "1" ? "Personal":apiData?.account_type =="2" ? "Business":apiData?.account_type =="3" ? "Creator": '--'}</Text>
+            <Text style={styles.infoValue}>
+              {apiData?.account_type == '1'
+                ? 'Personal'
+                : apiData?.account_type == '2'
+                ? 'Business'
+                : apiData?.account_type == '3'
+                ? 'Creator'
+                : '--'}
+            </Text>
           </View>
 
           <View style={styles.infoGroup}>

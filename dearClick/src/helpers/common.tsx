@@ -1,3 +1,4 @@
+// get user post duration
 export const getPostDuration = (createdAt: string | Date): string => {
   const now = new Date();
   const postDate = new Date(createdAt);
@@ -20,6 +21,7 @@ export const getPostDuration = (createdAt: string | Date): string => {
   return `${years} year${years > 1 ? 's' : ''} ago`;
 };
 
+// get user media extension
 export const getMediaType = (url: string) => {
   const ext = url.split('.').pop()?.toLowerCase();
   if (!ext) return 'unknown';
@@ -27,3 +29,22 @@ export const getMediaType = (url: string) => {
   if (['mp4', 'mov', 'avi', 'mkv'].includes(ext)) return 'video';
   return 'unknown';
 };
+
+// count user post, followers, following
+export function formatCount(input?: number | null, decimals = 2): string {
+  if (input == null || Number.isNaN(input)) return '0';
+
+  const sign = input < 0 ? '-' : '';
+  const num = Math.abs(input);
+
+  const truncate = (value: number) => {
+    const factor = Math.pow(10, decimals);
+    const truncated = Math.floor(value * factor) / factor;
+    return truncated.toString().replace(/\.0+$|(\.\d*[1-9])0+$/, '$1');
+  };
+
+  if (num >= 1_000_000_000) return `${sign}${truncate(num / 1_000_000_000)}b`;
+  if (num >= 1_000_000) return `${sign}${truncate(num / 1_000_000)}m`;
+  if (num >= 1_000) return `${sign}${truncate(num / 1_000)}k`;
+  return `${sign}${num}`;
+}

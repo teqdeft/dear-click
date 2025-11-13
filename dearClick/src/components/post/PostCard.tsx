@@ -13,9 +13,10 @@ import Comment from '../../assets/svgs/icons/Comment';
 import Share from '../../assets/svgs/icons/Share';
 import Save from '../../assets/svgs/icons/Save';
 import { IMAGE_BASE_URL } from '@env';
-import { getPostDuration } from '../../helpers/common';
+import { getMediaType, getPostDuration } from '../../helpers/common';
 import { useNavigation } from '@react-navigation/core';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import Video from 'react-native-video';
 
 type Post = {
   id: number;
@@ -33,9 +34,10 @@ type Post = {
 
 type PostCardProps = {
   item: Post;
+  isVisible: boolean;
 };
 
-export default function PostCard({ item }: PostCardProps) {
+export default function PostCard({ item, isVisible }: PostCardProps) {
   const scheme = useColorScheme();
   const isDark = scheme === 'dark';
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
@@ -91,14 +93,25 @@ export default function PostCard({ item }: PostCardProps) {
           <ThreeDots />
         </View>
 
-        {/* 🔹 Post Media */}
+        {/*  Post Media */}
         <View style={styles.postImage}>
-          <Image
-            source={{
-              uri: `${IMAGE_BASE_URL}/posts/${item?.media_url}`,
-            }}
-            style={styles.postMainImage}
-          />
+          {getMediaType(item.media_url) == 'image' ? (
+            <Image
+              source={{
+                uri: `${IMAGE_BASE_URL}/posts/${item?.media_url}`,
+              }}
+              style={styles.postMainImage}
+            />
+          ) : (
+            <Video
+              source={{ uri: `${IMAGE_BASE_URL}/posts/${item?.media_url}` }}
+              style={styles.postMainImage1}
+              resizeMode="cover"
+              repeat={true}
+              paused={!isVisible}
+              muted={false}
+            />
+          )}
           <Text
             style={[styles.caption, { color: isDark ? '#999999' : '#444' }]}
           >
@@ -109,7 +122,7 @@ export default function PostCard({ item }: PostCardProps) {
         {/* 🔹 Reactions */}
         <View style={styles.bottomContainer}>
           <View style={styles.reactions}>
-            <View
+            <TouchableOpacity
               style={[
                 styles.like,
                 { borderColor: isDark ? '#FFFFFF1A' : '#0000001A' },
@@ -124,7 +137,7 @@ export default function PostCard({ item }: PostCardProps) {
               >
                 {item.like_count}
               </Text>
-            </View>
+            </TouchableOpacity>
 
             <View
               style={[
@@ -218,17 +231,9 @@ const styles = StyleSheet.create({
   username: {
     fontSize: 12,
   },
-  postImage: {
-    width: '100%',
-    borderRadius: 10,
-    overflow: 'hidden',
-    resizeMode: 'contain',
-  },
-  postMainImage: {
-    width: '100%',
-    height: 343,
-    resizeMode: 'cover',
-  },
+  postImage: { width: '100%', borderRadius: 10, overflow: 'hidden' },
+  postMainImage: { width: '100%', height: 403, resizeMode: 'cover' },
+  postMainImage1: { width: '100%', height: 403 },
   caption: {
     fontFamily: 'Poppins-Regular',
     fontSize: 12,

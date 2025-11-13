@@ -4,6 +4,7 @@ exports.up = function (knex) {
     table.integer("userId").unsigned().notNullable();
     table.text("caption").nullable();
     table.string("media_url").nullable();
+    table.string("thumbnail_url").nullable().defaultTo(null);
     table.string("location").nullable();
     // Counters for performance
     table.integer("like_count").defaultTo(0);

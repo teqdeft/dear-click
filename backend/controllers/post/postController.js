@@ -1,5 +1,7 @@
 const db = require("../../db/db");
 const { success, error } = require("../../helpers/response");
+const { generateVideoThumbnail } = require("../../helpers/userPost");
+let path = require("path");
 
 //All core post logic
 
@@ -8,6 +10,14 @@ const createPost = async (req, res) => {
   try {
     const { caption, location } = req.body;
     const userId = req.user.id; // assuming auth middleware sets req.user
+
+    const mediaPath = path.join(process.cwd(), "public", req.filePath);
+    let thumbnailPath = null;
+
+    // Generate thumbnail if it's a video
+    if (req.file.mimetype.startsWith("video/")) {
+      thumbnailPath = await generateVideoThumbnail(mediaPath, "posts");
+    }
 
     // validation
     if (!caption && !req.filePath) {
@@ -26,6 +36,7 @@ const createPost = async (req, res) => {
       caption: caption || null,
       location: location || null,
       media_url: req.file.filename || null,
+      thumbnail_url: thumbnailPath || null
     });
 
     return success(res, null, 201, "Post created successfully");

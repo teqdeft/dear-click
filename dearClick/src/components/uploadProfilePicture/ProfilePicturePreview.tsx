@@ -51,7 +51,10 @@ export default function ProfilePicturePreview() {
     try {
       setLoading(true);
       if (!photo) return toast.error('Please adjust and confirm your photo!');
-      const data = await updateProfilePicture({ photo, action: 'profileImage' });
+      const data = await updateProfilePicture({
+        photo,
+        action: 'profileImage',
+      });
       setLoading(false);
       if (!data?.success) return toast.error(data.error.message);
       toast.success(data.message);
@@ -67,7 +70,10 @@ export default function ProfilePicturePreview() {
     <ScrollView style={styles.container}>
       {/* Header */}
       <View style={styles.profileInfoHeader}>
-        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+        <TouchableOpacity
+          style={styles.backBtn}
+          onPress={() => navigation.goBack()}
+        >
           <BackButton />
         </TouchableOpacity>
       </View>
@@ -79,7 +85,9 @@ export default function ProfilePicturePreview() {
       {/* Circular Frame */}
       <TouchableOpacity onPress={handleAdjustPhoto}>
         <View style={styles.userProfileOuter}>
-          {imageUri && <Image source={{ uri: imageUri }} style={styles.userProileImage} />}
+          {imageUri && (
+            <Image source={{ uri: imageUri }} style={styles.userProileImage} />
+          )}
         </View>
       </TouchableOpacity>
 
@@ -89,7 +97,11 @@ export default function ProfilePicturePreview() {
         onPress={handleUpdateProfile}
         disabled={loading}
       >
-        {loading ? <ActivityIndicator color="#000" /> : <Text style={styles.takePhotoText}>Save</Text>}
+        {loading ? (
+          <ActivityIndicator color="#000" />
+        ) : (
+          <Text style={styles.takePhotoText}>Save</Text>
+        )}
       </TouchableOpacity>
 
       {/* Skip */}
