@@ -1,6 +1,5 @@
-import { Alert } from "react-native";
 import api from "../../../helpers/axiosInstance";
-import {API_URL} from "@env"
+import { API_URL } from "@env"
 
 export interface UpdateProfileFormData {
   name?: string;
@@ -10,14 +9,14 @@ export interface UpdateProfileFormData {
   email?: string,
   phone?: string,
   gender?: string,
-  date_of_birth?:string,
+  date_of_birth?: string,
   account_type?: string,
   account_privacy?: string,
-  language?:string,
-  profilePic?:{ uri: string; type: string; fileName: string };
+  language?: string,
+  profilePic?: { uri: string; type: string; fileName: string };
 }
 
-export const updateProfile = async (formData: UpdateProfileFormData, action:string): Promise<any> => { 
+export const updateProfile = async (formData: UpdateProfileFormData, action: string): Promise<any> => {
   try {
     const payload = { ...formData, action };
     const { data } = await api.put(`${API_URL}/auth/update-profile`, payload);
@@ -27,28 +26,27 @@ export const updateProfile = async (formData: UpdateProfileFormData, action:stri
   }
 };
 
-export const updateProfilePicture = async (params: {photo: { uri: string; type: string; fileName: string },action:string}) => {
+export const updateProfilePicture = async (params: { photo: { uri: string; type: string; fileName: string }, action: string }) => {
   try {
     const formData = new FormData();
     formData.append('action', params.action)
-      formData.append('profilePic', {
+    formData.append('profilePic', {
       uri: params.photo.uri,
       type: params.photo.type,
       name: params.photo.fileName,
     } as any);
-    const { data } = await api.put(`${API_URL}/auth/update-profile`,formData,);
+    const { data } = await api.put(`${API_URL}/auth/update-profile`, formData,);
     return data;
   } catch (error: any) {
     return error?.response?.data;
   }
 };
 
-export const updateSettings = async (formData: UpdateProfileFormData): Promise<any> => { 
+export const updateSettings = async (formData: UpdateProfileFormData): Promise<any> => {
   try {
     const { data } = await api.put(`${API_URL}/auth/update-profile-settings`, formData);
     return data;
   } catch (error: any) {
-    console.error("Update profile error:", formData);
     return error?.response?.data;
   }
 };

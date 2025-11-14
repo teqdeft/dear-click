@@ -85,15 +85,13 @@ export default function ContactDetail() {
   if (apiLoading) return <ActivityIndicator size="large" color="#000" />;
 
   if (apiError) return <Text>Error: {apiError}</Text>;
+
   return (
     <ScrollView style={styles.container}>
       {/* Header */}
       <View style={styles.profileInfoHeader}>
         {/* Back Button */}
-        <TouchableOpacity
-          style={styles.backBtn}
-          onPress={() => navigation.goBack()}
-        >
+        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
           <BackButton />
         </TouchableOpacity>
         <Text style={styles.notificationTitle}>Contact Details</Text>
@@ -141,25 +139,14 @@ export default function ContactDetail() {
         </View>
         {/* Birthday */}
         <View style={styles.optionsContainer}>
-          <BirthdayPicker
-            value={formData.date_of_birth}
-            onChange={text => setFormData({ ...formData, date_of_birth: text })}
-            label="Birthday"
-          />
+          <BirthdayPicker value={formData.date_of_birth} onChange={text => setFormData({ ...formData, date_of_birth: text })} label="Birthday" />
         </View>
 
         {/* Continue Button */}
-        <TouchableOpacity
-          style={styles.continueBtn}
-          onPress={handleUpdateProfile}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="#000" />
-          ) : (
-            <Text style={styles.continueText}>Save</Text>
-          )}
+        <TouchableOpacity style={styles.continueBtn} onPress={handleUpdateProfile} disabled={loading}>
+          {loading ? (<ActivityIndicator color="#000" />) : (<Text style={styles.continueText}>Save</Text>)}
         </TouchableOpacity>
+
       </View>
     </ScrollView>
   );
@@ -169,12 +156,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+
   profileInfoHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 23,
   },
+
   profileInformation: {
     backgroundColor: '#1F1F1F',
     borderRadius: 15,
@@ -183,6 +172,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     position: 'relative',
   },
+
   backBtn: {
     position: 'absolute',
     left: 0,
@@ -207,15 +197,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 10,
   },
+
   optionsContainer: {
     marginBottom: 4,
     height: 100,
   },
+
   emaillabel: {
     color: 'grey',
     marginBottom: 10,
     fontSize: 14,
   },
+
   optionCard: {
     height: 56,
     fontSize: 16,
@@ -226,6 +219,7 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderColor: 'grey',
   },
+
   optionCard2: {
     height: 56,
     fontSize: 16,
@@ -236,6 +230,7 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderColor: 'grey',
   },
+
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -244,6 +239,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 10,
   },
+
   continueBtn: {
     backgroundColor: '#FBC213',
     paddingVertical: 15,
@@ -255,15 +251,18 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-Regular',
     fontSize: 16,
   },
+
   continueText: {
     color: '#000',
     fontSize: 16,
     fontWeight: '700',
   },
+
   signInText: {
     color: '#FBC213',
     fontWeight: '600',
   },
+
   pickerWrapper: {
     height: 56,
     borderWidth: 0.5,
@@ -271,6 +270,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     overflow: 'hidden',
   },
+
   optionCardV2: {
     height: 50,
     width: '100%',

@@ -11,19 +11,10 @@ interface TabButtonProps {
   inactiveColor?: string;
 }
 
-const TabButton: React.FC<TabButtonProps> = ({
-  icon: Icon,
-  count,
-  active,
-  onPress,
-  activeColor = '#FBC213',
-  inactiveColor = '#3F3F3F',
-}) => {
+const TabButton: React.FC<TabButtonProps> = ({ icon: Icon, count, active, onPress, activeColor = '#FBC213', inactiveColor = '#3F3F3F', }) => {
+
   return (
-    <TouchableOpacity
-      style={[styles.tabButton, active && styles.activeTab]}
-      onPress={onPress}
-    >
+    <TouchableOpacity style={[styles.tabButton, active && styles.activeTab]} onPress={onPress}>
       <View style={styles.storyMenu}>
         <Icon color={active ? activeColor : inactiveColor} />
         <Text style={[styles.storyText, active && styles.storyTextActive]}>
@@ -32,6 +23,7 @@ const TabButton: React.FC<TabButtonProps> = ({
       </View>
     </TouchableOpacity>
   );
+
 };
 
 const styles = StyleSheet.create({
@@ -61,6 +53,7 @@ const styles = StyleSheet.create({
     color: '#FBC213',
     fontWeight: '600',
   },
+
 });
 
 export default TabButton;

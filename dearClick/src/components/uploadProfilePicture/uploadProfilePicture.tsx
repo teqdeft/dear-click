@@ -129,10 +129,7 @@ export default function UploadProfilePicture() {
     <ScrollView style={styles.container}>
       {/* Profile Header */}
       <View style={styles.profileInfoHeader}>
-        <TouchableOpacity
-          style={styles.backBtn}
-          onPress={() => navigation.goBack()}
-        >
+        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
           <BackButton />
         </TouchableOpacity>
       </View>
@@ -145,31 +142,29 @@ export default function UploadProfilePicture() {
           source={
             apiData?.profile_pic
               ? {
-                  uri: `${IMAGE_BASE_URL}/profilePicture/${apiData?.profile_pic}`,
-                }
+                uri: `${IMAGE_BASE_URL}/profilePicture/${apiData?.profile_pic}`,
+              }
               : require('../../assets/posts/profile.jpg')
           }
           style={styles.userProileImage}
         />
       </View>
+
       {/* Upload Image Button */}
       <TouchableOpacity style={styles.uploadImageButton} onPress={openGallery}>
         <Text style={styles.uploadBtnText}>Upload A Photo</Text>
       </TouchableOpacity>
+
       {/* Take Photo Button */}
-      <TouchableOpacity
-        style={styles.takePhotoButton}
-        onPress={requestCameraPermission}
-      >
+      <TouchableOpacity style={styles.takePhotoButton} onPress={requestCameraPermission}>
         <Text style={styles.takePhotoText}>Take A Photo</Text>
       </TouchableOpacity>
+
       {/* Skip For Now Button */}
-      <TouchableOpacity
-        style={styles.skipBtn}
-        onPress={() => navigation.goBack()}
-      >
+      <TouchableOpacity style={styles.skipBtn} onPress={() => navigation.goBack()}>
         <Text style={styles.skipBtnText}>Skip For Now</Text>
       </TouchableOpacity>
+
     </ScrollView>
   );
 }
@@ -179,6 +174,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#1A1A1A',
     paddingHorizontal: 16,
   },
+
   profileInfoHeader: {
     borderRadius: 15,
     flexDirection: 'row',
@@ -188,6 +184,7 @@ const styles = StyleSheet.create({
     marginBottom: 0,
     height: 70,
   },
+
   backBtn: {
     marginBottom: '20%',
     backgroundColor: '#262626',
@@ -197,9 +194,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+
   addContent: {
     position: 'relative',
   },
+
   addProfileTitle: {
     fontSize: 20,
     color: '#fff',
@@ -208,12 +207,14 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     fontWeight: 500,
   },
+
   addProfiletext: {
     fontSize: 16,
     color: '#fff',
     textAlign: 'center',
     marginBottom: 30,
   },
+
   userProfileOuter: {
     position: 'relative',
     height: 250,
@@ -222,11 +223,13 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     margin: 'auto',
   },
+
   userProileImage: {
     height: '100%',
     width: '100%',
     objectFit: 'cover',
   },
+
   uploadImageButton: {
     backgroundColor: '#F5A623',
     padding: 15,
@@ -234,11 +237,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 30,
   },
+
   uploadBtnText: {
     fontSize: 18,
     color: '#101010',
     fontWeight: 500,
   },
+
   takePhotoButton: {
     backgroundColor: '#F5A623',
     padding: 15,
@@ -247,14 +252,17 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 40,
   },
+
   takePhotoText: {
     fontSize: 18,
     color: '#101010',
     fontWeight: 500,
   },
+
   skipBtn: {
     position: 'relative',
   },
+
   skipBtnText: {
     fontSize: 15,
     color: '#fff',

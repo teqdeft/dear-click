@@ -42,5 +42,7 @@ router.post("/share-post", authMiddleware, shareController.sharePost);
 // save post
 router.post("/save-post", authMiddleware, saveController.savePost);
 
+// user post interest
+router.post("/user-post-interest", authMiddleware, postController.userPostInterest);
 
 module.exports = router;

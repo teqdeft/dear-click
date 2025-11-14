@@ -25,24 +25,16 @@ interface ProfileMainProps {
   isFollowing?: boolean;
 }
 
-const ProfileMain: React.FC<ProfileMainProps> = ({
-  profileData,
-  onFollow,
-  isFollowing = false,
-}) => {
+const ProfileMain: React.FC<ProfileMainProps> = ({ profileData, onFollow, isFollowing = false, }) => {
   return (
     <View style={styles.container}>
       {/* Profile Section */}
       <View style={styles.profileMain}>
         <View style={styles.profileInfo}>
           <View style={styles.proifleImage}>
+
             <View style={styles.usrImage}>
-              <Image
-                source={{
-                  uri: `${IMAGE_BASE_URL}/profilePicture/${profileData?.profile_pic}`,
-                }}
-                style={styles.uploadUserImage}
-              />
+              <Image source={{ uri: `${IMAGE_BASE_URL}/profilePicture/${profileData?.profile_pic}`, }} style={styles.uploadUserImage} />
             </View>
           </View>
 
@@ -50,6 +42,7 @@ const ProfileMain: React.FC<ProfileMainProps> = ({
             <Text style={styles.userName}>{profileData?.name}</Text>
             <Text style={styles.userPhone}>{profileData?.bio}</Text>
           </View>
+
         </View>
 
         {isFollowing ? (
@@ -73,16 +66,12 @@ const ProfileMain: React.FC<ProfileMainProps> = ({
         </View>
 
         <View style={styles.userPostDetail}>
-          <Text style={styles.numberPost}>
-            {formatCount(profileData?.followers_count)}
-          </Text>
+          <Text style={styles.numberPost}> {formatCount(profileData?.followers_count)}</Text>
           <Text style={styles.postTypeTitle}>Followers</Text>
         </View>
 
         <View style={styles.userPostDetail}>
-          <Text style={styles.numberPost}>
-            {formatCount(profileData?.following_count)}
-          </Text>
+          <Text style={styles.numberPost}> {formatCount(profileData?.following_count)} </Text>
           <Text style={styles.postTypeTitle}>Following</Text>
         </View>
       </View>
@@ -165,6 +154,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '500',
   },
+
   userUnFollow: {
     backgroundColor: '#353535',
     borderRadius: 40,
@@ -173,11 +163,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
   },
+
   userUnFollowText: {
     color: '#fff',
     fontSize: 12,
     fontWeight: '500',
   },
+
   userAllPost: {
     flexDirection: 'row',
     justifyContent: 'space-around',
@@ -185,14 +177,17 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     paddingHorizontal: 10,
   },
+
   userPostDetail: {
     alignItems: 'center',
   },
+
   numberPost: {
     color: '#FFF',
     fontSize: 18,
     fontWeight: '700',
   },
+
   postTypeTitle: {
     color: '#999999',
     fontSize: 13,

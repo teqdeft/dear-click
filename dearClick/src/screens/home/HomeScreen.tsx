@@ -14,6 +14,7 @@ type Post = {
   like_count: number;
   comment_count: number;
   created_at: string;
+  share_count: string;
   userId: number;
   name: string;
   username: string;
@@ -24,6 +25,7 @@ export default function HomeScreen() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [visiblePostId, setVisiblePostId] = useState<number | null>(null);
+  const [likeTrigger, setLikeTrigger] = useState<number | null>(0);
 
   const viewabilityConfig = useRef({
     itemVisiblePercentThreshold: 70, // must be at least 70% visible
@@ -40,45 +42,38 @@ export default function HomeScreen() {
     { viewabilityConfig, onViewableItemsChanged },
   ]);
 
-  useEffect(() => {
-    const getPosts = async () => {
-      try {
-        setLoading(true);
-        const { data } = await fetchPost();
-        console.log('API full response:', data);
-        setPosts(data);
-      } catch (error) {
-        console.error('Error fetching posts:', error);
-      } finally {
-        setLoading(false);
+  const getPosts = async () => {
+    try {
+      setLoading(true);
+      const { data } = await fetchPost();
+      if (likeTrigger == 0) {
+        const shuffledPosts = data.sort(() => Math.random() - 0.5);
+        setPosts(shuffledPosts);
       }
-    };
+      setPosts(data);
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     getPosts();
-  }, []);
+  }, [likeTrigger]);
 
   return (
-    // <SafeAreaView>
-    //   <ScrollView style={styles.container}>
-    //     <ProfileSection />
-    //     <Stories />
-    //     <Interests />
-    //     <View>
-    //       <FlatList
-    //         data={posts}
-    //         keyExtractor={item => item.id.toString()}
-    //         renderItem={({ item }) => <PostCard item={item} />}
-    //         showsVerticalScrollIndicator={true}
-    //       />
-    //     </View>
-    //   </ScrollView>
-    // </SafeAreaView>
+
     <SafeAreaView style={styles.container}>
       <FlatList
         data={posts}
         keyExtractor={item => item.id.toString()}
         renderItem={({ item }) => (
-          <PostCard item={item} isVisible={visiblePostId === item.id} />
+          <PostCard
+            item={item}
+            isVisible={visiblePostId === item.id}
+            onLikeSuccess={() => setLikeTrigger(prev => prev + 1)}
+          />
         )}
         showsVerticalScrollIndicator={true}
         // showsVerticalScrollIndicator={true}

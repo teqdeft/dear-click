@@ -52,10 +52,10 @@ type MediaType = 'AllMedia' | 'reels' | 'images';
 export default function FollowerScreen() {
   const [activeTab, setActiveTab] = useState<MediaType>('AllMedia');
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
-  const route = useRoute();
-  const { userId } = route.params as { userId: number };
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const route = useRoute();
+  const { userId } = route.params as { userId: number };
 
   useEffect(() => {
     const getPosts = async () => {
@@ -80,10 +80,7 @@ export default function FollowerScreen() {
     <ScrollView style={styles.container}>
       {/* Profile Header */}
       <View style={styles.profileInfoHeader}>
-        <TouchableOpacity
-          style={styles.goBackBtn}
-          onPress={() => navigation.goBack()}
-        >
+        <TouchableOpacity style={styles.goBackBtn} onPress={() => navigation.goBack()}>
           <BackButton />
         </TouchableOpacity>
 
@@ -93,23 +90,20 @@ export default function FollowerScreen() {
       </View>
 
       {/* Profile Main */}
-
       <View style={styles.profileMain}>
         <View style={styles.profileInfo}>
           <View style={styles.proifleImage}>
+
             <View style={styles.usrImage}>
-              <Image
-                source={{
-                  uri: `${IMAGE_BASE_URL}/profilePicture/${profileData?.profile_pic}`,
-                }}
-                style={styles.uploadUserImage}
-              />
+              <Image source={{ uri: `${IMAGE_BASE_URL}/profilePicture/${profileData?.profile_pic}`, }} style={styles.uploadUserImage} />
             </View>
           </View>
+
           <View style={styles.userDetail}>
             <Text style={styles.userName}>{profileData?.name}</Text>
             <Text style={styles.userPhone}>{profileData?.bio}</Text>
           </View>
+
         </View>
 
         <TouchableOpacity style={styles.userFollow}>
@@ -122,32 +116,22 @@ export default function FollowerScreen() {
 
       {/* User Post Detail */}
       <View style={styles.userAllPost}>
-        <View style={styles.userPostDetail}>
-          <Text style={styles.numberPost}>
-            {formatCount(profileData?.all_media_count)}
-          </Text>
 
+        <View style={styles.userPostDetail}>
+          <Text style={styles.numberPost}> {formatCount(profileData?.all_media_count)}</Text>
           <Text style={styles.postTypeTitle}>Posts</Text>
         </View>
 
         <View style={styles.userPostDetail}>
-          <Text style={styles.numberPost}>
-            {formatCount(profileData?.followers_count)}
-          </Text>
+          <Text style={styles.numberPost}> {formatCount(profileData?.followers_count)}</Text>
           <Text style={styles.postTypeTitle}>Followers</Text>
         </View>
 
         <View style={styles.userPostDetail}>
-          <Text style={styles.numberPost}>
-            {formatCount(profileData?.following_count)}
-          </Text>
+          <Text style={styles.numberPost}> {formatCount(profileData?.following_count)}</Text>
           <Text style={styles.postTypeTitle}>Following</Text>
         </View>
 
-        <View style={styles.userPostDetail}>
-          <Text style={styles.numberPost}>87</Text>
-          <Text style={styles.postTypeTitle}>Stories</Text>
-        </View>
       </View>
 
       {/* <Highlights /> */}
@@ -220,11 +204,7 @@ export default function FollowerScreen() {
             {profileData?.posts?.map(posts => (
               <View style={styles.postStoryColl} key={posts.id}>
                 <View style={styles.postType}>
-                  {getMediaType(posts.media_url) == 'image' ? (
-                    <ImageIcon color={'#FFFFFF'} />
-                  ) : (
-                    <ReelsIcon color={'#FFFFFF'} />
-                  )}
+                  {getMediaType(posts.media_url) == 'image' ? (<ImageIcon color={'#FFFFFF'} />) : (<ReelsIcon color={'#FFFFFF'} />)}
                 </View>
                 <View style={styles.postCard}>
                   <Image
@@ -242,21 +222,15 @@ export default function FollowerScreen() {
           <View style={styles.postStoryRow}>
             {profileData?.posts?.map(posts => (
               <View style={styles.postStoryColl} key={posts.id}>
+
                 <View style={styles.postType}>
-                  {getMediaType(posts.media_url) == 'image' ? (
-                    <ImageIcon color={'#FFFFFF'} />
-                  ) : (
-                    <ReelsIcon color={'#FFFFFF'} />
-                  )}
+                  {getMediaType(posts.media_url) == 'image' ? (<ImageIcon color={'#FFFFFF'} />) : (<ReelsIcon color={'#FFFFFF'} />)}
                 </View>
+
                 <View style={styles.postCard}>
-                  <Image
-                    source={{
-                      uri: `${IMAGE_BASE_URL}/posts/${posts?.media_url}`,
-                    }}
-                    style={styles.postMediaContent}
-                  />
+                  <Image source={{ uri: `${IMAGE_BASE_URL}/posts/${posts?.media_url}`, }} style={styles.postMediaContent} />
                 </View>
+
               </View>
             ))}
           </View>
@@ -272,7 +246,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#1A1A1A',
     paddingHorizontal: 16,
   },
-
   // post detail
   userAllPost: {
     flexDirection: 'row',
@@ -297,8 +270,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginTop: 4,
   },
-
-  // end
 
   profileInfoHeader: {
     borderRadius: 15,
@@ -352,12 +323,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 20,
   },
+
   mainContainer: {
     flexDirection: 'row',
     gap: 8,
     alignItems: 'center',
     paddingHorizontal: 5,
   },
+
   profileInfo: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -400,6 +373,7 @@ const styles = StyleSheet.create({
     color: '#999999',
     maxWidth: 140,
   },
+
   highlights: {
     flex: 1,
     gap: 10,
@@ -482,28 +456,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
 
-  // storyMenu: {
-  //   flexDirection: 'row',
-  //   alignItems: 'center',
-  //   justifyContent: 'center',
-  //   gap: 8,
-  // },
-
   storyIcon: {
     width: 20,
     height: 20,
     resizeMode: 'contain',
   },
-
-  // storyText: {
-  //   fontSize: 12,
-  //   color: '#555',
-  // },
-
-  // storyTextActive: {
-  //   color: '#FBC213',
-  //   fontWeight: '600',
-  // },
 
   tabContent: {
     paddingHorizontal: 16,
@@ -560,21 +517,11 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
 
-  // tabButton: {
-  //   flex: 1,
-  //   paddingVertical: 15,
-  //   alignItems: 'center',
-  // },
-
   tabText: {
     color: '#333',
     fontWeight: '500',
     fontSize: 16,
   },
-
-  // activeTab: {
-  //   position: 'relative',
-  // },
 
   activeTabText: {
     color: '#FBC213',

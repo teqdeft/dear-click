@@ -8,15 +8,14 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import BackButton from '../../assets/svgs/Auth svg/BackButton';
-import {  useNavigation } from '@react-navigation/core';
+import { useNavigation } from '@react-navigation/core';
 import { AuthContext } from '../../context/AuthContext';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import toast from '../../components/utils/Toast';
 import { updateProfile, updateSettings } from './services';
 import { Picker } from '@react-native-picker/picker';
 export default function AccountSetings() {
-  const { apiData, apiLoading, apiError, fetchApiData } =
-    useContext(AuthContext);
+  const { apiData, apiLoading, apiError, fetchApiData } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
   const [formData, setFormData] = useState({
@@ -42,9 +41,11 @@ export default function AccountSetings() {
   }, []);
 
   const handleUpdateSettings = async () => {
+
     if (!formData.account_type) {
       return toast.error('account_type is required!');
     }
+
     if (!formData.account_privacy) {
       return toast.error('account_privacy is required!');
     }
@@ -57,6 +58,7 @@ export default function AccountSetings() {
       if (!data.success) {
         return toast.error(data.error.message);
       }
+
       toast.success(data.message);
       navigation.navigate('AppTabs', { screen: 'Profile' });
     } catch (err) {
@@ -75,10 +77,7 @@ export default function AccountSetings() {
       {/* Header */}
       <View style={styles.profileInfoHeader}>
         {/* Back Button */}
-        <TouchableOpacity
-          style={styles.backBtn}
-          onPress={() => navigation.goBack()}
-        >
+        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
           <BackButton />
         </TouchableOpacity>
         <Text style={styles.notificationTitle}>Account Settings</Text>
@@ -136,17 +135,10 @@ export default function AccountSetings() {
         </View>
 
         {/* Continue Button */}
-        <TouchableOpacity
-          style={styles.continueBtn}
-          onPress={handleUpdateSettings}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="#000" />
-          ) : (
-            <Text style={styles.continueText}>Save</Text>
-          )}
+        <TouchableOpacity style={styles.continueBtn} onPress={handleUpdateSettings} disabled={loading}>
+          {loading ? (<ActivityIndicator color="#000" />) : (<Text style={styles.continueText}>Save</Text>)}
         </TouchableOpacity>
+
       </View>
     </ScrollView>
   );
@@ -156,12 +148,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+
   profileInfoHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 23,
   },
+
   profileInformation: {
     backgroundColor: '#1F1F1F',
     borderRadius: 15,
@@ -170,6 +164,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     position: 'relative',
   },
+
   backBtn: {
     position: 'absolute',
     left: 0,
@@ -194,15 +189,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 10,
   },
+
   optionsContainer: {
     marginBottom: 4,
     height: 100,
   },
+
   emaillabel: {
     color: 'grey',
     marginBottom: 10,
     fontSize: 14,
   },
+
   optionCard: {
     height: 56,
     fontSize: 16,
@@ -213,6 +211,7 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderColor: 'grey',
   },
+
   optionCard2: {
     height: 56,
     fontSize: 16,
@@ -223,6 +222,7 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderColor: 'grey',
   },
+
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -231,6 +231,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 10,
   },
+
   continueBtn: {
     backgroundColor: '#FBC213',
     paddingVertical: 15,
@@ -238,15 +239,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: '10%',
   },
+
   continueText: {
     color: '#000',
     fontSize: 16,
     fontWeight: '700',
   },
+
   signInText: {
     color: '#FBC213',
     fontWeight: '600',
   },
+
   pickerWrapper: {
     height: 56,
     borderWidth: 0.5,
@@ -254,8 +258,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     overflow: 'hidden',
   },
+
   optionCardV2: {
     height: 53,
     width: '100%',
   },
+
 });

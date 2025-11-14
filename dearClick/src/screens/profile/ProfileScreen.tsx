@@ -52,10 +52,7 @@ export default function ProfileScreen() {
       {/* Header */}
       <View style={styles.profileInfoHeader}>
         {/* Back Button */}
-        <TouchableOpacity
-          style={styles.backBtn}
-          onPress={() => navigation.goBack()}
-        >
+        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()} >
           <BackButton />
         </TouchableOpacity>
         <Text style={styles.notificationTitle}>Settings</Text>
@@ -65,50 +62,35 @@ export default function ProfileScreen() {
       <View style={styles.profileMain}>
         <View style={styles.profileInfo}>
           <View style={styles.proifleImage}>
+
             <View style={styles.usrImage}>
               <Image
-                source={
-                  apiData?.profile_pic
-                    ? {
-                        uri: `${IMAGE_BASE_URL}/profilePicture/${apiData?.profile_pic}`,
-                      }
-                    : require('../../assets/posts/profile.jpg')
-                }
+                source={apiData?.profile_pic ? { uri: `${IMAGE_BASE_URL}/profilePicture/${apiData?.profile_pic}`, } : require('../../assets/posts/profile.jpg')}
                 style={styles.uploadUserImage}
               />
             </View>
-            <TouchableOpacity
-              style={styles.editImage}
-              onPress={() => navigation.navigate('UploadProfilePicture')}
-            >
+
+            <TouchableOpacity style={styles.editImage} onPress={() => navigation.navigate('UploadProfilePicture')}>
               <EditIcon width={10} fill="#0a0a0aff" />
             </TouchableOpacity>
           </View>
+
           <View>
             <Text style={styles.userName}>{apiData?.name || '--'}</Text>
             <Text style={styles.userPhone}>{apiData?.phone || '--'}</Text>
           </View>
         </View>
+
         <TouchableOpacity style={styles.signOutButton} onPress={logout}>
-          <Text
-            style={{
-              color: '#fff',
-              fontSize: 14,
-              fontFamily: 'Poppins-Medium',
-            }}
-          >
-            Sign out
-          </Text>
+          <Text style={{ color: '#fff', fontSize: 14, fontFamily: 'Poppins-Medium', }}>Sign out</Text>
         </TouchableOpacity>
+
       </View>
 
       {/* Profile Information Section */}
       <View style={styles.profileInformation}>
         <Text style={styles.informationTitle}>Profile Information</Text>
-        <TouchableOpacity
-          style={styles.editInfo}
-          onPress={() => navigation.navigate('ProfileInfo')}
-        >
+        <TouchableOpacity style={styles.editInfo} onPress={() => navigation.navigate('ProfileInfo')}>
           <EditIcon />
         </TouchableOpacity>
 
@@ -138,10 +120,7 @@ export default function ProfileScreen() {
       {/* Contact Details */}
       <View style={styles.profileInformation}>
         <Text style={styles.informationTitle}>Contact Details</Text>
-        <TouchableOpacity
-          style={styles.editInfo}
-          onPress={() => navigation.navigate('ContactDetail')}
-        >
+        <TouchableOpacity style={styles.editInfo} onPress={() => navigation.navigate('ContactDetail')}>
           <EditIcon />
         </TouchableOpacity>
 
@@ -173,10 +152,7 @@ export default function ProfileScreen() {
       {/* Account Settings */}
       <View style={styles.profileInformation}>
         <Text style={styles.informationTitle}>Account Settings</Text>
-        <TouchableOpacity
-          style={styles.editInfo}
-          onPress={() => navigation.navigate('AccountSetings')}
-        >
+        <TouchableOpacity style={styles.editInfo} onPress={() => navigation.navigate('AccountSetings')}>
           <EditIcon />
         </TouchableOpacity>
 
@@ -184,20 +160,13 @@ export default function ProfileScreen() {
           <View style={styles.infoGroup}>
             <Text style={styles.infoName}>Account Type</Text>
             <Text style={styles.infoValue}>
-              {apiData?.account_type == '1'
-                ? 'Personal'
-                : apiData?.account_type == '2'
-                ? 'Business'
-                : apiData?.account_type == '3'
-                ? 'Creator'
-                : '--'}
+              {apiData?.account_type == '1' ? 'Personal' : apiData?.account_type == '2' ? 'Business' : apiData?.account_type == '3' ? 'Creator' : '--'}
             </Text>
           </View>
 
           <View style={styles.infoGroup}>
             <Text style={styles.infoName}>Account Status</Text>
-            <Text style={styles.infoValue}>
-              {apiData?.account_privacy || '--'}
+            <Text style={styles.infoValue}> {apiData?.account_privacy || '--'}
             </Text>
           </View>
 
@@ -207,7 +176,7 @@ export default function ProfileScreen() {
           </View>
         </View>
       </View>
-    </ScrollView>
+    </ScrollView >
   );
 }
 
@@ -217,6 +186,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#1A1A1A',
     paddingHorizontal: 16,
   },
+
   profileInfoHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -245,7 +215,6 @@ const styles = StyleSheet.create({
   profileMain: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 15,
-    // padding: 23,
     paddingHorizontal: 20,
     paddingVertical: 20,
     marginBottom: 20,
@@ -253,25 +222,30 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+
   profileInfo: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
   },
+
   proifleImage: {
     position: 'relative',
   },
+
   usrImage: {
     height: 70,
     width: 70,
     borderRadius: 35,
     overflow: 'hidden',
   },
+
   uploadUserImage: {
     height: '100%',
     width: '100%',
     resizeMode: 'cover',
   },
+
   editImage: {
     position: 'absolute',
     right: 0,
@@ -285,6 +259,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+
   userName: {
     fontFamily: 'Poppins-Medium',
     fontSize: 16,
@@ -292,11 +267,13 @@ const styles = StyleSheet.create({
     color: '#fff',
     paddingBottom: 5,
   },
+
   userPhone: {
     fontFamily: 'Poppins-Medium',
     fontSize: 13,
     color: '#fff',
   },
+
   signOutButton: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 40,
@@ -305,6 +282,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+
   profileInformation: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 15,
@@ -312,6 +290,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     position: 'relative',
   },
+
   informationTitle: {
     fontFamily: 'Poppins-Medium',
     fontSize: 18,
@@ -319,6 +298,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginBottom: 20,
   },
+
   editInfo: {
     position: 'absolute',
     right: 16,
@@ -331,14 +311,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+
   information: {
     marginTop: 10,
   },
+
   infoGroup: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 15,
   },
+
   infoName: {
     fontFamily: 'Poppins-Medium',
     fontSize: 15,
@@ -346,6 +329,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     width: '40%',
   },
+
   infoValue: {
     fontFamily: 'Poppins-Medium',
     fontSize: 15,
@@ -353,4 +337,5 @@ const styles = StyleSheet.create({
     width: '56%',
     fontWeight: '400',
   },
+
 });

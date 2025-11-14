@@ -70,10 +70,7 @@ export default function ProfilePicturePreview() {
     <ScrollView style={styles.container}>
       {/* Header */}
       <View style={styles.profileInfoHeader}>
-        <TouchableOpacity
-          style={styles.backBtn}
-          onPress={() => navigation.goBack()}
-        >
+        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()} >
           <BackButton />
         </TouchableOpacity>
       </View>
@@ -85,30 +82,17 @@ export default function ProfilePicturePreview() {
       {/* Circular Frame */}
       <TouchableOpacity onPress={handleAdjustPhoto}>
         <View style={styles.userProfileOuter}>
-          {imageUri && (
-            <Image source={{ uri: imageUri }} style={styles.userProileImage} />
-          )}
+          {imageUri && (<Image source={{ uri: imageUri }} style={styles.userProileImage} />)}
         </View>
       </TouchableOpacity>
 
       {/* Upload button */}
-      <TouchableOpacity
-        style={styles.uploadImageButton}
-        onPress={handleUpdateProfile}
-        disabled={loading}
-      >
-        {loading ? (
-          <ActivityIndicator color="#000" />
-        ) : (
-          <Text style={styles.takePhotoText}>Save</Text>
-        )}
+      <TouchableOpacity style={styles.uploadImageButton} onPress={handleUpdateProfile} disabled={loading}>
+        {loading ? (<ActivityIndicator color="#000" />) : (<Text style={styles.takePhotoText}>Save</Text>)}
       </TouchableOpacity>
 
       {/* Skip */}
-      <TouchableOpacity
-        style={styles.skipBtn}
-        onPress={() => navigation.navigate('AppTabs', { screen: 'Profile' })}
-      >
+      <TouchableOpacity style={styles.skipBtn} onPress={() => navigation.navigate('AppTabs', { screen: 'Profile' })} >
         <Text style={styles.skipBtnText}>Skip For Now</Text>
       </TouchableOpacity>
     </ScrollView>
@@ -121,6 +105,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#1A1A1A',
     paddingHorizontal: 16,
   },
+
   profileInfoHeader: {
     borderRadius: 15,
     flexDirection: 'row',
@@ -129,6 +114,7 @@ const styles = StyleSheet.create({
     marginTop: 50,
     height: 70,
   },
+
   backBtn: {
     backgroundColor: '#262626',
     width: 40,
@@ -137,15 +123,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+
   addContent: {
     marginBottom: 20,
   },
+
   addProfileTitle: {
     fontSize: 20,
     color: '#fff',
     textAlign: 'center',
     fontWeight: '500',
   },
+
   userProfileOuter: {
     alignSelf: 'center',
     height: 250,
@@ -154,10 +143,12 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     backgroundColor: '#333',
   },
+
   userProileImage: {
     height: '100%',
     width: '100%',
   },
+
   uploadImageButton: {
     backgroundColor: '#F5A623',
     padding: 15,
@@ -165,18 +156,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 30,
   },
+
   takePhotoText: {
     fontSize: 18,
     color: '#101010',
     fontWeight: '500',
   },
+
   skipBtn: {
     marginTop: 30,
   },
+
   skipBtnText: {
     fontSize: 15,
     color: '#fff',
     textAlign: 'center',
     marginBottom: 50,
   },
+
 });
