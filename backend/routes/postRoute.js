@@ -16,12 +16,8 @@ router.post(
   postController.createPost
 );
 
-// fetch post 
-router.get(
-  "/fetch-post",
-  authMiddleware,
-  postController.getFeedPosts
-);
+// fetch post
+router.get("/fetch-post", authMiddleware, postController.getFeedPosts);
 
 // like post
 router.post("/:postId/toggle-like", authMiddleware, toggleLike);
@@ -43,6 +39,10 @@ router.post("/share-post", authMiddleware, shareController.sharePost);
 router.post("/save-post", authMiddleware, saveController.savePost);
 
 // user post interest
-router.post("/user-post-interest", authMiddleware, postController.userPostInterest);
+router.post(
+  "/user-post-interest",
+  authMiddleware,
+  postController.userPostInterest
+);
 
 module.exports = router;

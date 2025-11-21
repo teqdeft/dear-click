@@ -1,11 +1,18 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { AuthContext } from '../../../context/AuthContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function CongratsScreen() {
+  const { login } = useContext(AuthContext);
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
+  const handleClick = async () => {
+    const token = await AsyncStorage.getItem('userToken');
+    await login(token);
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -16,10 +23,7 @@ export default function CongratsScreen() {
           Welcome to Dear Click — start exploring and connect with the world
           around you
         </Text>
-        <TouchableOpacity
-          style={styles.continueBtn}
-          onPress={() => navigation.navigate('Stories')}
-        >
+        <TouchableOpacity style={styles.continueBtn} onPress={handleClick}>
           <Text style={styles.continueText}>Done</Text>
         </TouchableOpacity>
       </View>

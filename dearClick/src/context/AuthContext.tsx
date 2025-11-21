@@ -58,13 +58,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const fetchApiData = async () => {
     try {
-      const { data } = await api.get(`${API_URL}/auth/profile-details`, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-          'Cache-Control': 'no-cache',
-          Pragma: 'no-cache',
-        },
-      });
+      const { data } = await api.get(`${API_URL}/auth/profile-details`);
       setApiData(data.data.user);
     } catch (error) {
       console.error(error);

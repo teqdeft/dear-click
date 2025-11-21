@@ -12,7 +12,9 @@ export const fetchPost = async (): Promise<any> => {
 
 export const postLike = async (params: { postId: number }): Promise<any> => {
   try {
-    const { data } = await api.post(`${API_URL}/post/${params.postId}/toggle-like`,);
+    const { data } = await api.post(
+      `${API_URL}/post/${params.postId}/toggle-like`,
+    );
     return data;
   } catch (error: any) {
     return error?.response?.data;

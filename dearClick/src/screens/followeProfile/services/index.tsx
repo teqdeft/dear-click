@@ -10,6 +10,7 @@ export const fetchFollowerProfile = async ({
   media_type,
 }: paramsType): Promise<any> => {
   try {
+    console.log('-=-=-=-=-', API_URL);
     const { data } = await api.get(
       `${API_URL}/user/fetch-follower-profile/${id}`,
       {

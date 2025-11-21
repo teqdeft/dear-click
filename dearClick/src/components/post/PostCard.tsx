@@ -43,7 +43,11 @@ type PostCardProps = {
   onLikeSuccess: () => void;
 };
 
-export default function PostCard({ item, isVisible, onLikeSuccess, }: PostCardProps) {
+export default function PostCard({
+  item,
+  isVisible,
+  onLikeSuccess,
+}: PostCardProps) {
   const scheme = useColorScheme();
   const isDark = scheme === 'dark';
   const [like, setlike] = useState(null);
@@ -52,42 +56,60 @@ export default function PostCard({ item, isVisible, onLikeSuccess, }: PostCardPr
 
   const handleLike = async (postId: number) => {
     try {
-      setLoading(true)
+      setLoading(true);
       const { data } = await postLike({ postId });
       setlike(data.action);
       onLikeSuccess();
     } catch (error) {
       console.error('Error fetching posts:', error);
     } finally {
-      setLoading(true)
+      setLoading(true);
     }
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: isDark ? 'black' : '#F5F5F5' },]}>
-      <View style={[styles.innnercontainer,
-      { backgroundColor: isDark ? '#1F1F1F' : '#FFFFFF' },]}>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: isDark ? 'black' : '#F5F5F5' },
+      ]}
+    >
+      <View
+        style={[
+          styles.innnercontainer,
+          { backgroundColor: isDark ? '#1F1F1F' : '#FFFFFF' },
+        ]}
+      >
         {/*  User Info */}
         <View style={styles.userinfo}>
           <View style={styles.profileDetails}>
-
             <View style={styles.imageContainer}>
-              <Image source={{ uri: `${IMAGE_BASE_URL}/profilePicture/${item?.profile_pic}`, }} style={styles.profileImage} />
+              <Image
+                source={{
+                  uri: `${IMAGE_BASE_URL}/profilePicture/${item?.profile_pic}`,
+                }}
+                style={styles.profileImage}
+              />
             </View>
 
             <View style={styles.textDetails}>
-
-              <TouchableOpacity onPress={() =>
-                navigation.navigate('FollowerScreen', { userId: item.userId })} >
-                <Text style={[styles.name, { color: isDark ? '#fff' : '#000' }]}>
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate('FollowerScreen', { userId: item.userId })
+                }
+              >
+                <Text
+                  style={[styles.name, { color: isDark ? '#fff' : '#000' }]}
+                >
                   {item?.name}
                 </Text>
               </TouchableOpacity>
 
-              <Text style={[styles.username, { color: isDark ? '#aaa' : '#555' }]}>
+              <Text
+                style={[styles.username, { color: isDark ? '#aaa' : '#555' }]}
+              >
                 @{item.username} • {getPostDuration(item.created_at)}
               </Text>
-
             </View>
           </View>
           <ThreeDots />
@@ -96,47 +118,100 @@ export default function PostCard({ item, isVisible, onLikeSuccess, }: PostCardPr
         {/*  Post Media */}
         <View style={styles.postImage}>
           {getMediaType(item.media_url) == 'image' ? (
-            <Image source={{ uri: `${IMAGE_BASE_URL}/posts/${item?.media_url}`, }} style={styles.postMainImage} />
-          ) :
-            (
-              <Video source={{ uri: `${IMAGE_BASE_URL}/posts/${item?.media_url}` }} style={styles.postMainImage1} resizeMode="cover"
-                repeat={true}
-                paused={!isVisible}
-                muted={false}
-              />
-            )}
-          <Text style={[styles.caption, { color: isDark ? '#999999' : '#444' }]}> {item.caption}</Text>
+            <Image
+              source={{
+                uri: `${IMAGE_BASE_URL}/posts/${item?.media_url}`,
+              }}
+              style={styles.postMainImage}
+            />
+          ) : (
+            <Video
+              source={{ uri: `${IMAGE_BASE_URL}/posts/${item?.media_url}` }}
+              style={styles.postMainImage1}
+              resizeMode="cover"
+              repeat={true}
+              paused={!isVisible}
+              muted={false}
+            />
+          )}
+          <Text
+            style={[styles.caption, { color: isDark ? '#999999' : '#444' }]}
+          >
+            {' '}
+            {item.caption}
+          </Text>
         </View>
 
         {/*  Reactions */}
         <View style={styles.bottomContainer}>
           <View style={styles.reactions}>
-
-            <TouchableOpacity style={[styles.like, { borderColor: isDark ? '#FFFFFF1A' : '#0000001A' },]} onPress={() => handleLike(item.id)}>
+            <TouchableOpacity
+              style={[
+                styles.like,
+                { borderColor: isDark ? '#FFFFFF1A' : '#0000001A' },
+              ]}
+              onPress={() => handleLike(item.id)}
+            >
               <Like color={like == 'liked' ? '#FBC213' : '#cfcfcfff'} />
-              <Text style={[styles.reactionText, { color: isDark ? '#fff' : '#000' },]}>
+              <Text
+                style={[
+                  styles.reactionText,
+                  { color: isDark ? '#fff' : '#000' },
+                ]}
+              >
                 {formatCount(item?.like_count)}
               </Text>
             </TouchableOpacity>
 
-            <View style={[styles.like, { borderColor: isDark ? '#FFFFFF1A' : '#0000001A' },]}>
+            <View
+              style={[
+                styles.like,
+                { borderColor: isDark ? '#FFFFFF1A' : '#0000001A' },
+              ]}
+            >
               <Comment />
-              <Text style={[styles.reactionText, { color: isDark ? '#fff' : '#000' },]}> {item.comment_count} </Text>
+              <Text
+                style={[
+                  styles.reactionText,
+                  { color: isDark ? '#fff' : '#000' },
+                ]}
+              >
+                {' '}
+                {item.comment_count}{' '}
+              </Text>
             </View>
 
-            <View style={[styles.like, { borderColor: isDark ? '#FFFFFF1A' : '#0000001A' },]}>
+            <View
+              style={[
+                styles.like,
+                { borderColor: isDark ? '#FFFFFF1A' : '#0000001A' },
+              ]}
+            >
               <Share />
-              <Text style={[styles.reactionText, { color: isDark ? '#fff' : '#000' },]}>{item.share_count} Share</Text>
+              <Text
+                style={[
+                  styles.reactionText,
+                  { color: isDark ? '#fff' : '#000' },
+                ]}
+              >
+                {item.share_count} Share
+              </Text>
             </View>
           </View>
 
           <View>
-            <View style={[styles.save, { borderColor: isDark ? '#FFFFFF1A' : '#0000001A' },]}><Save /></View>
+            <View
+              style={[
+                styles.save,
+                { borderColor: isDark ? '#FFFFFF1A' : '#0000001A' },
+              ]}
+            >
+              <Save />
+            </View>
           </View>
-
         </View>
       </View>
-    </View >
+    </View>
   );
 }
 
@@ -241,6 +316,4 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     padding: 10,
   },
-
 });
-

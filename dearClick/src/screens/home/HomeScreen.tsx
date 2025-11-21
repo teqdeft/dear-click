@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Interests from '../interests/Interests';
 import ProfileSection from './ProfileSection';
 import { fetchPost } from '../post/services/services';
+import DarkSkeleton from './DarkSkeleton';
 
 type Post = {
   id: number;
@@ -57,13 +58,13 @@ export default function HomeScreen() {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     getPosts();
   }, [likeTrigger]);
 
-  return (
+  if (loading) return <DarkSkeleton />;
 
+  return (
     <SafeAreaView style={styles.container}>
       <FlatList
         data={posts}

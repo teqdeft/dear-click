@@ -53,7 +53,7 @@ export default function Interests() {
       horizontal
       showsHorizontalScrollIndicator={false}
     >
-      <View style={styles.container}>
+      <View style={styles.container}> 
         {interests.map((interest, idx) => (
           <View
             style={[
