@@ -32,12 +32,12 @@ export default function AppTabs() {
   const colors = {
     dark: {
       tabBar: '#1F1F1F',
-      active: '#FF0000',
+      active: '#FBC213',
       inactive: '#888',
     },
     light: {
       tabBar: '#fff',
-      active: '#FF0000',
+      active: '#FBC213',
       inactive: '#555',
     },
   };
