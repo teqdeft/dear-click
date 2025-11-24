@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { View, Text, TouchableOpacity, Pressable, Animated, Easing, Platform, } from "react-native";
+import { View, Text, TouchableOpacity, Pressable, Animated, Easing, Platform, Alert, } from "react-native";
 import { Camera, useCameraDevice, CameraPermissionStatus, VideoFile, } from "react-native-vision-camera";
 import PreviewScreen from "./PreviewScreen";
 import toast from "../utils/Toast";
@@ -193,31 +193,34 @@ export default function CameraWithSpinner() {
         );
     }
 
-
-
     const handleAddStoryOrPost = async () => {
         try {
+            setLoading(true);
 
-            if (type == "Post") {
-                setLoading(true);
-                const data = await createPost(photo);
-                if (!data?.success) return toast.error(data.error.message);
-                toast.success(data.message);
+            let data;
+
+            if (type === "Post") {
+                data = await createPost(photo);
             }
 
-            else if (type == "Story") {
-                setLoading(true);
-                const data = await createStory(photo);
-                if (!data?.success) return toast.error(data.error.message);
-                toast.success(data.message);
+            if (type === "Story") {
+                data = await createStory(photo);
             }
 
+            if (!data?.success) {
+                toast.error(data?.error?.message || "Failed to submit");
+                return;
+            }
+
+            toast.success(data.message);
             navigation.navigate('AppTabs', { screen: 'Home' });
-        } catch (err) {
 
+        } catch (err) {
+            toast.error("Something went wrong");
+        } finally {
             setLoading(false);
-            toast.error('Something went wrong');
         }
+
     };
 
     if (preview) {

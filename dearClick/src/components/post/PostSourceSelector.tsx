@@ -25,6 +25,7 @@ export default function PostSourceSelector() {
         const result = await launchImageLibrary({
             mediaType: 'mixed',
             quality: 1,
+            selectionLimit: 10
         });
 
         if (result.assets && result.assets.length > 0) {
@@ -41,26 +42,32 @@ export default function PostSourceSelector() {
 
     const handleAddStoryOrPost = async () => {
         try {
+            setLoading(true);
+
+            let data;
+
             if (type == "Post") {
-                setLoading(true);
-                const data = await createPost(photo);
-                if (!data?.success) return toast.error(data.error.message);
-                toast.success(data.message);
+                data = await createPost(photo);
             }
 
-            else if (type == "Story") {
-                setLoading(true);
-                const data = await createStory(photo);
-                if (!data?.success) return toast.error(data.error.message);
-                toast.success(data.message);
+            if (type == "Story") {
+                data = await createStory(photo);
             }
 
+            if (!data?.success) {
+                toast.error(data?.error?.message || "Failed to submit");
+                return;
+            }
+
+            toast.success(data.message);
             navigation.navigate('AppTabs', { screen: 'Home' });
-        } catch (err) {
 
+        } catch (err) {
+            toast.error("Something went wrong");
+        } finally {
             setLoading(false);
-            toast.error('Something went wrong');
         }
+
     };
 
     if (preview) {
@@ -71,6 +78,17 @@ export default function PostSourceSelector() {
                 onUse={() => handleAddStoryOrPost()}
             />
         );
+    }
+
+    if (loading) {
+        return (
+            <>
+                <View>
+                    <Text>loading.............</Text>
+                </View>
+            </>
+
+        )
     }
 
     return (
