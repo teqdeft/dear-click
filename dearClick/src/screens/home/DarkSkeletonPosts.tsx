@@ -3,7 +3,7 @@ import { View, Animated, FlatList, Dimensions } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
-export default function DarkSkeletonSoft() {
+export default function DarkSkeletonPosts() {
   const pulse = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
@@ -39,20 +39,7 @@ export default function DarkSkeletonSoft() {
 
   return (
     <View style={{ flex: 1, backgroundColor: '#000' }}>
-      {/* Header */}
-      <View
-        style={{
-          padding: 12,
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}
-      >
-        <FadeBox style={{ height: 24, width: '35%' }} />
-        <FadeBox style={{ height: 24, width: 60 }} />
-      </View>
-
-      {/* Stories */}
+      {/* Stories
       <FlatList
         horizontal
         data={[...Array(8)]}
@@ -77,8 +64,7 @@ export default function DarkSkeletonSoft() {
             />
           </View>
         )}
-      />
-
+      /> */}
       {/* Posts */}
       <FlatList
         data={[...Array(4)]}

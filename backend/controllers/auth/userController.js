@@ -586,7 +586,7 @@ const UserAccountSetting = async (req, res) => {
 const getUserDetails = async (req, res) => {
   try {
     const userId = req.user.id;
-    console.log("userId", userId)
+    
     if (!userId) {
       return error(res, "Id is required!", null, 403);
     }

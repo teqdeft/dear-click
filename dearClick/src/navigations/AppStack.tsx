@@ -13,6 +13,7 @@ import FollowerScreen from '../screens/followeProfile/FollowerScreen';
 import PostSourceSelector from '../components/post/PostSourceSelector';
 import CameraWithSpinner from '../components/uploadProfilePicture/CameraScreen';
 import StorySourceSelector from '../screens/stories/StorySourceSelector';
+import ProfileScreen from '../screens/profile/ProfileScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -41,6 +42,7 @@ export default function AppStack() {
       <Stack.Screen name="ContactDetail" component={ContactDetail} />
       <Stack.Screen name="PostSourceSelector" component={PostSourceSelector} />
       <Stack.Screen name="StorySourceSelector" component={StorySourceSelector} />
+      <Stack.Screen name="Profilesc" component={ProfileScreen} />
 
 
     </Stack.Navigator>
