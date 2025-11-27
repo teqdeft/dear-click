@@ -20,7 +20,6 @@ export default function MyStory() {
   const [photo, setPhoto] = useState<string | null>(null);
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
 
-
   return (
     <View style={styles.yourStory}>
       <View style={styles.outerContainer}>
@@ -35,24 +34,19 @@ export default function MyStory() {
           />
         </View>
         <View
-          style={[
-            styles.plusIconContainer,
-            { backgroundColor: isDarkMode ? '#1F1F1F' : '#FFFFFF' },
-          ]}
+          style={[styles.plusIconContainer, { backgroundColor: '#1F1F1F' }]}
         >
           <TouchableOpacity
             style={styles.innerplusIconContainer}
-            onPress={() => navigation.navigate('PostSourceSelector', { type: "Story" })}
+            onPress={() =>
+              navigation.navigate('PostSourceSelector', { type: 'Story' })
+            }
           >
-            <PlusIcon fill={isDarkMode ? '#FFFFFF' : '#000000'} />
+            <PlusIcon fill={'#FFFFFF'} />
           </TouchableOpacity>
         </View>
       </View>
-      <Text
-        style={[styles.username, { color: isDarkMode ? '#CCCCCC' : '#555555' }]}
-      >
-        Your Story
-      </Text>
+      <Text style={[styles.username, { color: '#CCCCCC' }]}>Your Story</Text>
     </View>
   );
 }

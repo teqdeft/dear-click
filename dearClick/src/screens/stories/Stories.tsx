@@ -62,7 +62,7 @@ export default function Stories() {
     <ScrollView
       style={[
         styles.container,
-        { backgroundColor: isDarkMode ? '#1F1F1F' : '#FFFFFF' },
+        { backgroundColor: '#1F1F1F'  },
       ]}
       horizontal
       showsHorizontalScrollIndicator={false}
@@ -84,7 +84,7 @@ export default function Stories() {
             <Text
               style={[
                 styles.username,
-                { color: isDarkMode ? '#CCCCCC' : '#555555' },
+                { color:  '#CCCCCC'  },
               ]}
             >
               {story.username}
