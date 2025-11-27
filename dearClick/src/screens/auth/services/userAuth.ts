@@ -93,13 +93,10 @@ export const createPassword = async ({
 // sign in
 export const SignIn = async ({ input, password }: paramsType) => {
   try {
-    const { data } = await axios.post(
-      `http://192.168.1.46:5050/api/auth/signin`,
-      {
-        input,
-        password,
-      },
-    );
+    const { data } = await axios.post(`${API_URL}/auth/signin`, {
+      input,
+      password,
+    });
     return data;
   } catch (error: any) {
     return error?.response?.data;
