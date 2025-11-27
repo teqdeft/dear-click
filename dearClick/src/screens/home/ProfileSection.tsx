@@ -8,20 +8,19 @@ export default function ProfileSection() {
   const isDarkMode = scheme === 'dark';
 
   return (
-    <View style={[styles.profileContainer, { backgroundColor: isDarkMode ? '#1F1F1F' : '#FFFFFF' },]}>
-
+    <View style={[styles.profileContainer, { backgroundColor: '#1F1F1F' }]}>
       <View>
-        <DearClickLogo
-          width={100}
-          height={20}
-          fill={isDarkMode ? '#FFFFFF' : '#000000'}
-        />
+        <DearClickLogo width={100} height={20} fill={'#FFFFFF'} />
       </View>
 
-      <View style={[styles.notification, { borderColor: isDarkMode ? '#FFFFFF1A' : '#0000001A', backgroundColor: isDarkMode ? '#2C2C2C' : '#F5F5F5', },]}>
+      <View
+        style={[
+          styles.notification,
+          { borderColor: '#FFFFFF1A', backgroundColor: '#2C2C2C' },
+        ]}
+      >
         <Notification />
       </View>
-
     </View>
   );
 }

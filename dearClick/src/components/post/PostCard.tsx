@@ -66,18 +66,8 @@ export default function PostCard({
     : require('../../assets/posts/postimg.png');
 
   return (
-    <View
-      style={[
-        styles.container,
-        { backgroundColor: isDark ? 'black' : '#F5F5F5' },
-      ]}
-    >
-      <View
-        style={[
-          styles.innnercontainer,
-          { backgroundColor: isDark ? '#1F1F1F' : '#FFFFFF' },
-        ]}
-      >
+    <View style={[styles.container, { backgroundColor: 'black' }]}>
+      <View style={[styles.innnercontainer, { backgroundColor: '#1F1F1F' }]}>
         {/* User Info Section */}
         <View style={styles.userinfo}>
           <View style={styles.profileDetails}>
@@ -85,12 +75,8 @@ export default function PostCard({
               <Image source={profilePicSource} style={styles.profileImage} />
             </View>
             <View style={styles.textDetails}>
-              <Text style={[styles.name, { color: isDark ? '#fff' : '#000' }]}>
-                {user_name}
-              </Text>
-              <Text
-                style={[styles.username, { color: isDark ? '#aaa' : '#555' }]}
-              >
+              <Text style={[styles.name, { color: '#fff' }]}>{user_name}</Text>
+              <Text style={[styles.username, { color: '#aaa' }]}>
                 @{user_username} • {timeAgo}
               </Text>
             </View>
@@ -101,61 +87,33 @@ export default function PostCard({
         {/* Post Image */}
         <View style={styles.postImage}>
           <Image source={postImageSource} style={styles.postMainImage} />
-          <Text
-            style={[styles.caption, { color: isDark ? '#999999' : '#444' }]}
-          >
-            {caption}
-          </Text>
+          <Text style={[styles.caption, { color: '#999999' }]}>{caption}</Text>
         </View>
 
         {/* Reactions */}
         <View style={styles.bottomContainer}>
           <View style={styles.reactions}>
             <TouchableOpacity
-              style={[
-                styles.like,
-                { borderColor: isDark ? '#FFFFFF1A' : '#0000001A' },
-              ]}
+              style={[styles.like, { borderColor: '#FFFFFF1A' }]}
             >
               <Like />
-              <Text
-                style={[
-                  styles.reactionText,
-                  { color: isDark ? '#fff' : '#000' },
-                ]}
-              >
+              <Text style={[styles.reactionText, { color: '#fff' }]}>
                 {like_count}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[
-                styles.like,
-                { borderColor: isDark ? '#FFFFFF1A' : '#0000001A' },
-              ]}
+              style={[styles.like, { borderColor: '#FFFFFF1A' }]}
             >
               <Comment />
-              <Text
-                style={[
-                  styles.reactionText,
-                  { color: isDark ? '#fff' : '#000' },
-                ]}
-              >
+              <Text style={[styles.reactionText, { color: '#fff' }]}>
                 {comment_count}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[
-                styles.like,
-                { borderColor: isDark ? '#FFFFFF1A' : '#0000001A' },
-              ]}
+              style={[styles.like, { borderColor: '#FFFFFF1A' }]}
             >
               <Share />
-              <Text
-                style={[
-                  styles.reactionText,
-                  { color: isDark ? '#fff' : '#000' },
-                ]}
-              >
+              <Text style={[styles.reactionText, { color: '#fff' }]}>
                 {share_count}
               </Text>
             </TouchableOpacity>
@@ -163,10 +121,7 @@ export default function PostCard({
 
           <View>
             <TouchableOpacity
-              style={[
-                styles.save,
-                { borderColor: isDark ? '#FFFFFF1A' : '#0000001A' },
-              ]}
+              style={[styles.save, { borderColor: '#FFFFFF1A' }]}
             >
               <Save />
             </TouchableOpacity>

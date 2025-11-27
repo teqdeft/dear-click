@@ -27,9 +27,7 @@ export default function RegisterStartScreen() {
     }
   };
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: isDark ? '#111' : '#fff' }]}
-    >
+    <SafeAreaView style={[styles.container, { backgroundColor: '#111' }]}>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -46,10 +44,10 @@ export default function RegisterStartScreen() {
 
         {/* Title + Subtitle */}
         <View style={styles.header}>
-          <Text style={[styles.title, { color: isDark ? '#fff' : '#000' }]}>
+          <Text style={[styles.title, { color: '#fff' }]}>
             Create account using
           </Text>
-          <Text style={[styles.subtitle, { color: isDark ? 'grey' : '#555' }]}>
+          <Text style={[styles.subtitle, { color: 'grey' }]}>
             No account yet? Sign up quickly with your phone or email
           </Text>
         </View>
@@ -59,16 +57,14 @@ export default function RegisterStartScreen() {
           <TouchableOpacity
             style={[
               styles.optionCard,
-              { backgroundColor: isDark ? '#262626' : '#f2f2f2' },
+              { backgroundColor: '#262626' },
               selected === 'phone' && styles.optionSelected,
             ]}
             onPress={() => setSelected('phone')}
           >
             <PhoneLogo />
             {/* <Image source={require('../../assets/images/phone.png')} /> */}
-            <Text
-              style={[styles.optionText, { color: isDark ? '#fff' : '#000' }]}
-            >
+            <Text style={[styles.optionText, { color: '#fff' }]}>
               Phone Number
             </Text>
             <View style={styles.radioCircle}>
@@ -79,16 +75,14 @@ export default function RegisterStartScreen() {
           <TouchableOpacity
             style={[
               styles.optionCard,
-              { backgroundColor: isDark ? '#262626' : '#f2f2f2' },
+              { backgroundColor: '#262626' },
               selected === 'email' && styles.optionSelected,
             ]}
             onPress={() => setSelected('email')}
           >
             <EmailLogo />
             {/* <Image source={require('../../assets/images/email.png')} /> */}
-            <Text
-              style={[styles.optionText, { color: isDark ? '#fff' : '#000' }]}
-            >
+            <Text style={[styles.optionText, { color: '#fff' }]}>
               Email Address
             </Text>
             <View style={styles.radioCircle}>
@@ -105,17 +99,13 @@ export default function RegisterStartScreen() {
           ]}
           onPress={navigateToNext}
         >
-          <Text
-            style={[styles.continueText, { color: isDark ? '#000' : '#fff' }]}
-          >
-            Continue
-          </Text>
+          <Text style={[styles.continueText, { color: '#000' }]}>Continue</Text>
         </TouchableOpacity>
 
         {/* Footer */}
         <Text
           onPress={() => navigation.navigate('SignIn' as never)}
-          style={[styles.footer, { color: isDark ? 'grey' : '#555' }]}
+          style={[styles.footer, { color: 'grey' }]}
         >
           Already have an account?{' '}
           <Text style={styles.signInText}>Sign In</Text>

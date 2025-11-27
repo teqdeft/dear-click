@@ -12,9 +12,6 @@ import React from 'react';
 import Plus from '../../assets/svgs/icons/Plus';
 
 export default function Stories() {
-  const scheme = useColorScheme();
-  const isDarkMode = scheme === 'dark';
-
   const stories = [
     {
       id: 1,
@@ -50,10 +47,7 @@ export default function Stories() {
 
   return (
     <ScrollView
-      style={[
-        styles.container,
-        { backgroundColor: isDarkMode ? '#1A1A1A' : '#FFFFFF' },
-      ]}
+      style={[styles.container, { backgroundColor: '#1A1A1A' }]}
       horizontal
       showsHorizontalScrollIndicator={false}
     >
@@ -62,26 +56,14 @@ export default function Stories() {
           <View style={styles.innerContainer}>
             <Plus />
           </View>
-          <Text
-            style={[
-              styles.username,
-              { color: isDarkMode ? '#CCCCCC' : '#555555' },
-            ]}
-          >
-            New
-          </Text>
+          <Text style={[styles.username, { color: '#CCCCCC' }]}>New</Text>
         </TouchableOpacity>
         {stories.map(story => (
           <View key={story.id}>
             <View style={styles.innerContainer}>
               <Image style={styles.image} source={story.image} />
             </View>
-            <Text
-              style={[
-                styles.username,
-                { color: isDarkMode ? '#CCCCCC' : '#555555' },
-              ]}
-            >
+            <Text style={[styles.username, { color: '#CCCCCC' }]}>
               {story.username}
             </Text>
           </View>

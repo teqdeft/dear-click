@@ -41,7 +41,7 @@ export default function HomeScreen() {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#000' }}>
+    <View style={{ flex: 1, backgroundColor: '#1F1F1F' }}>
       <FlatList
         data={posts}
         keyExtractor={item => item.id.toString()}

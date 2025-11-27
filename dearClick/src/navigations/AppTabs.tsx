@@ -37,14 +37,7 @@ export default function AppTabs() {
       active: '#FBC213',
       inactive: '#888',
     },
-    light: {
-      tabBar: '#fff',
-      active: '#FBC213',
-      inactive: '#555',
-    },
   };
-
-  const themeColors = scheme === 'dark' ? colors.dark : colors.light;
 
   return (
     <>
@@ -52,9 +45,9 @@ export default function AppTabs() {
         screenOptions={({ route }) => ({
           headerShown: false,
           tabBarShowLabel: false,
-          tabBarStyle: [styles.tabBar, { backgroundColor: themeColors.tabBar }],
+          tabBarStyle: [styles.tabBar, { backgroundColor: '#1F1F1F' }],
           tabBarIcon: ({ focused }) => {
-            const color = focused ? themeColors.active : themeColors.inactive;
+            const color = focused ? colors.dark.active : colors.dark.inactive;
             switch (route.name) {
               case 'Home':
                 return <Homeicon fill={color} />;
