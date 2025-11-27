@@ -18,6 +18,7 @@ import Reelsicon from '../assets/svgs/home/Reelsicon';
 import PlusIcon from '../assets/svgs/home/Plusicon';
 import BottomModal from '../components/post/PostModal';
 import CameraWithSpinner from '../components/uploadProfilePicture/CameraScreen';
+import Profile from '../screens/profile/Profile';
 
 const Tab = createBottomTabNavigator();
 
@@ -46,8 +47,6 @@ export default function AppTabs() {
   const themeColors = scheme === 'dark' ? colors.dark : colors.light;
 
   return (
-
-
     <>
       <Tab.Navigator
         screenOptions={({ route }) => ({
@@ -79,18 +78,20 @@ export default function AppTabs() {
           name="CreatePost"
           component={HomeScreen}
           listeners={{
-            tabPress: (e) => {
+            tabPress: e => {
               e.preventDefault();
               openModal();
             },
           }}
           options={{
-            tabBarIcon: ({ focused }) => <PlusIcon fill={focused ? '#FF0000' : '#555'} />
+            tabBarIcon: ({ focused }) => (
+              <PlusIcon fill={focused ? '#FF0000' : '#555'} />
+            ),
           }}
         /> */}
         <Tab.Screen name="CreatePost" component={CameraWithSpinner} />
         <Tab.Screen name="Reels" component={ReelsScreen} />
-        <Tab.Screen name="Profile" component={ProfileScreen} />
+        <Tab.Screen name="Profile" component={Profile} />
       </Tab.Navigator>
 
       <BottomModal visible={showModal} onClose={closeModal} />
