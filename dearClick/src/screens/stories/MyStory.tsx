@@ -42,7 +42,7 @@ export default function MyStory() {
         >
           <TouchableOpacity
             style={styles.innerplusIconContainer}
-            onPress={() => navigation.navigate('PostSourceSelector', { type: "Story" })}
+            onPress={() => navigation.navigate('CreatePost')}
           >
             <PlusIcon fill={isDarkMode ? '#FFFFFF' : '#000000'} />
           </TouchableOpacity>

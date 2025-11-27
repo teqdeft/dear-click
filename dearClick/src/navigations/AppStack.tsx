@@ -11,7 +11,6 @@ import UploadProfilePicture from '../components/uploadProfilePicture/uploadProfi
 import ProfilePicturePreview from '../components/uploadProfilePicture/ProfilePicturePreview';
 import FollowerScreen from '../screens/followeProfile/FollowerScreen';
 import PostSourceSelector from '../components/post/PostSourceSelector';
-import CameraWithSpinner from '../components/uploadProfilePicture/CameraScreen';
 import StorySourceSelector from '../screens/stories/StorySourceSelector';
 
 const Stack = createNativeStackNavigator();
@@ -34,8 +33,6 @@ export default function AppStack() {
         component={ProfilePicturePreview}
       />
       <Stack.Screen name="FollowerScreen" component={FollowerScreen} />
-
-      <Stack.Screen name="CameraScreen" component={CameraWithSpinner} />
       <Stack.Screen name="ProfileInfo" component={ProfileInfo} />
       <Stack.Screen name="AccountSetings" component={AccountSetings} />
       <Stack.Screen name="ContactDetail" component={ContactDetail} />

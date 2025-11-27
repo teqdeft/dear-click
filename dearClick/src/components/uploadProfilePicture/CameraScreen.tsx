@@ -1,12 +1,18 @@
 import React, { useEffect, useRef, useState } from "react";
-import { View, Text, TouchableOpacity, Pressable, Animated, Easing, Platform, Alert, } from "react-native";
+import { View, Text, TouchableOpacity, Pressable, Animated, Easing, Platform, } from "react-native";
 import { Camera, useCameraDevice, CameraPermissionStatus, VideoFile, } from "react-native-vision-camera";
 import PreviewScreen from "./PreviewScreen";
 import toast from "../utils/Toast";
 import { createPost } from "../../screens/post/services/services";
-import { RouteProp, useNavigation, useRoute } from "@react-navigation/core";
+import { useNavigation } from "@react-navigation/core";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { createStory } from "../../screens/stories/services";
+import { launchImageLibrary } from "react-native-image-picker";
+import GalleryIcon from "../../assets/svgs/icons/GalleryIcon";
+import CameraFlashOff from "../../assets/svgs/icons/CameraFlashOff";
+import CameraFlahOn from "../../assets/svgs/icons/CameraFlahOn";
+import CameraFlip from "../../assets/svgs/icons/CameraFlip";
+
 
 export default function CameraWithSpinner() {
     const [cameraPermission, setCameraPermission] = useState<CameraPermissionStatus>("not-determined");
@@ -15,6 +21,11 @@ export default function CameraWithSpinner() {
     const [flash, setFlash] = useState<"off" | "on">("off");
     const [isRecording, setIsRecording] = useState(false);
     const [recordTimeSec, setRecordTimeSec] = useState(0);
+
+    const [selectedTab, setSelectedTab] = useState("Story");
+
+    const tabs = ["Story", "Post"];
+
     const [photo, setPhoto] = useState<any>(null);
     const [loading, setLoading] = useState(false);
     const [preview, setPreview] = useState<{
@@ -22,8 +33,6 @@ export default function CameraWithSpinner() {
         path: string;
     } | null>(null);
 
-    const route = useRoute<RouteProp<{ params: { type: string } }, 'params'>>();
-    const { type } = route.params;
 
     // handle camera access front and back 
     const device = useCameraDevice(isFront ? "front" : "back");
@@ -179,16 +188,16 @@ export default function CameraWithSpinner() {
     // Permission & device checks
     if (cameraPermission !== "granted") {
         return (
-            <View style={styles.center}>
-                <Text style={styles.infoText}>Camera permission required</Text>
+            <View >
+                <Text >Camera permission required</Text>
             </View>
         );
     }
 
     if (!device) {
         return (
-            <View style={styles.center}>
-                <Text style={styles.infoText}>Loading camera...</Text>
+            <View >
+                <Text >Loading camera...</Text>
             </View>
         );
     }
@@ -199,11 +208,11 @@ export default function CameraWithSpinner() {
 
             let data;
 
-            if (type === "Post") {
+            if (selectedTab === "Post") {
                 data = await createPost(photo);
             }
 
-            if (type === "Story") {
+            if (selectedTab === "Story") {
                 data = await createStory(photo);
             }
 
@@ -223,6 +232,25 @@ export default function CameraWithSpinner() {
 
     };
 
+    const openGallery = async () => {
+        const result = await launchImageLibrary({
+            mediaType: 'mixed',
+            quality: 1,
+            selectionLimit: 10
+        });
+
+        if (result.assets && result.assets.length > 0) {
+            const asset = result.assets[0];
+
+            const fileType = asset.type;
+            let mediaType: "photo" | "video" = fileType?.startsWith("image") ? "photo" : "video";
+
+            setPhoto(asset);
+
+            setPreview({ type: mediaType, path: asset.uri!, });
+        }
+    };
+
     if (preview) {
         return (<PreviewScreen media={preview} onRetake={() => setPreview(null)} onUse={() => handleAddStoryOrPost()} />);
     }
@@ -231,82 +259,81 @@ export default function CameraWithSpinner() {
         <View style={styles.container}>
             <Camera
                 ref={cameraRef}
-                style={StyleSheet.absoluteFill as any}
+                style={StyleSheet.absoluteFill}
                 device={device}
                 isActive={true}
                 photo={true}
                 video={true}
             />
 
-            {/* Top controls */}
-            <View style={styles.topControls}>
-                <TouchableOpacity
-                    onPress={() => setFlash((f) => (f === "off" ? "on" : "off"))}
-                    style={styles.topBtn}
-                >
-                    <Text style={styles.topBtnText}>{flash === "off" ? "Flash Off" : "Flash On"}</Text>
+            {/* TOP BAR — Instagram Style */}
+            <View style={styles.topBar}>
+                <TouchableOpacity onPress={() => setFlash(f => (f === "off" ? "on" : "off"))}>
+                    {/* <EditIcon flash={flash} /> */}
+                    {flash === "on" ? <CameraFlahOn /> : <CameraFlashOff />}
                 </TouchableOpacity>
 
-                <TouchableOpacity
-                    onPress={() => setIsFront((p) => !p)}
-                    style={styles.topBtn}
-                >
-                    <Text style={styles.topBtnText}>Flip{type}</Text>
+                <TouchableOpacity onPress={() => setIsFront(p => !p)}>
+                    <CameraFlip />
                 </TouchableOpacity>
             </View>
 
-            {/* Recording timer (shows when recording) */}
+            {/* RECORDING TIMER */}
             {isRecording && (
                 <View style={styles.recTimer}>
                     <View style={styles.recDot} />
                     <Text style={styles.recTimerText}>
-                        {Math.floor(recordTimeSec / 60)
-                            .toString()
-                            .padStart(2, "0")}
-                        :
+                        {Math.floor(recordTimeSec / 60).toString().padStart(2, "0")}:
                         {(recordTimeSec % 60).toString().padStart(2, "0")}
                     </Text>
                 </View>
             )}
 
-            {/* Bottom controls - center shutter with rotating ring */}
-            <View style={styles.bottomControls}>
-                {/* Spacer left */}
-                <View style={{ width: 60 }} />
+            {/* BOTTOM AREA */}
+            <View style={styles.bottomContainer}>
+                {/* LEFT — Gallery Preview */}
+                <TouchableOpacity onPress={openGallery} style={styles.galleryBox}>
+                    <GalleryIcon />
+                </TouchableOpacity>
 
-                {/* Shutter + spinner */}
-                <View style={styles.shutterContainer}>
-                    {/* Rotating outer ring visible only while recording */}
-                    <Animated.View
-                        style={[
-                            styles.spinnerRing,
-                            {
-                                transform: [{ rotate: spin }],
-                                opacity: isRecording ? 1 : 0,
-                            },
-                        ]}
-                    />
+                {/* CENTER — SHUTTER BUTTON */}
+                <Pressable
+                    onPress={capturePhoto}
+                    onLongPress={startRecording}
+                    onPressOut={stopRecording}
+                    style={[
+                        styles.captureButton,
+                        isRecording && styles.captureButtonRecording
+                    ]}
+                />
 
-                    {/* Inner clickable capture button */}
-                    <Pressable
-                        onPress={capturePhoto}
-                        onLongPress={startRecording}
-                        onPressOut={stopRecording}
-                        style={[
-                            styles.captureButton,
-                            isRecording ? styles.captureButtonRecording : undefined,
-                        ]}
-                        android_ripple={{ color: "rgba(255,255,255,0.12)", radius: 40 }}
-                    />
-                </View>
-
-                {/* Spacer right */}
+                {/* RIGHT SPACER */}
                 <View style={{ width: 60 }} />
             </View>
+
+            {/* MODES BELOW SHUTTER → POST / STORY / REEL */}
+            <View style={styles.modeTabs}>
+                {tabs.map((item, index) => (
+                    <TouchableOpacity
+                        key={index}
+                        onPress={() => setSelectedTab(item)}
+                        style={styles.modeItem}
+                    >
+                        <Text
+                            style={[
+                                styles.modeText,
+                                selectedTab === item && styles.modeTextActive
+                            ]}
+                        >
+                            {item}
+                        </Text>
+                    </TouchableOpacity>
+                ))}
+            </View>
         </View>
+
     );
 }
-
 const StyleSheet = {
     absoluteFill: {
         position: "absolute" as const,
@@ -325,34 +352,20 @@ function StyleSheetCreate() {
             flex: 1,
             backgroundColor: "black",
         } as any,
-        center: {
-            flex: 1,
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: "black",
-        } as any,
-        infoText: {
-            color: "white",
-            fontSize: 16,
-        } as any,
-        topControls: {
+
+        /* ---- TOP BAR ---- */
+        topBar: {
             position: "absolute" as const,
             top: Platform.OS === "ios" ? 50 : 30,
-            left: 20,
-            right: 20,
+            left: 0,
+            right: 0,
             flexDirection: "row" as const,
             justifyContent: "space-between",
-            alignItems: "center",
+            paddingHorizontal: 20,
+            zIndex: 20,
         } as any,
-        topBtn: {
-            padding: 8,
-            backgroundColor: "rgba(0,0,0,0.4)",
-            borderRadius: 8,
-        } as any,
-        topBtnText: {
-            color: "white",
-            fontSize: 14,
-        } as any,
+
+        /* ---- RECORD TIMER ---- */
         recTimer: {
             position: "absolute" as const,
             top: Platform.OS === "ios" ? 50 : 30,
@@ -363,57 +376,84 @@ function StyleSheetCreate() {
             paddingVertical: 4,
             backgroundColor: "rgba(0,0,0,0.5)",
             borderRadius: 20,
+            zIndex: 20,
         } as any,
+
         recDot: {
             width: 10,
             height: 10,
             borderRadius: 5,
             backgroundColor: "red",
-            marginRight: 8,
+            marginRight: 6,
         } as any,
+
         recTimerText: {
             color: "white",
             fontSize: 14,
             fontWeight: "600",
         } as any,
-        bottomControls: {
+
+        /* ---- BOTTOM BAR (GALLERY + SHUTTER) ---- */
+        bottomContainer: {
+            width: "100%",
             position: "absolute" as const,
-            bottom: 40,
-            left: 0,
-            right: 0,
+            bottom: 110,
             flexDirection: "row",
-            justifyContent: "center",
+            justifyContent: "space-between",
             alignItems: "center",
+            paddingHorizontal: 25,
+            zIndex: 20,
         } as any,
-        shutterContainer: {
-            width: 120,
-            height: 120,
+
+        galleryBox: {
+            width: 60,
+            height: 60,
             alignItems: "center",
             justifyContent: "center",
+            overflow: "hidden",
         } as any,
-        spinnerRing: {
-            position: "absolute" as const,
-            width: 120,
-            height: 120,
-            borderRadius: 60,
-            borderWidth: 4,
-            borderColor: "rgba(255,0,0,0.9)",
-            borderLeftColor: "transparent",
-            borderBottomColor: "transparent",
-        } as any,
+
+        /* ---- SHUTTER BUTTON ---- */
         captureButton: {
             width: 80,
             height: 80,
             borderRadius: 40,
             borderWidth: 6,
             borderColor: "white",
-            backgroundColor: "rgba(255,255,255,0.12)",
-            alignItems: "center",
-            justifyContent: "center",
+            backgroundColor: "transparent",
         } as any,
+
         captureButtonRecording: {
             backgroundColor: "red",
             borderColor: "red",
         } as any,
+
+        /* ---- MODES UNDER SHUTTER (POST / STORY / REEL) ---- */
+        modeTabs: {
+            position: "absolute" as const,
+            bottom: 40,
+            width: "100%",
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 20,
+        } as any,
+
+        modeItem: {
+            marginHorizontal: 15,
+        } as any,
+
+        modeText: {
+            color: "#b6b0b0ff",
+            fontSize: 16,
+            fontWeight: "500",
+        } as any,
+
+        modeTextActive: {
+            color: "white",
+            fontWeight: "700",
+        } as any,
     };
 }
+
+
