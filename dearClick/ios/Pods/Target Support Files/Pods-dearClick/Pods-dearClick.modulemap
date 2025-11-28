@@ -1,0 +1,6 @@
+module Pods_dearClick {
+  umbrella header "Pods-dearClick-umbrella.h"
+
+  export *
+  module * { export * }
+}

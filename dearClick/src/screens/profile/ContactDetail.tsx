@@ -16,6 +16,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthContext } from '../../context/AuthContext';
 import { Picker } from '@react-native-picker/picker';
 import BirthdayPicker from '../../components/utils/DatePicker';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ContactDetail() {
   const { apiData, apiLoading, apiError, fetchApiData } =
@@ -87,7 +88,8 @@ export default function ContactDetail() {
   if (apiError) return <Text>Error: {apiError}</Text>;
 
   return (
-    <ScrollView style={styles.container}>
+    <SafeAreaView style={styles.container}>
+    <ScrollView >
       {/* Header */}
       <View style={styles.profileInfoHeader}>
         {/* Back Button */}
@@ -149,6 +151,7 @@ export default function ContactDetail() {
 
       </View>
     </ScrollView>
+    </SafeAreaView>
   );
 }
 const styles = StyleSheet.create({

@@ -19,6 +19,7 @@ import { useNavigation } from '@react-navigation/core';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Setting from '../../assets/svgs/icons/Setting';
 import Stories from '../stories/Stories';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type MediaType = 'AllMedia' | 'reels' | 'images';
 
@@ -43,7 +44,8 @@ export default function Profile() {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <SafeAreaView style={styles.container} >
+    <ScrollView  >
       {/* Header */}
       <View style={styles.profileInfoHeader}>
         <TouchableOpacity
@@ -146,6 +148,7 @@ export default function Profile() {
         </View>
       </View>
     </ScrollView>
+    </SafeAreaView>
   );
 }
 
