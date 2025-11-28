@@ -12,7 +12,7 @@ const { forgotPasswordTemplate } = require("../../templates/forgotPassword");
 const { createResetToken } = require("../../services/createPasswordResetToken");
 const { getMediaCounts, applyMediaTypeFilter } = require("../../helpers/userPost");
 
-// test
+// test route
 const test = async (req, res) => {
   try {
     return success(res, { user: req.user }, 200, "route working");
