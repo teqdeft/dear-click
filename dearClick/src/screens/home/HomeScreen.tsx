@@ -1,97 +1,64 @@
-import { ScrollView, StyleSheet, View, FlatList } from 'react-native';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import Stories from '../stories/Stories';
-import PostCard from '../../components/post/PostCard';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Interests from '../interests/Interests';
+import React, { useEffect, useState } from 'react';
+import { FlatList, RefreshControl, View } from 'react-native';
 import ProfileSection from './ProfileSection';
+import Stories from '../stories/Stories';
+import Interests from '../interests/Interests';
+import PostCard from '../../components/post/PostCard';
 import { fetchPost } from '../post/services/services';
-
-type Post = {
-  id: number;
-  media_url: string;
-  caption: string;
-  like_count: number;
-  comment_count: number;
-  created_at: string;
-  share_count: string;
-  userId: number;
-  name: string;
-  username: string;
-  profile_pic: string;
-};
+import DarkSkeletonSoft from './DarkSkeleton';
+import DarkSkeletonPosts from './DarkSkeletonPosts';
 
 export default function HomeScreen() {
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [visiblePostId, setVisiblePostId] = useState<number | null>(null);
-  const [likeTrigger, setLikeTrigger] = useState<number | null>(0);
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const viewabilityConfig = useRef({
-    itemVisiblePercentThreshold: 70, // must be at least 70% visible
-  }).current;
-
-  const onViewableItemsChanged = useCallback(({ viewableItems }: any) => {
-    if (viewableItems.length > 0) {
-      const firstVisible = viewableItems[0]?.item?.id;
-      setVisiblePostId(firstVisible);
-    }
+  useEffect(() => {
+    loadFeed();
   }, []);
 
-  const viewabilityConfigCallbackPairs = useRef([
-    { viewabilityConfig, onViewableItemsChanged },
-  ]);
-
-  const getPosts = async () => {
+  const loadFeed = async () => {
     try {
-      setLoading(true);
-      const { data } = await fetchPost();
-      if (likeTrigger == 0) {
-        const shuffledPosts = data.sort(() => Math.random() - 0.5);
-        setPosts(shuffledPosts);
+      const res = await fetchPost();
+      if (res.success && res.data) {
+        setPosts(res.data);
       }
-      setPosts(data);
-    } catch (error) {
-      console.error('Error fetching posts:', error);
+    } catch (err) {
+      console.log(err);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
-  useEffect(() => {
-    getPosts();
-  }, [likeTrigger]);
+  const onRefresh = () => {
+    setRefreshing(true);
+    loadFeed();
+  };
+
+  if (loading) {
+    return <DarkSkeletonSoft />;
+  }
 
   return (
-
-    <SafeAreaView style={styles.container}>
+    <View style={{ flex: 1, backgroundColor: '#1F1F1F' }}>
       <FlatList
         data={posts}
         keyExtractor={item => item.id.toString()}
-        renderItem={({ item }) => (
-          <PostCard
-            item={item}
-            isVisible={visiblePostId === item.id}
-            onLikeSuccess={() => setLikeTrigger(prev => prev + 1)}
-          />
-        )}
-        showsVerticalScrollIndicator={true}
-        // showsVerticalScrollIndicator={true}
+        renderItem={({ item }) => <PostCard {...item} />}
         ListHeaderComponent={
           <>
             <ProfileSection />
             <Stories />
             <Interests />
+            {refreshing && <DarkSkeletonPosts />}
           </>
         }
-        viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        showsVerticalScrollIndicator={false}
       />
-    </SafeAreaView>
+    </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: 'black',
-  },
-});

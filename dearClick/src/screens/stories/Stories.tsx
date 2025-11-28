@@ -10,7 +10,13 @@ import {
 import React from 'react';
 import MyStory from './MyStory';
 
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+import { useNavigation } from '@react-navigation/native';
+import { RootStackParamList } from '../../navigations/types';
 export default function Stories() {
+  type NavProp = NativeStackNavigationProp<RootStackParamList, 'Stories'>;
+  const navigation = useNavigation<NavProp>();
   const scheme = useColorScheme();
   const isDarkMode = scheme === 'dark';
 
@@ -56,22 +62,29 @@ export default function Stories() {
     <ScrollView
       style={[
         styles.container,
-        { backgroundColor: isDarkMode ? '#1F1F1F' : '#FFFFFF' },
+        { backgroundColor: '#1F1F1F'  },
       ]}
       horizontal
       showsHorizontalScrollIndicator={false}
     >
       <MyStory />
       <View style={styles.mainContainer}>
-        {stories.map(story => (
-          <View key={story.id}>
+        {stories.map((story, index) => (
+          <View
+            key={story.id}
+            onTouchEnd={() =>
+              navigation.navigate('StoryScreen', {
+                userIndex: index,
+              })
+            }
+          >
             <View style={styles.innerContainer}>
               <Image style={styles.image} source={story.image} />
             </View>
             <Text
               style={[
                 styles.username,
-                { color: isDarkMode ? '#CCCCCC' : '#555555' },
+                { color:  '#CCCCCC'  },
               ]}
             >
               {story.username}

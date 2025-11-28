@@ -2,6 +2,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
   useColorScheme,
 } from 'react-native';
@@ -46,32 +47,21 @@ export default function Interests() {
 
   return (
     <ScrollView
-      style={[
-        styles.mainContainer,
-        { backgroundColor: isDarkMode ? '#1F1F1F' : '#FFFFFF' },
-      ]}
+      style={[styles.mainContainer, { backgroundColor: '#1F1F1F' }]}
       horizontal
       showsHorizontalScrollIndicator={false}
     >
       <View style={styles.container}>
         {interests.map((interest, idx) => (
-          <View
-            style={[
-              styles.inner,
-              { borderColor: isDarkMode ? '#FFFFFF1A' : '#0000001A' },
-            ]}
+          <TouchableOpacity
+            style={[styles.inner, { borderColor: '#FFFFFF1A' }]}
             key={idx}
           >
             {interest.icon}
-            <Text
-              style={[
-                styles.innerText,
-                { color: isDarkMode ? '#FFFFFF' : '#000000' },
-              ]}
-            >
+            <Text style={[styles.innerText, { color: '#FFFFFF' }]}>
               {interest.name}
             </Text>
-          </View>
+          </TouchableOpacity>
         ))}
       </View>
     </ScrollView>

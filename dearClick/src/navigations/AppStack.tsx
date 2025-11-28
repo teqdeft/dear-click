@@ -10,8 +10,13 @@ import ContactDetail from '../screens/profile/ContactDetail';
 import UploadProfilePicture from '../components/uploadProfilePicture/uploadProfilePicture';
 import ProfilePicturePreview from '../components/uploadProfilePicture/ProfilePicturePreview';
 import FollowerScreen from '../screens/followeProfile/FollowerScreen';
+import PostSourceSelector from '../components/post/PostSourceSelector';
+import StorySourceSelector from '../screens/stories/StorySourceSelector';
+import ProfileScreen from '../screens/profile/ProfileScreen';
+import StoryScreen from '../screens/stories/StoryScreen';
+import { RootStackParamList } from './types';
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function AppStack() {
   return (
@@ -31,10 +36,16 @@ export default function AppStack() {
         component={ProfilePicturePreview}
       />
       <Stack.Screen name="FollowerScreen" component={FollowerScreen} />
-
       <Stack.Screen name="ProfileInfo" component={ProfileInfo} />
       <Stack.Screen name="AccountSetings" component={AccountSetings} />
       <Stack.Screen name="ContactDetail" component={ContactDetail} />
+      <Stack.Screen name="PostSourceSelector" component={PostSourceSelector} />
+      <Stack.Screen
+        name="StorySourceSelector"
+        component={StorySourceSelector}
+      />
+      <Stack.Screen name="Profilesc" component={ProfileScreen} />
+      <Stack.Screen name="StoryScreen" component={StoryScreen} />
     </Stack.Navigator>
   );
 }

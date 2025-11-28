@@ -18,8 +18,10 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { IMAGE_BASE_URL } from '@env';
 import { formatDate } from '../../helpers/dateFormatter';
 import { launchImageLibrary } from 'react-native-image-picker';
+import { API_URL } from '@env';
 
 export default function ProfileScreen() {
+  
   const { logout } = useContext(AuthContext);
   const { apiData, apiLoading, apiError, fetchApiData } =
     useContext(AuthContext);
@@ -52,7 +54,10 @@ export default function ProfileScreen() {
       {/* Header */}
       <View style={styles.profileInfoHeader}>
         {/* Back Button */}
-        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()} >
+        <TouchableOpacity
+          style={styles.backBtn}
+          onPress={() => navigation.goBack()}
+        >
           <BackButton />
         </TouchableOpacity>
         <Text style={styles.notificationTitle}>Settings</Text>
@@ -62,15 +67,23 @@ export default function ProfileScreen() {
       <View style={styles.profileMain}>
         <View style={styles.profileInfo}>
           <View style={styles.proifleImage}>
-
             <View style={styles.usrImage}>
               <Image
-                source={apiData?.profile_pic ? { uri: `${IMAGE_BASE_URL}/profilePicture/${apiData?.profile_pic}`, } : require('../../assets/posts/profile.jpg')}
+                source={
+                  apiData?.profile_pic
+                    ? {
+                        uri: `${IMAGE_BASE_URL}/profilePicture/${apiData?.profile_pic}`,
+                      }
+                    : require('../../assets/posts/profile.jpg')
+                }
                 style={styles.uploadUserImage}
               />
             </View>
 
-            <TouchableOpacity style={styles.editImage} onPress={() => navigation.navigate('UploadProfilePicture')}>
+            <TouchableOpacity
+              style={styles.editImage}
+              onPress={() => navigation.navigate('UploadProfilePicture')}
+            >
               <EditIcon width={10} fill="#0a0a0aff" />
             </TouchableOpacity>
           </View>
@@ -82,15 +95,25 @@ export default function ProfileScreen() {
         </View>
 
         <TouchableOpacity style={styles.signOutButton} onPress={logout}>
-          <Text style={{ color: '#fff', fontSize: 14, fontFamily: 'Poppins-Medium', }}>Sign out</Text>
+          <Text
+            style={{
+              color: '#fff',
+              fontSize: 14,
+              fontFamily: 'Poppins-Medium',
+            }}
+          >
+            Sign out
+          </Text>
         </TouchableOpacity>
-
       </View>
 
       {/* Profile Information Section */}
       <View style={styles.profileInformation}>
         <Text style={styles.informationTitle}>Profile Information</Text>
-        <TouchableOpacity style={styles.editInfo} onPress={() => navigation.navigate('ProfileInfo')}>
+        <TouchableOpacity
+          style={styles.editInfo}
+          onPress={() => navigation.navigate('ProfileInfo')}
+        >
           <EditIcon />
         </TouchableOpacity>
 
@@ -120,7 +143,10 @@ export default function ProfileScreen() {
       {/* Contact Details */}
       <View style={styles.profileInformation}>
         <Text style={styles.informationTitle}>Contact Details</Text>
-        <TouchableOpacity style={styles.editInfo} onPress={() => navigation.navigate('ContactDetail')}>
+        <TouchableOpacity
+          style={styles.editInfo}
+          onPress={() => navigation.navigate('ContactDetail')}
+        >
           <EditIcon />
         </TouchableOpacity>
 
@@ -152,7 +178,10 @@ export default function ProfileScreen() {
       {/* Account Settings */}
       <View style={styles.profileInformation}>
         <Text style={styles.informationTitle}>Account Settings</Text>
-        <TouchableOpacity style={styles.editInfo} onPress={() => navigation.navigate('AccountSetings')}>
+        <TouchableOpacity
+          style={styles.editInfo}
+          onPress={() => navigation.navigate('AccountSetings')}
+        >
           <EditIcon />
         </TouchableOpacity>
 
@@ -160,13 +189,21 @@ export default function ProfileScreen() {
           <View style={styles.infoGroup}>
             <Text style={styles.infoName}>Account Type</Text>
             <Text style={styles.infoValue}>
-              {apiData?.account_type == '1' ? 'Personal' : apiData?.account_type == '2' ? 'Business' : apiData?.account_type == '3' ? 'Creator' : '--'}
+              {apiData?.account_type == '1'
+                ? 'Personal'
+                : apiData?.account_type == '2'
+                ? 'Business'
+                : apiData?.account_type == '3'
+                ? 'Creator'
+                : '--'}
             </Text>
           </View>
 
           <View style={styles.infoGroup}>
             <Text style={styles.infoName}>Account Status</Text>
-            <Text style={styles.infoValue}> {apiData?.account_privacy || '--'}
+            <Text style={styles.infoValue}>
+              {' '}
+              {apiData?.account_privacy || '--'}
             </Text>
           </View>
 
@@ -176,7 +213,7 @@ export default function ProfileScreen() {
           </View>
         </View>
       </View>
-    </ScrollView >
+    </ScrollView>
   );
 }
 
@@ -337,5 +374,4 @@ const styles = StyleSheet.create({
     width: '56%',
     fontWeight: '400',
   },
-
 });

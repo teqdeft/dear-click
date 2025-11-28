@@ -1,118 +1,107 @@
+/* eslint-disable react-native/no-inline-styles */
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  useColorScheme,
+} from 'react-native';
 import React from 'react';
-import { View, Text, Image, ScrollView, StyleSheet } from 'react-native';
-const Highlights = () => {
+import Plus from '../../assets/svgs/icons/Plus';
+
+export default function Stories() {
+  const stories = [
+    {
+      id: 1,
+      image: require('../../assets/images/storyImage.jpg'),
+      username: 'Travels',
+    },
+    {
+      id: 2,
+      image: require('../../assets/images/storyImage2.jpg'),
+      username: 'Cool',
+    },
+    {
+      id: 3,
+      image: require('../../assets/images/storyImage.jpg'),
+      username: 'Scot',
+    },
+    {
+      id: 4,
+      image: require('../../assets/images/storyImage.jpg'),
+      username: 'Holidays',
+    },
+    {
+      id: 5,
+      image: require('../../assets/images/storyImage.jpg'),
+      username: 'Outing',
+    },
+    {
+      id: 6,
+      image: require('../../assets/images/storyImage.jpg'),
+      username: 'Junlge safari',
+    },
+  ];
+
   return (
     <ScrollView
+      style={[styles.container, { backgroundColor: '#1A1A1A' }]}
       horizontal
       showsHorizontalScrollIndicator={false}
-      style={styles.highlights}
     >
       <View style={styles.mainContainer}>
-        <View style={styles.moodCard}>
-          <View style={styles.moodImage}>
-            <Image
-              source={require('../../assets/posts/profile.jpg')}
-              style={styles.moodCardImage}
-            />
+        <TouchableOpacity>
+          <View style={styles.innerContainer}>
+            <Plus />
           </View>
-          <Text style={styles.moodText}>Travels</Text>
-        </View>
-
-        <View style={styles.moodCard}>
-          <View style={styles.moodImage}>
-            <Image
-              source={require('../../assets/images/storyImage2.jpg')}
-              style={styles.moodCardImage}
-            />
+          <Text style={[styles.username, { color: '#CCCCCC' }]}>New</Text>
+        </TouchableOpacity>
+        {stories.map(story => (
+          <View key={story.id}>
+            <View style={styles.innerContainer}>
+              <Image style={styles.image} source={story.image} />
+            </View>
+            <Text style={[styles.username, { color: '#CCCCCC' }]}>
+              {story.username}
+            </Text>
           </View>
-          <Text style={styles.moodText}>Cool</Text>
-        </View>
-        <View style={styles.moodCard}>
-          <View style={styles.moodImage}>
-            <Image
-              source={require('../../assets/images/storyImage2.jpg')}
-              style={styles.moodCardImage}
-            />
-          </View>
-          <Text style={styles.moodText}>Cool</Text>
-        </View>
-        <View style={styles.moodCard}>
-          <View style={styles.moodImage}>
-            <Image
-              source={require('../../assets/images/storyImage2.jpg')}
-              style={styles.moodCardImage}
-            />
-          </View>
-          <Text style={styles.moodText}>Cool</Text>
-        </View>
-        <View style={styles.moodCard}>
-          <View style={styles.moodImage}>
-            <Image
-              source={require('../../assets/images/storyImage2.jpg')}
-              style={styles.moodCardImage}
-            />
-          </View>
-          <Text style={styles.moodText}>Cool</Text>
-        </View>
-        <View style={styles.moodCard}>
-          <View style={styles.moodImage}>
-            <Image
-              source={require('../../assets/images/storyImage2.jpg')}
-              style={styles.moodCardImage}
-            />
-          </View>
-          <Text style={styles.moodText}>Cool</Text>
-        </View>
-        <View style={styles.moodCard}>
-          <View style={styles.moodImage}>
-            <Image
-              source={require('../../assets/images/storyImage2.jpg')}
-              style={styles.moodCardImage}
-            />
-          </View>
-
-          <Text style={styles.moodText}>Cool</Text>
-        </View>
+        ))}
       </View>
     </ScrollView>
   );
-};
-
-export default Highlights;
+}
 
 const styles = StyleSheet.create({
-  highlights: {
-    flex: 1,
-    gap: 10,
-    height: 100,
+  container: {
+    padding: 10,
   },
-
   mainContainer: {
     flexDirection: 'row',
-    gap: 8,
     alignItems: 'center',
-    paddingHorizontal: 5,
+    gap: 10,
   },
-  moodCard: {
-    alignItems: 'flex-start',
-  },
-  moodImage: {
-    height: 60,
+  innerContainer: {
     width: 60,
-    borderRadius: 50,
-    borderWidth: 1,
-    borderColor: '#3f3f3f',
+    height: 60,
+    borderWidth: 2,
+    padding: 4,
+    borderRadius: 41,
     overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#999999',
   },
-  moodCardImage: {
-    height: '100%',
-    width: '100%',
-    objectFit: 'cover',
+  image: {
+    width: 70,
+    height: 70,
+    borderRadius: 39,
+    resizeMode: 'cover',
   },
-
-  moodText: {
+  username: {
+    marginTop: 5,
     fontSize: 12,
-    color: '#999',
-    marginTop: 8,
+    textAlign: 'center',
   },
 });
