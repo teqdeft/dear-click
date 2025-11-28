@@ -34,11 +34,7 @@ router.post(
 );
 
 // user hide for stories
-router.post(
-  "/hide-story/:storyId",
-  authMiddleware,
-  storyController.storyHide
-);
+router.post("/hide-story/:storyId", authMiddleware, storyController.storyHide);
 
 // user close friend list for stories
 router.post(
@@ -54,12 +50,8 @@ router.post(
   storyController.deleteStory
 );
 
-// share delete
-router.post(
-  "/story-share",
-  authMiddleware,
-  storyController.shareStory
-);
+// get stories
+router.get("/get-stories", authMiddleware, storyController.getStories);
 
 router.get(
   "/fetch-follower-profile/:id",

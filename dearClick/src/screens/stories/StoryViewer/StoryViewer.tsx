@@ -12,22 +12,19 @@ import Video from 'react-native-video';
 import { allStories } from '../data/storiesData';
 import ProgressBar from './ProgressBar';
 import styles from './styles';
+import { API_URL } from '@env';
 
 const { width, height } = Dimensions.get('window');
-
-export default function StoryViewer({ userIndex, onClose }) {
+export default function StoryViewer({ userIndex, users, onClose }) {
   const [currentUser, setCurrentUser] = useState(userIndex);
   const [currentStory, setCurrentStory] = useState(0);
 
-  const storyData = allStories[currentUser];
+  const storyData = users[currentUser];
   const stories = storyData.stories;
 
   const progress = useRef(new Animated.Value(0)).current;
-
-  // ⭐ Added flip animation value
   const flipAnim = useRef(new Animated.Value(0)).current;
 
-  // ⭐ Flip animation function
   const playFlip = () => {
     flipAnim.setValue(0);
     Animated.timing(flipAnim, {
@@ -65,7 +62,7 @@ export default function StoryViewer({ userIndex, onClose }) {
   };
 
   const nextUser = () => {
-    if (currentUser < allStories.length - 1) {
+    if (currentUser < users.length - 1) {
       setCurrentUser(currentUser + 1);
       setCurrentStory(0);
     } else {
@@ -82,7 +79,6 @@ export default function StoryViewer({ userIndex, onClose }) {
     }
   };
 
-  // ⭐ Run flip + progress on story change
   useEffect(() => {
     playFlip();
     startProgress();
@@ -90,10 +86,9 @@ export default function StoryViewer({ userIndex, onClose }) {
 
   const currentItem = stories[currentStory];
 
-  // ⭐ Interpolate flip animation (rotateY)
   const flipInterpolate = flipAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: ['90deg', '0deg'], // flip in
+    outputRange: ['90deg', '0deg'],
   });
 
   return (
@@ -104,24 +99,22 @@ export default function StoryViewer({ userIndex, onClose }) {
       style={styles.container}
     >
       <View style={styles.header}>
-        <Image source={storyData.profile} style={styles.profileImg} />
+        <Image
+          source={{ uri: `${API_URL}/profilePicture/${storyData.profile_pic}` }}
+          style={styles.profileImg}
+        />
         <Text style={styles.username}>{storyData.username}</Text>
       </View>
 
       <View style={styles.progressContainer}>
         {stories.map((_, i) => (
-          <ProgressBar
-            key={i}
-            progress={progress}
-            active={i === currentStory}
-          />
+          <ProgressBar key={i} progress={progress} active={i === currentStory} />
         ))}
       </View>
 
       <TouchableOpacity style={styles.leftTap} onPress={prevStory} />
       <TouchableOpacity style={styles.rightTap} onPress={nextStory} />
 
-      {/* ⭐ FLIP ANIMATION WRAPPER */}
       <Animated.View
         style={{
           flex: 1,

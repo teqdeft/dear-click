@@ -285,5 +285,33 @@ const shareStory = async (req, res) => {
     return error(res, "Failed to share story", err.message, 500, "SHARE_FAILED");
   }
 };
+const getStories = async (req, res) => {
+  try {
+    // Fetch all stories which are active and not expired
+    const now = new Date();
 
-module.exports = { uploadStory, storyHide, closeFriendStory, deleteStory, shareStory };
+    const allStories = await db("stories")
+      .join("users", "stories.userId", "users.id")
+      .select(
+        "stories.id",
+        "stories.userId",
+        "stories.media_url",
+        "stories.type",
+        "stories.caption",
+        "stories.duration",
+        "stories.expiry_at",
+        "users.name",
+        "users.username",
+        "users.profile_pic"
+      )
+      .where("stories.status", 1)
+      .andWhere("stories.expiry_at", ">", now)
+      .orderBy("stories.created_at", "asc");
+
+    return success(res, allStories, 200, "Stories fetched");
+  } catch (err) {
+    return error(res, "Something went wrong", err.message, 500);
+  }
+};
+
+module.exports = { uploadStory, storyHide, closeFriendStory, deleteStory, shareStory,getStories };

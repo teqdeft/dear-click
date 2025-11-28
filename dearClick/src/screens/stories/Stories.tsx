@@ -1,94 +1,83 @@
 /* eslint-disable react-native/no-inline-styles */
-import {
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-  useColorScheme,
-} from 'react-native';
-import React from 'react';
+import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
 import MyStory from './MyStory';
 
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigations/types';
+
+import { API_URL } from '@env';
+import { getStories } from './services';
+
 export default function Stories() {
   type NavProp = NativeStackNavigationProp<RootStackParamList, 'Stories'>;
   const navigation = useNavigation<NavProp>();
-  const scheme = useColorScheme();
-  const isDarkMode = scheme === 'dark';
 
-  const stories = [
-    {
-      id: 1,
-      image: require('../../assets/images/storyImage.jpg'),
-      username: '@Prachi',
-    },
-    {
-      id: 2,
-      image: require('../../assets/images/storyImage2.jpg'),
-      username: '@Ankit',
-    },
-    {
-      id: 3,
-      image: require('../../assets/images/storyImage.jpg'),
-      username: '@Vishal',
-    },
-    {
-      id: 4,
-      image: require('../../assets/images/storyImage.jpg'),
-      username: '@Neha',
-    },
-    {
-      id: 5,
-      image: require('../../assets/images/storyImage.jpg'),
-      username: '@Ravi',
-    },
-    {
-      id: 6,
-      image: require('../../assets/images/storyImage.jpg'),
-      username: '@Kriti',
-    },
-    {
-      id: 7,
-      image: require('../../assets/images/storyImage.jpg'),
-      username: '@Aman',
-    },
-  ];
+  const [users, setUsers] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetchStories();
+  }, []);
+
+  const fetchStories = async () => {
+    const res = await getStories();
+    if (res?.success) {
+      const grouped: any = {};
+
+      res.data.forEach((item: any) => {
+        if (!grouped[item.userId]) {
+          grouped[item.userId] = {
+            userId: item.userId,
+            username: item.username,
+            name: item.name,
+            profile_pic: item.profile_pic,
+            stories: [],
+          };
+        }
+
+        grouped[item.userId].stories.push({
+          id: item.id,
+          type: item.type,
+          duration: item.duration,
+          url: {
+            uri: `http://192.168.1.19:5050/assets/images/stories/${item.media_url}`,
+          },
+        });
+      });
+
+      setUsers(Object.values(grouped));
+    }
+  };
 
   return (
     <ScrollView
-      style={[
-        styles.container,
-        { backgroundColor: '#1F1F1F'  },
-      ]}
+      style={styles.container}
       horizontal
       showsHorizontalScrollIndicator={false}
     >
       <MyStory />
+
       <View style={styles.mainContainer}>
-        {stories.map((story, index) => (
+        {users.map((user, index) => (
           <View
-            key={story.id}
+            key={user.userId}
             onTouchEnd={() =>
               navigation.navigate('StoryScreen', {
                 userIndex: index,
+                users,
               })
             }
           >
             <View style={styles.innerContainer}>
-              <Image style={styles.image} source={story.image} />
+              <Image
+                style={styles.image}
+                source={{
+                  uri: `http://192.168.1.19:5050/assets/images/profilePicture/${user.profile_pic}`,
+                }}
+              />
             </View>
-            <Text
-              style={[
-                styles.username,
-                { color:  '#CCCCCC'  },
-              ]}
-            >
-              {story.username}
-            </Text>
+            <Text style={styles.username}>{user.username}</Text>
           </View>
         ))}
       </View>
@@ -97,14 +86,8 @@ export default function Stories() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 14,
-  },
-  mainContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
+  container: { padding: 14, backgroundColor: '#1F1F1F' },
+  mainContainer: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   innerContainer: {
     width: 82,
     height: 82,
@@ -116,15 +99,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderColor: '#FBC213',
   },
-  image: {
-    width: 70,
-    height: 70,
-    borderRadius: 39,
-    resizeMode: 'cover',
-  },
+  image: { width: 70, height: 70, borderRadius: 39, resizeMode: 'cover' },
   username: {
     marginTop: 5,
     fontSize: 12,
     textAlign: 'center',
+    color: '#CCCCCC',
   },
 });
