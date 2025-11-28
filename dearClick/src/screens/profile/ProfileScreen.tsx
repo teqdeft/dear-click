@@ -19,6 +19,7 @@ import { IMAGE_BASE_URL } from '@env';
 import { formatDate } from '../../helpers/dateFormatter';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { API_URL } from '@env';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ProfileScreen() {
   
@@ -50,7 +51,9 @@ export default function ProfileScreen() {
   }
 
   return (
-    <ScrollView style={styles.container}>
+    <SafeAreaView style={styles.container}>
+    <ScrollView showsVerticalScrollIndicator={false} 
+  showsHorizontalScrollIndicator={false}>
       {/* Header */}
       <View style={styles.profileInfoHeader}>
         {/* Back Button */}
@@ -214,6 +217,7 @@ export default function ProfileScreen() {
         </View>
       </View>
     </ScrollView>
+    </SafeAreaView>
   );
 }
 

@@ -7,6 +7,7 @@ import PostCard from '../../components/post/PostCard';
 import { fetchPost } from '../post/services/services';
 import DarkSkeletonSoft from './DarkSkeleton';
 import DarkSkeletonPosts from './DarkSkeletonPosts';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
   const [posts, setPosts] = useState([]);
@@ -41,7 +42,7 @@ export default function HomeScreen() {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#1F1F1F' }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#1F1F1F' }}>
       <FlatList
         data={posts}
         keyExtractor={item => item.id.toString()}
@@ -59,6 +60,6 @@ export default function HomeScreen() {
         }
         showsVerticalScrollIndicator={false}
       />
-    </View>
+    </SafeAreaView>
   );
 }

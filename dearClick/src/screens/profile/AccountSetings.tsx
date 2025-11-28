@@ -14,6 +14,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import toast from '../../components/utils/Toast';
 import { updateProfile, updateSettings } from './services';
 import { Picker } from '@react-native-picker/picker';
+import { SafeAreaView } from 'react-native-safe-area-context';
 export default function AccountSetings() {
   const { apiData, apiLoading, apiError, fetchApiData } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
@@ -73,7 +74,8 @@ export default function AccountSetings() {
   if (apiError) return <Text>Error: {apiError}</Text>;
 
   return (
-    <ScrollView style={styles.container}>
+    <SafeAreaView style={styles.container}>
+    <ScrollView >
       {/* Header */}
       <View style={styles.profileInfoHeader}>
         {/* Back Button */}
@@ -141,6 +143,7 @@ export default function AccountSetings() {
 
       </View>
     </ScrollView>
+    </SafeAreaView>
   );
 }
 const styles = StyleSheet.create({

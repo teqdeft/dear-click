@@ -15,6 +15,7 @@ import { AuthContext } from '../../context/AuthContext';
 import toast from '../../components/utils/Toast';
 import { updateProfile } from './services';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ProfileInfo() {
   const { apiData, apiLoading, apiError, fetchApiData } =
@@ -77,7 +78,8 @@ export default function ProfileInfo() {
   if (apiError) return <Text>Error: {apiError}</Text>;
 
   return (
-    <ScrollView style={styles.container}>
+    <SafeAreaView style={styles.container}>
+    <ScrollView >
       {/* Header */}
       <View style={styles.profileInfoHeader}>
         {/* Back Button */}
@@ -140,6 +142,7 @@ export default function ProfileInfo() {
 
       </View>
     </ScrollView>
+    </SafeAreaView>
   );
 }
 const styles = StyleSheet.create({
