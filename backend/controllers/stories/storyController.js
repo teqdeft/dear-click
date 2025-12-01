@@ -3,7 +3,6 @@ const db = require("../../db/db");
 
 const uploadStory = async (req, res) => {
   try {
-
     const userId = req.user.id; // from auth middleware
     const { caption } = req.body;
 
@@ -77,7 +76,9 @@ const storyHide = async (req, res) => {
     }
 
     // check if all given user_hide_id exist in users table
-    const usersExist = await db("users").whereIn("id", user_hide_id).pluck("id");
+    const usersExist = await db("users")
+      .whereIn("id", user_hide_id)
+      .pluck("id");
 
     if (usersExist.length !== user_hide_id.length) {
       return error(res, "Some user_hide_id are invalid", null, 400);
@@ -93,7 +94,9 @@ const storyHide = async (req, res) => {
     }
 
     // fetch already hidden users for this user
-    const existingHidden = await db("stories_hides").where({ userId }).pluck("hiddenUserId")
+    const existingHidden = await db("stories_hides")
+      .where({ userId })
+      .pluck("hiddenUserId");
 
     // determine new users to add to hide list
     const toAdd = user_hide_id.filter((id) => !existingHidden.includes(id));
@@ -120,7 +123,6 @@ const storyHide = async (req, res) => {
 
     return success(res, null, 200, "Story hide list updated successfully");
   } catch (err) {
-
     return error(res, "Something went wrong", err.message, 500);
   }
 };
@@ -144,17 +146,13 @@ const closeFriendStory = async (req, res) => {
 
     // validation: storyId is required
     if (!storyId) {
-      return error(
-        res,
-        "storyId is required!",
-        null,
-        400,
-        "INVALID_INPUT"
-      );
+      return error(res, "storyId is required!", null, 400, "INVALID_INPUT");
     }
 
     // check if provided close_friends_id exist in users table
-    const usersExist = await db("users").whereIn("id", close_friends_id).pluck("id");
+    const usersExist = await db("users")
+      .whereIn("id", close_friends_id)
+      .pluck("id");
 
     if (usersExist.length !== close_friends_id.length) {
       return error(res, "Some close_friends_id are invalid", null, 400);
@@ -170,13 +168,17 @@ const closeFriendStory = async (req, res) => {
     }
 
     // fetch already existing close friends for this user
-    const existingHidden = await db("close_friend_stories").where({ userId }).pluck("closeFriendId")
+    const existingHidden = await db("close_friend_stories")
+      .where({ userId })
+      .pluck("closeFriendId");
 
     // determine new close friends to add
     const toAdd = close_friends_id.filter((id) => !existingHidden.includes(id));
 
     // determine close friends to remove
-    const toRemove = existingHidden.filter((id) => !close_friends_id.includes(id));
+    const toRemove = existingHidden.filter(
+      (id) => !close_friends_id.includes(id)
+    );
 
     // insert new close friends
     if (toAdd.length > 0) {
@@ -206,44 +208,40 @@ const deleteStory = async (req, res) => {
   try {
     // Convert storyId from request parameters to a number
     const storyId = Number(req.params.storyId);
-    const userId = req.user.id  // current logged-in user id (from auth middleware)
+    const userId = req.user.id; // current logged-in user id (from auth middleware)
 
     // Validate: storyId must be provided
     if (!storyId) {
-      return error(
-        res,
-        "storyId is required!",
-        null,
-        400,
-        "INVALID_INPUT"
-      );
+      return error(res, "storyId is required!", null, 400, "INVALID_INPUT");
     }
 
     // Check if the story exists for this user
-    const existStory = await db('stories').where({ id: storyId, userId }).first()
+    const existStory = await db("stories")
+      .where({ id: storyId, userId })
+      .first();
 
     // If story not found or doesn’t belong to this user
     if (!existStory) {
-      return error(res, "Story Is Not Found!", null, 400,)
+      return error(res, "Story Is Not Found!", null, 400);
     }
 
     // Soft delete the story (set status = 0 instead of removing from DB)
-    await db('stories').where({ id: storyId }).update({
-      status: 0
-    })
+    await db("stories").where({ id: storyId }).update({
+      status: 0,
+    });
 
-    return success(res, null, 200, "Story Deleted successfully")
+    return success(res, null, 200, "Story Deleted successfully");
   } catch (error) {
     return error(res, "Something went wrong", err.message, 500);
   }
-}
+};
 
 const shareStory = async (req, res) => {
   try {
     // Extract receiverId and storyId from request body
     const { receiverId, storyId } = req.body;
 
-    const senderId = req.user?.id;  // current logged-in user id (from auth middleware)
+    const senderId = req.user?.id; // current logged-in user id (from auth middleware)
 
     // Validate required fields
     if (!storyId || !receiverId) {
@@ -282,36 +280,69 @@ const shareStory = async (req, res) => {
 
     return success(res, null, 201, "Story shared!");
   } catch (err) {
-    return error(res, "Failed to share story", err.message, 500, "SHARE_FAILED");
+    return error(
+      res,
+      "Failed to share story",
+      err.message,
+      500,
+      "SHARE_FAILED"
+    );
   }
 };
-const getStories = async (req, res) => {
+
+const getMyStories = async (req, res) => {
   try {
-    // Fetch all stories which are active and not expired
     const now = new Date();
+    const userId = req.user.id;
 
-    const allStories = await db("stories")
+    const myStories = await db("stories")
       .join("users", "stories.userId", "users.id")
-      .select(
-        "stories.id",
-        "stories.userId",
-        "stories.media_url",
-        "stories.type",
-        "stories.caption",
-        "stories.duration",
-        "stories.expiry_at",
-        "users.name",
-        "users.username",
-        "users.profile_pic"
-      )
-      .where("stories.status", 1)
+      .select("stories.*", "users.name", "users.username", "users.profile_pic")
+      .where("stories.userId", userId)
+      .andWhere("stories.status", 1)
       .andWhere("stories.expiry_at", ">", now)
-      .orderBy("stories.created_at", "asc");
+      .orderBy("stories.created_at", "desc");
 
-    return success(res, allStories, 200, "Stories fetched");
+    return success(res, myStories, 200, "My stories fetched");
   } catch (err) {
     return error(res, "Something went wrong", err.message, 500);
   }
 };
 
-module.exports = { uploadStory, storyHide, closeFriendStory, deleteStory, shareStory,getStories };
+const getFollowingStories = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const now = new Date();
+
+    // Find who the user follows
+    const followingIds = await db("follows")
+      .where({ followerId: userId })
+      .pluck("followingId");
+
+    if (followingIds.length === 0) {
+      return success(res, [], 200, "No following stories found");
+    }
+
+    const stories = await db("stories")
+      .join("users", "stories.userId", "users.id")
+      .select("stories.*", "users.name", "users.username", "users.profile_pic")
+      .whereIn("stories.userId", followingIds)
+      .andWhere("stories.status", 1)
+      .andWhere("stories.expiry_at", ">", now)
+      .orderBy("stories.created_at", "desc");
+
+    return success(res, stories, 200, "Following stories fetched");
+  } catch (err) {
+    return error(res, "Something went wrong", err.message, 500);
+  }
+};
+
+module.exports = {
+  uploadStory,
+  storyHide,
+  closeFriendStory,
+  deleteStory,
+  shareStory,
+  getMyStories,
+  getFollowingStories,
+};

@@ -21,7 +21,15 @@ export const createStory = async (photo: {
 };
 export const getStories = async (): Promise<any> => {
   try {
-    const { data } = await api.get(`${API_URL}/user/get-stories`);
+    const { data } = await api.get(`${API_URL}/user/get-following-stories`);
+    return data;
+  } catch (error: any) {
+    return error?.response?.data;
+  }
+};
+export const getmyStories = async (): Promise<any> => {
+  try {
+    const { data } = await api.get(`${API_URL}/user/get-my-stories`);
     return data;
   } catch (error: any) {
     return error?.response?.data;

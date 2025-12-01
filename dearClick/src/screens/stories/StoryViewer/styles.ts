@@ -61,10 +61,10 @@ export default StyleSheet.create({
 },
 
 profileImg: {
-  width: 40,
-  height: 40,
+  width: 35,
+  height: 35,
   borderRadius: 20,
-  marginRight: 10,
+  marginRight: 5,
 },
 
 username: {

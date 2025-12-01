@@ -7,7 +7,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigations/types';
 
-import { API_URL } from '@env';
+import { API_URL, IMAGE_BASE_URL } from '@env';
 import { getStories } from './services';
 
 export default function Stories() {
@@ -41,7 +41,7 @@ export default function Stories() {
           type: item.type,
           duration: item.duration,
           url: {
-            uri: `http://192.168.1.19:5050/assets/images/stories/${item.media_url}`,
+            uri: `${IMAGE_BASE_URL}/stories/${item.media_url}`,
           },
         });
       });
@@ -73,7 +73,7 @@ export default function Stories() {
               <Image
                 style={styles.image}
                 source={{
-                  uri: `http://192.168.1.19:5050/assets/images/profilePicture/${user.profile_pic}`,
+                  uri: `${IMAGE_BASE_URL}/profilePicture/${user.profile_pic}`,
                 }}
               />
             </View>

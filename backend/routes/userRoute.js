@@ -6,6 +6,10 @@ const interestController = require("../controllers/interest/interest");
 const storyController = require("../controllers/stories/storyController");
 const { uploadStoryMedia } = require("../middlewares/imageUploadMiddleware");
 const authController = require("../controllers/auth/userController");
+const searchController = require("../controllers/search/search");
+
+// search routes
+router.get("/search", authMiddleware, searchController.searchUsers);
 
 // follow routes
 // Follow / Unfollow / Request / Cancel
@@ -51,12 +55,20 @@ router.post(
 );
 
 // get stories
-router.get("/get-stories", authMiddleware, storyController.getStories);
-
+router.get("/get-my-stories", authMiddleware, storyController.getMyStories);
+router.get(
+  "/get-following-stories",
+  authMiddleware,
+  storyController.getFollowingStories
+);
 router.get(
   "/fetch-follower-profile/:id",
   authMiddleware,
   authController.fetchFollowerProfile
 );
+
+// search users
+router.get("/search", searchController.searchUsers);
+router.get("/show-search-all-posts", searchController.fetchPostsForSearch);
 
 module.exports = router;
