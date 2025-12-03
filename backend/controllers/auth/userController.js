@@ -10,7 +10,10 @@ const {
 const moment = require("moment");
 const { forgotPasswordTemplate } = require("../../templates/forgotPassword");
 const { createResetToken } = require("../../services/createPasswordResetToken");
-const { getMediaCounts, applyMediaTypeFilter } = require("../../helpers/userPost");
+const {
+  getMediaCounts,
+  applyMediaTypeFilter,
+} = require("../../helpers/userPost");
 
 // test route
 const test = async (req, res) => {
@@ -437,9 +440,10 @@ const signIn = async (req, res) => {
 // update user details
 const addUserDetails = async (req, res) => {
   try {
-    const { bio, website, gender, date_of_birth, phone, email, name, action } = req.body;
+    const { bio, website, gender, date_of_birth, phone, email, name, action } =
+      req.body;
     const filename = req?.file?.filename;
-    console.log("filename", filename)
+    console.log("filename", filename);
 
     // validation
     if (action === "Profile-info") {
@@ -479,12 +483,12 @@ const addUserDetails = async (req, res) => {
         bio,
         website,
         gender,
-        date_of_birth
+        date_of_birth,
       });
       if (name) {
-        await db('users').where({ id: userId }).update({
-          name
-        })
+        await db("users").where({ id: userId }).update({
+          name,
+        });
       }
     } else {
       await db("user_details").where({ userId }).update({
@@ -492,12 +496,12 @@ const addUserDetails = async (req, res) => {
         bio,
         website,
         gender,
-        date_of_birth
+        date_of_birth,
       });
       if (name) {
-        await db('users').where({ id: userId }).update({
-          name
-        })
+        await db("users").where({ id: userId }).update({
+          name,
+        });
       }
     }
     // update email or phone  only if data not entered before
@@ -515,13 +519,13 @@ const addUserDetails = async (req, res) => {
 
     if (filename) {
       await db("users").where({ id: userId }).update({
-        profile_pic: filename
+        profile_pic: filename,
       });
     }
 
     return success(res, " ", 200, "Details Updated!");
   } catch (err) {
-    console.log((err))
+    console.log(err);
     return error(res, "Something went wrong", err.message, 500);
   }
 };
@@ -529,9 +533,8 @@ const addUserDetails = async (req, res) => {
 // update account settings
 const UserAccountSetting = async (req, res) => {
   try {
-
     const { account_type, account_privacy, language } = req.body;
-    console.log("object", req.body)
+    console.log("object", req.body);
     if (!account_type) {
       return error(res, "Account Type is required!", null, 403);
     }
@@ -586,7 +589,7 @@ const UserAccountSetting = async (req, res) => {
 const getUserDetails = async (req, res) => {
   try {
     const userId = req.user.id;
-    
+
     if (!userId) {
       return error(res, "Id is required!", null, 403);
     }
@@ -630,17 +633,17 @@ const getUserDetails = async (req, res) => {
 // fetch follower profile
 const fetchFollowerProfile = async (req, res) => {
   try {
-    let { id } = req.params
-    let { media_type } = req.query
+    let { id } = req.params;
+    let { media_type } = req.query;
 
     if (!id) {
       return error(res, "Id is required!", null, 403);
     }
 
-    let existingUser = await db('users').where({ id }).first()
+    let existingUser = await db("users").where({ id }).first();
 
     if (!existingUser) {
-      return error(res, "User Not Found!", null, 403)
+      return error(res, "User Not Found!", null, 403);
     }
 
     // user details
@@ -651,8 +654,10 @@ const fetchFollowerProfile = async (req, res) => {
 
     let query = db("posts").where("userId", id);
 
-    // return count of user media 
-    const { images_count, reels_count, all_media_count } = await getMediaCounts(id);
+    // return count of user media
+    const { images_count, reels_count, all_media_count } = await getMediaCounts(
+      id
+    );
 
     // filter user posts based on their extensions
     query = applyMediaTypeFilter(query, media_type);
@@ -685,26 +690,33 @@ const fetchFollowerProfile = async (req, res) => {
       posts: userPosts,
     };
 
-    return success(res, userProfileData, 200, "follower profile fetch successfully")
+    return success(
+      res,
+      userProfileData,
+      200,
+      "follower profile fetch successfully"
+    );
   } catch (err) {
     return error(res, "Something went wrong", err.message, 500);
   }
-}
-
+};
 
 const fetchUserProfile = async (req, res) => {
   try {
     const userId = req.user.id;
-    let { media_type } = req.query
+    let { media_type } = req.query;
 
     if (!userId) {
       return error(res, "User Id is required!", null, 403);
     }
 
-    let existUser = await db("users").where({ id: userId }).andWhere({ status: 1 }).first()
+    let existUser = await db("users")
+      .where({ id: userId })
+      .andWhere({ status: 1 })
+      .first();
 
     if (!existUser) {
-      return error(res, "User Not Found!", null, 403)
+      return error(res, "User Not Found!", null, 403);
     }
 
     const userDetails = await db("user_details")
@@ -714,8 +726,10 @@ const fetchUserProfile = async (req, res) => {
 
     let query = db("posts").where({ userId });
 
-    // return count of user media 
-    const { images_count, reels_count, all_media_count } = await getMediaCounts(userId);
+    // return count of user media
+    const { images_count, reels_count, all_media_count } = await getMediaCounts(
+      userId
+    );
 
     // filter user posts based on their extensions
     query = applyMediaTypeFilter(query, media_type);
@@ -748,11 +762,17 @@ const fetchUserProfile = async (req, res) => {
       posts: userPosts,
     };
 
-    return success(res, userProfileData, 200, "User Profile Fetch Successfully!")
+    return success(
+      res,
+      userProfileData,
+      200,
+      "User Profile Fetch Successfully!"
+    );
   } catch (err) {
     return error(res, "Something went wrong", err.message, 500);
   }
-}
+};
+
 module.exports = {
   test,
   sendOtp,
@@ -767,5 +787,5 @@ module.exports = {
   getUserDetails,
   UserAccountSetting,
   fetchFollowerProfile,
-  fetchUserProfile
+  fetchUserProfile,
 };

@@ -22,6 +22,7 @@ import { fetchUserProfile } from './services';
 import { formatCount, getMediaType } from '../../helpers/common';
 import { IMAGE_BASE_URL } from '@env';
 
+
 type Post = {
   id: number;
   caption: string;
@@ -56,11 +57,12 @@ export default function Profile() {
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
+
   useEffect(() => {
     const getUserProfle = async () => {
       try {
         setLoading(true);
-        const { data } = await fetchUserProfile({ media_type: activeTab });
+        const { data } = await fetchUserProfile({ media_type: activeTab, });
         setProfileData(data);
       } catch (error) {
         console.log('Error fetching posts:', error);
@@ -97,12 +99,7 @@ export default function Profile() {
           <View style={styles.mainContainer}>
             <View style={styles.innerContainer}>
               <View style={styles.usrImage}>
-                <Image
-                  source={{
-                    uri: `${IMAGE_BASE_URL}/profilePicture/${profileData?.profile_pic}`,
-                  }}
-                  style={styles.uploadUserImage}
-                />
+                <Image source={{ uri: `${IMAGE_BASE_URL}/profilePicture/${profileData?.profile_pic}`, }} style={styles.uploadUserImage} />
               </View>
             </View>
           </View>
@@ -116,23 +113,17 @@ export default function Profile() {
       {/* User Stats */}
       <View style={styles.userAllPost}>
         <View style={styles.userPostDetail}>
-          <Text style={styles.numberPost}>
-            {formatCount(profileData?.all_media_count)}
-          </Text>
+          <Text style={styles.numberPost}>{formatCount(profileData?.all_media_count)}</Text>
           <Text style={styles.postTypeTitle}>Posts</Text>
         </View>
 
         <View style={styles.userPostDetail}>
-          <Text style={styles.numberPost}>
-            {formatCount(profileData?.followers_count)}
-          </Text>
+          <Text style={styles.numberPost}>{formatCount(profileData?.followers_count)}</Text>
           <Text style={styles.postTypeTitle}>Followers</Text>
         </View>
 
         <View style={styles.userPostDetail}>
-          <Text style={styles.numberPost}>
-            {formatCount(profileData?.following_count)}
-          </Text>
+          <Text style={styles.numberPost}>{formatCount(profileData?.following_count)}</Text>
           <Text style={styles.postTypeTitle}>Following</Text>
         </View>
       </View>
@@ -205,11 +196,7 @@ export default function Profile() {
             {profileData?.posts?.map(posts => (
               <View style={styles.postStoryColl} key={posts.id}>
                 <View style={styles.postType}>
-                  {getMediaType(posts.media_url) == 'image' ? (
-                    <ImageIcon color={'#FFFFFF'} />
-                  ) : (
-                    <ReelsIcon color={'#FFFFFF'} />
-                  )}
+                  {getMediaType(posts.media_url) == 'image' ? (<ImageIcon color={'#FFFFFF'} />) : (<ReelsIcon color={'#FFFFFF'} />)}
                 </View>
                 <View style={styles.postCard}>
                   <Image
@@ -227,22 +214,15 @@ export default function Profile() {
           <View style={styles.postStoryRow}>
             {profileData?.posts?.map(posts => (
               <View style={styles.postStoryColl} key={posts.id}>
+
                 <View style={styles.postType}>
-                  {getMediaType(posts.media_url) == 'image' ? (
-                    <ImageIcon color={'#FFFFFF'} />
-                  ) : (
-                    <ReelsIcon color={'#FFFFFF'} />
-                  )}
+                  {getMediaType(posts.media_url) == 'image' ? (<ImageIcon color={'#FFFFFF'} />) : (<ReelsIcon color={'#FFFFFF'} />)}
                 </View>
 
                 <View style={styles.postCard}>
-                  <Image
-                    source={{
-                      uri: `${IMAGE_BASE_URL}/posts/${posts?.media_url}`,
-                    }}
-                    style={styles.postMediaContent}
-                  />
+                  <Image source={{ uri: `${IMAGE_BASE_URL}/posts/${posts?.media_url}`, }} style={styles.postMediaContent} />
                 </View>
+
               </View>
             ))}
           </View>
@@ -404,6 +384,7 @@ const styles = StyleSheet.create({
   tabRow: {
     flexDirection: 'row',
     justifyContent: 'space-around',
+
   },
   contentBox: {
     marginTop: 10,
