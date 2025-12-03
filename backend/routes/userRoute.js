@@ -70,5 +70,15 @@ router.get(
 // search users
 router.get("/search", searchController.searchUsers);
 router.get("/show-search-all-posts", searchController.fetchPostsForSearch);
+router.get(
+  "/get-user-details/:id",
+  authMiddleware,
+  searchController.GetUserDeatilsById
+);
+router.get(
+  "/fetch-User-profile",
+  authMiddleware,
+  authController.fetchUserProfile
+);
 
 module.exports = router;

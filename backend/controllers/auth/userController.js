@@ -692,6 +692,67 @@ const fetchFollowerProfile = async (req, res) => {
 }
 
 
+const fetchUserProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    let { media_type } = req.query
+
+    if (!userId) {
+      return error(res, "User Id is required!", null, 403);
+    }
+
+    let existUser = await db("users").where({ id: userId }).andWhere({ status: 1 }).first()
+
+    if (!existUser) {
+      return error(res, "User Not Found!", null, 403)
+    }
+
+    const userDetails = await db("user_details")
+      .where({ userId })
+      .select("bio")
+      .first();
+
+    let query = db("posts").where({ userId });
+
+    // return count of user media 
+    const { images_count, reels_count, all_media_count } = await getMediaCounts(userId);
+
+    // filter user posts based on their extensions
+    query = applyMediaTypeFilter(query, media_type);
+
+    // Fetch all posts of that user
+    const userPosts = await query.select(
+      "id",
+      "caption",
+      "media_url",
+      "like_count",
+      "comment_count",
+      "share_count",
+      "save_count",
+      "location",
+      "thumbnail_url"
+    );
+
+    // create a sigle object
+    const userProfileData = {
+      id: existUser.id,
+      name: existUser.name,
+      userName: existUser.userName,
+      profile_pic: existUser.profile_pic,
+      following_count: existUser.following_count,
+      followers_count: existUser.followers_count,
+      images_count,
+      reels_count,
+      all_media_count,
+      bio: userDetails?.bio || null,
+      posts: userPosts,
+    };
+
+    return success(res, userProfileData, 200, "User Profile Fetch Successfully!")
+  } catch (err) {
+    return error(res, "Something went wrong", err.message, 500);
+  }
+}
 module.exports = {
   test,
   sendOtp,
@@ -705,5 +766,6 @@ module.exports = {
   addUserDetails,
   getUserDetails,
   UserAccountSetting,
-  fetchFollowerProfile
+  fetchFollowerProfile,
+  fetchUserProfile
 };

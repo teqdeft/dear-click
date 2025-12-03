@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -18,34 +18,62 @@ import ImageIcon from '../../assets/svgs/profile/ImageIcon';
 import { useNavigation } from '@react-navigation/core';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Setting from '../../assets/svgs/icons/Setting';
-import Stories from '../stories/Stories';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { fetchUserProfile } from './services';
+import { formatCount, getMediaType } from '../../helpers/common';
+import { IMAGE_BASE_URL } from '@env';
+
+type Post = {
+  id: number;
+  caption: string;
+  media_url: string;
+  like_count: number;
+  comment_count: number;
+  share_count: number;
+  save_count: number;
+  location: string;
+  thumbnail_url: string;
+};
+
+type ProfileData = {
+  id: number;
+  name: string;
+  userName: string;
+  profile_pic: string;
+  following_count: number;
+  followers_count: number;
+  bio: string;
+  all_media_count: number;
+  images_count: number;
+  reels_count: number;
+  posts: Post[];
+};
 
 type MediaType = 'AllMedia' | 'reels' | 'images';
 
 export default function Profile() {
   const [activeTab, setActiveTab] = useState<MediaType>('AllMedia');
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
-  // Static dummy data (UI only)
-  const profileData = {
-    name: 'John Doe',
-    bio: 'This is a user bio',
-    profile_pic: '',
-    all_media_count: 23,
-    followers_count: 500,
-    following_count: 120,
-    reels_count: 8,
-    images_count: 15,
-    posts: [
-      { id: 1, media_url: '', thumbnail_url: '' },
-      { id: 2, media_url: '', thumbnail_url: '' },
-      { id: 3, media_url: '', thumbnail_url: '' },
-    ],
-  };
+  const [profileData, setProfileData] = useState<ProfileData | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const getUserProfle = async () => {
+      try {
+        setLoading(true);
+        const { data } = await fetchUserProfile({ media_type: activeTab });
+        setProfileData(data);
+      } catch (error) {
+        console.log('Error fetching posts:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getUserProfle();
+  }, [activeTab]);
 
   return (
-    <SafeAreaView style={styles.container} >
-    <ScrollView  >
+    <ScrollView style={styles.container}>
       {/* Header */}
       <View style={styles.profileInfoHeader}>
         <TouchableOpacity
@@ -55,11 +83,11 @@ export default function Profile() {
           <BackButton />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.goProfileDetail}>
-          <Setting
-            onPress={() => navigation.navigate('Profilesc')}
-            style={styles.goBackImage}
-          />
+        <TouchableOpacity
+          style={styles.goProfileDetail}
+          onPress={() => navigation.navigate('Profilesc')}
+        >
+          <Setting style={styles.goBackImage} />
         </TouchableOpacity>
       </View>
 
@@ -68,15 +96,19 @@ export default function Profile() {
         <View style={styles.profileInfo}>
           <View style={styles.mainContainer}>
             <View style={styles.innerContainer}>
-              <Image
-                source={require('../../assets/posts/profile.jpg')}
-                style={styles.image}
-              />
+              <View style={styles.usrImage}>
+                <Image
+                  source={{
+                    uri: `${IMAGE_BASE_URL}/profilePicture/${profileData?.profile_pic}`,
+                  }}
+                  style={styles.uploadUserImage}
+                />
+              </View>
             </View>
           </View>
           <View style={styles.userDetail}>
-            <Text style={styles.userName}>{profileData.name}</Text>
-            <Text style={styles.userPhone}>{profileData.bio}</Text>
+            <Text style={styles.userName}>{profileData?.name}</Text>
+            <Text style={styles.userPhone}>{profileData?.bio}</Text>
           </View>
         </View>
       </View>
@@ -84,29 +116,35 @@ export default function Profile() {
       {/* User Stats */}
       <View style={styles.userAllPost}>
         <View style={styles.userPostDetail}>
-          <Text style={styles.numberPost}>{profileData.all_media_count}</Text>
+          <Text style={styles.numberPost}>
+            {formatCount(profileData?.all_media_count)}
+          </Text>
           <Text style={styles.postTypeTitle}>Posts</Text>
         </View>
 
         <View style={styles.userPostDetail}>
-          <Text style={styles.numberPost}>{profileData.followers_count}</Text>
+          <Text style={styles.numberPost}>
+            {formatCount(profileData?.followers_count)}
+          </Text>
           <Text style={styles.postTypeTitle}>Followers</Text>
         </View>
 
         <View style={styles.userPostDetail}>
-          <Text style={styles.numberPost}>{profileData.following_count}</Text>
+          <Text style={styles.numberPost}>
+            {formatCount(profileData?.following_count)}
+          </Text>
           <Text style={styles.postTypeTitle}>Following</Text>
         </View>
       </View>
 
-      <Highlights />
+      {/* <Highlights /> */}
 
       {/* Tabs */}
       <View style={styles.tabRow}>
         <TabButton
           icon={AllImagesIcon}
           label="AllMedia"
-          count={profileData.all_media_count}
+          count={formatCount(profileData?.all_media_count)}
           active={activeTab === 'AllMedia'}
           onPress={() => setActiveTab('AllMedia')}
         />
@@ -114,7 +152,7 @@ export default function Profile() {
         <TabButton
           icon={ReelsIcon}
           label="reels"
-          count={profileData.reels_count}
+          count={formatCount(profileData?.reels_count)}
           active={activeTab === 'reels'}
           onPress={() => setActiveTab('reels')}
         />
@@ -122,33 +160,95 @@ export default function Profile() {
         <TabButton
           icon={ImageIcon}
           label="images"
-          count={profileData.images_count}
+          count={formatCount(profileData?.images_count)}
           active={activeTab === 'images'}
           onPress={() => setActiveTab('images')}
         />
       </View>
 
-      {/* Posts Display – static UI */}
       <View style={styles.contentBox}>
-        <View style={styles.postStoryRow}>
-          {profileData.posts.map(post => (
-            <View style={styles.postStoryColl} key={post.id}>
-              <View style={styles.postType}>
-                <ImageIcon color={'#FFFFFF'} />
+        {activeTab === 'AllMedia' && (
+          <View style={styles.postStoryRow}>
+            {profileData?.posts?.map(posts => (
+              <View style={styles.postStoryColl} key={posts.id}>
+                <View style={styles.postType}>
+                  {getMediaType(posts.media_url) == 'image' ? (
+                    <ImageIcon color={'#FFFFFF'} />
+                  ) : (
+                    <ReelsIcon color={'#FFFFFF'} />
+                  )}
+                </View>
+                <View style={styles.postCard}>
+                  {getMediaType(posts.media_url) == 'image' ? (
+                    <Image
+                      source={{
+                        uri: `${IMAGE_BASE_URL}/posts/${posts?.media_url}`,
+                      }}
+                      style={styles.postMediaContent}
+                    />
+                  ) : (
+                    <Image
+                      source={{
+                        uri: `${IMAGE_BASE_URL}/thumbnail/posts/${posts?.thumbnail_url}`,
+                      }}
+                      style={styles.postMediaContent}
+                    />
+                  )}
+                </View>
               </View>
+            ))}
+          </View>
+        )}
 
-              <View style={styles.postCard}>
-                <Image
-                  source={require('../../assets/posts/profile.jpg')}
-                  style={styles.postMediaContent}
-                />
+        {activeTab === 'reels' && (
+          <View style={styles.postStoryRow}>
+            {profileData?.posts?.map(posts => (
+              <View style={styles.postStoryColl} key={posts.id}>
+                <View style={styles.postType}>
+                  {getMediaType(posts.media_url) == 'image' ? (
+                    <ImageIcon color={'#FFFFFF'} />
+                  ) : (
+                    <ReelsIcon color={'#FFFFFF'} />
+                  )}
+                </View>
+                <View style={styles.postCard}>
+                  <Image
+                    source={{
+                      uri: `${IMAGE_BASE_URL}/thumbnail/posts/${posts?.thumbnail_url}`,
+                    }}
+                    style={styles.postMediaContent}
+                  />
+                </View>
               </View>
-            </View>
-          ))}
-        </View>
+            ))}
+          </View>
+        )}
+        {activeTab === 'images' && (
+          <View style={styles.postStoryRow}>
+            {profileData?.posts?.map(posts => (
+              <View style={styles.postStoryColl} key={posts.id}>
+                <View style={styles.postType}>
+                  {getMediaType(posts.media_url) == 'image' ? (
+                    <ImageIcon color={'#FFFFFF'} />
+                  ) : (
+                    <ReelsIcon color={'#FFFFFF'} />
+                  )}
+                </View>
+
+                <View style={styles.postCard}>
+                  <Image
+                    source={{
+                      uri: `${IMAGE_BASE_URL}/posts/${posts?.media_url}`,
+                    }}
+                    style={styles.postMediaContent}
+                  />
+                </View>
+              </View>
+            ))}
+          </View>
+        )}
       </View>
     </ScrollView>
-    </SafeAreaView>
   );
 }
 
@@ -304,7 +404,6 @@ const styles = StyleSheet.create({
   tabRow: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-   
   },
   contentBox: {
     marginTop: 10,

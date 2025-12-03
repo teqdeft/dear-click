@@ -55,6 +55,43 @@ const fetchPostsForSearch = async (req, res) => {
   }
 };
 
-module.exports = { fetchPostsForSearch };
+const GetUserDeatilsById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const currentUserId = req.user?.id;
 
-module.exports = { searchUsers, fetchPostsForSearch };
+    const user = await db("users").select("*").where("id", id).first();
+
+    if (!user) {
+      return error(res, "User not found", "User not found", 404);
+    }
+
+    delete user.password;
+
+    let followStatus = null;
+
+    if (currentUserId) {
+      const followRow = await db("follows")
+        .select("status")
+        .where({
+          followerId: currentUserId,
+          followingId: Number(id),
+        })
+        .first();
+
+      followStatus = followRow ? followRow.status : null;
+    }
+
+    return success(
+      res,
+      { ...user, followStatus },
+      200,
+      "User fetched successfully"
+    );
+  } catch (err) {
+    console.error(err);
+    return error(res, "Something went wrong", err.message, 500);
+  }
+};
+
+module.exports = { searchUsers, fetchPostsForSearch, GetUserDeatilsById };

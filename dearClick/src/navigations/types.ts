@@ -12,8 +12,11 @@ export type RootStackParamList = {
   PostSourceSelector: undefined;
   StorySourceSelector: undefined;
   Profilesc: undefined;
+  SearchedUser: {
+    userId: number;
+  };
 
   StoryScreen: {
-    userIndex: number;  
+    userIndex: number;
   };
 };

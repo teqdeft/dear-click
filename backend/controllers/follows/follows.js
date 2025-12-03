@@ -123,9 +123,9 @@ const toggleFollow = async (req, res) => {
 
 // follow - private account
 const respondToFollowRequest = async (req, res) => {
-  const { requestId } = req.params; // id from follows table
-  const { action } = req.body; // "accept" or "reject"
-  const userId = req.user?.id; // the user who owns the account
+  const { requestId } = req.params; 
+  const { action } = req.body; 
+  const userId = req.user?.id; 
 
   try {
     let updated = null;

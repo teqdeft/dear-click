@@ -11,11 +11,16 @@ import {
 import { searchUsers } from './services';
 import { IMAGE_BASE_URL } from '@env';
 import AllPosts from './AllPosts';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/core';
+import Interests from '../interests/Interests';
+import BackButton from '../../assets/svgs/Auth svg/BackButton';
 
 export default function SearchScreen() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const navigation = useNavigation();
 
   // Fetch results when typing
   const fetchResults = async (text: string) => {
@@ -41,8 +46,14 @@ export default function SearchScreen() {
     return () => clearTimeout(timeout);
   }, [query]);
 
+  const handleClick = (id: number) => {
+    navigation.navigate('SearchedUser', { userId: id });
+  };
   const renderItem = ({ item }: any) => (
-    <TouchableOpacity style={styles.itemContainer}>
+    <TouchableOpacity
+      style={styles.itemContainer}
+      onPress={() => handleClick(item.id)}
+    >
       <Image
         source={{
           uri: `${IMAGE_BASE_URL}/profilePicture/${item.profile_pic}`,
@@ -55,17 +66,41 @@ export default function SearchScreen() {
       </View>
     </TouchableOpacity>
   );
+  const SkeletonItem = () => {
+    return (
+      <View style={styles.skeletonItem}>
+        <View style={styles.skeletonAvatar} />
+        <View style={{ flex: 1 }}>
+          <View style={styles.skeletonLine} />
+          <View style={[styles.skeletonLine, { width: 120, marginTop: 6 }]} />
+        </View>
+      </View>
+    );
+  };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       {/* Search Input */}
-      <TextInput
-        placeholder="Search users..."
-        placeholderTextColor="#999"
-        value={query}
-        onChangeText={setQuery}
-        style={styles.input}
-      />
+      <View>
+        <View style={styles.searchContainer}>
+          <TouchableOpacity
+            style={styles.goBackBtn}
+            onPress={() => navigation.goBack()}
+          >
+            <BackButton />
+          </TouchableOpacity>
+          <TextInput
+            placeholder="Search users..."
+            placeholderTextColor="#999"
+            value={query}
+            onChangeText={setQuery}
+            style={styles.input}
+          />
+        </View>
+        <View>
+          <Interests />
+        </View>
+      </View>
 
       {/* If no search → show All Posts */}
       {query.length === 0 ? (
@@ -84,29 +119,46 @@ export default function SearchScreen() {
           />
 
           {loading && (
-            <Text style={{ color: '#fff', marginVertical: 10 }}>
-              Loading...
-            </Text>
+            <FlatList
+              data={[1, 2, 3, 4, 5, 6]}
+              keyExtractor={item => item.toString()}
+              renderItem={() => <SkeletonItem />}
+            />
           )}
         </>
       )}
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    padding: 10,
     backgroundColor: '#1F1F1F',
+  },
+  searchContainer: {
+    flexDirection: 'row',
   },
   input: {
     borderWidth: 1,
-    borderColor: '#444',
+    borderColor: '#262626',
     padding: 10,
-    borderRadius: 8,
-    marginBottom: 10,
+    borderRadius: 12,
+
     color: '#fff',
+    flex: 1,
+  },
+  goBackBtn: {
+    height: 40,
+    width: 40,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#262626',
+
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 5,
   },
   itemContainer: {
     flexDirection: 'row',
@@ -123,5 +175,26 @@ const styles = StyleSheet.create({
   },
   username: {
     color: '#fff',
+  },
+  skeletonItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+  },
+
+  skeletonAvatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: '#2a2a2a',
+    marginRight: 12,
+    overflow: 'hidden',
+  },
+
+  skeletonLine: {
+    height: 12,
+    width: 180,
+    backgroundColor: '#2a2a2a',
+    borderRadius: 6,
   },
 });

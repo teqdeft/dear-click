@@ -15,6 +15,7 @@ import StorySourceSelector from '../screens/stories/StorySourceSelector';
 import ProfileScreen from '../screens/profile/ProfileScreen';
 import StoryScreen from '../screens/stories/StoryScreen';
 import { RootStackParamList } from './types';
+import SearchedUser from '../screens/search/SearchedUser';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -45,6 +46,7 @@ export default function AppStack() {
         component={StorySourceSelector}
       />
       <Stack.Screen name="Profilesc" component={ProfileScreen} />
+      <Stack.Screen name="SearchedUser" component={SearchedUser} />
       <Stack.Screen name="StoryScreen" component={StoryScreen} />
     </Stack.Navigator>
   );

@@ -14,8 +14,10 @@ import Comment from '../../assets/svgs/icons/Comment';
 import Share from '../../assets/svgs/icons/Share';
 import Save from '../../assets/svgs/icons/Save';
 import { IMAGE_BASE_URL } from '@env';
+import { useNavigation } from '@react-navigation/core';
 
 type PostCardProps = {
+  user_id?: number;
   user_name?: string;
   user_username?: string;
   user_profile_pic?: string;
@@ -28,6 +30,7 @@ type PostCardProps = {
 };
 
 export default function PostCard({
+  user_id,
   user_name = 'John Doe',
   user_username = '@johndoerunner',
   user_profile_pic = require('../../assets/posts/profile.jpg'),
@@ -40,7 +43,7 @@ export default function PostCard({
 }: PostCardProps) {
   const scheme = useColorScheme();
   const isDark = scheme === 'dark';
-
+  const navigation = useNavigation();
   // Format time ago (simple version)
   const timeAgo = (() => {
     const now = new Date();
@@ -64,13 +67,18 @@ export default function PostCard({
   const postImageSource = media_url
     ? { uri: `${IMAGE_BASE_URL}/posts/${media_url}` } // Update base URL
     : require('../../assets/posts/postimg.png');
-
+  const handleClick = (id: number) => {
+    navigation.navigate('SearchedUser', { userId: id });
+  };
   return (
     <View style={[styles.container, { backgroundColor: 'black' }]}>
       <View style={[styles.innnercontainer, { backgroundColor: '#1F1F1F' }]}>
         {/* User Info Section */}
         <View style={styles.userinfo}>
-          <View style={styles.profileDetails}>
+          <TouchableOpacity
+            style={styles.profileDetails}
+            onPress={() => handleClick(user_id)}
+          >
             <View style={styles.imageContainer}>
               <Image source={profilePicSource} style={styles.profileImage} />
             </View>
@@ -80,7 +88,7 @@ export default function PostCard({
                 @{user_username} • {timeAgo}
               </Text>
             </View>
-          </View>
+          </TouchableOpacity>
           <ThreeDots />
         </View>
 

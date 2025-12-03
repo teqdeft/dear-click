@@ -13,6 +13,7 @@ export default function HomeScreen() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [storiesRefreshKey, setStoriesRefreshKey] = useState(0);
 
   useEffect(() => {
     loadFeed();
@@ -28,13 +29,16 @@ export default function HomeScreen() {
       console.log(err);
     } finally {
       setLoading(false);
-      setRefreshing(false);
+      // setRefreshing(false);
     }
   };
 
-  const onRefresh = () => {
+  const onRefresh = async () => {
     setRefreshing(true);
-    loadFeed();
+
+    await loadFeed();
+    setStoriesRefreshKey(prev => prev + 1);
+    setRefreshing(false);
   };
 
   if (loading) {
@@ -50,7 +54,7 @@ export default function HomeScreen() {
         ListHeaderComponent={
           <>
             <ProfileSection />
-            <Stories />
+            <Stories refreshKey={storiesRefreshKey} />
             <Interests />
             {refreshing && <DarkSkeletonPosts />}
           </>

@@ -17,3 +17,21 @@ export const searchUsersPublicPosts = async (): Promise<any> => {
     return error?.response?.data;
   }
 };
+
+export const getUserDetails = async (id: any): Promise<any> => {
+  try {
+    const { data } = await api.get(`${API_URL}/user/get-user-details/${id}`);
+    return data;
+  } catch (error: any) {
+    return error?.response?.data;
+  }
+};
+
+export const follows = async (userId: number) => {
+  try {
+    const { data } = await api.post(`${API_URL}/user/${userId}/follows`);
+    return data;
+  } catch (error: any) {
+    return error?.response?.data;
+  }
+};

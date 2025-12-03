@@ -10,19 +10,16 @@ import { RootStackParamList } from '../../navigations/types';
 import { API_URL, IMAGE_BASE_URL } from '@env';
 import { getStories } from './services';
 
-export default function Stories() {
+export default function Stories(refreshKey: any) {
   type NavProp = NativeStackNavigationProp<RootStackParamList, 'Stories'>;
   const navigation = useNavigation<NavProp>();
 
   const [users, setUsers] = useState<any[]>([]);
 
-  useEffect(() => {
-    fetchStories();
-  }, []);
-
   const fetchStories = async () => {
     const res = await getStories();
     if (res?.success) {
+      // to show more than one story in one circle
       const grouped: any = {};
 
       res.data.forEach((item: any) => {
@@ -49,7 +46,9 @@ export default function Stories() {
       setUsers(Object.values(grouped));
     }
   };
-
+  useEffect(() => {
+    fetchStories();
+  }, [refreshKey]);
   return (
     <ScrollView
       style={styles.container}

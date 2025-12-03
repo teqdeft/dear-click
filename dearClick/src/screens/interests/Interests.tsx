@@ -70,7 +70,7 @@ export default function Interests() {
 
 const styles = StyleSheet.create({
   mainContainer: {
-    padding: 14,
+    padding: 10,
   },
   container: {
     flexDirection: 'row',
