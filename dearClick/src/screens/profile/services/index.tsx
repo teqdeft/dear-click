@@ -16,6 +16,10 @@ export interface UpdateProfileFormData {
   profilePic?: { uri: string; type: string; fileName: string };
 }
 
+interface paramsType {
+  media_type: string;
+}
+
 export const updateProfile = async (
   formData: UpdateProfileFormData,
   action: string,
@@ -61,3 +65,21 @@ export const updateSettings = async (
     return error?.response?.data;
   }
 };
+
+export const fetchUserProfile = async ({
+  media_type,
+}: paramsType): Promise<any> => {
+  try {
+    const { data } = await api.get(
+      `${API_URL}/user/fetch-user-profile`,
+      {
+        params: { media_type },
+      },
+    );
+    return data;
+  } catch (error: any) {
+    console.error('error:', error);
+    return error?.response?.data;
+  }
+};
+

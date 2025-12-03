@@ -67,4 +67,12 @@ router.get(
   authController.fetchFollowerProfile
 );
 
+router.get(
+  "/fetch-User-profile",
+  authMiddleware,
+  authController.fetchUserProfile
+);
+
+
+
 module.exports = router;

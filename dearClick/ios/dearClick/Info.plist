@@ -51,5 +51,14 @@
 	<array>
 		<string>Poppins-Regular.ttf</string>
 	</array>
+<key>NSCameraUsageDescription</key>
+<string>This app requires camera access.</string>
+
+<key>NSMicrophoneUsageDescription</key>
+<string>This app needs microphone access for video recording.</string>
+
+<key>NSPhotoLibraryAddUsageDescription</key>
+<string>Allow to save photos and videos.</string>
+
 </dict>
 </plist>
