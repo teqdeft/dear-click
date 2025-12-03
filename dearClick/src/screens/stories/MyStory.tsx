@@ -14,17 +14,12 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { IMAGE_BASE_URL } from '@env';
 import { getmyStories } from './services';
 
-
-export default function MyStory() {
+export default function MyStory(refreshKey: any) {
   const scheme = useColorScheme();
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
 
   const [profilePic, setProfilePic] = useState<string | null>(null);
   const [myStories, setMyStories] = useState<any[]>([]);
-
-  useEffect(() => {
-    loadMyStories();
-  }, []);
 
   const loadMyStories = async () => {
     const res = await getmyStories();
@@ -33,10 +28,14 @@ export default function MyStory() {
       setMyStories(res.data);
 
       // ALWAYS show user's profile picture (NOT story thumbnail)
-      setProfilePic(`${IMAGE_BASE_URL}/profilePicture/${res.data[0].profile_pic}`);
+      setProfilePic(
+        `${IMAGE_BASE_URL}/profilePicture/${res.data[0].profile_pic}`,
+      );
     }
   };
-
+  useEffect(() => {
+    loadMyStories();
+  }, [refreshKey]);
   const handlePress = () => {
     if (myStories.length === 0) {
       // No stories → Create Story
@@ -80,7 +79,9 @@ export default function MyStory() {
           </View>
 
           {/* DO NOT REMOVE + ICON (Always visible) */}
-          <View style={[styles.plusIconContainer, { backgroundColor: '#1F1F1F' }]}>
+          <View
+            style={[styles.plusIconContainer, { backgroundColor: '#1F1F1F' }]}
+          >
             <TouchableOpacity
               style={styles.innerplusIconContainer}
               onPress={() => navigation.navigate('CreatePost')}

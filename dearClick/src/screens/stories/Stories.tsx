@@ -55,7 +55,7 @@ export default function Stories(refreshKey: any) {
       horizontal
       showsHorizontalScrollIndicator={false}
     >
-      <MyStory />
+      <MyStory refreshKey={refreshKey} />
 
       <View style={styles.mainContainer}>
         {users.map((user, index) => (
