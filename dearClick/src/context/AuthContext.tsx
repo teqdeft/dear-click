@@ -18,12 +18,12 @@ interface AuthContextType {
 export const AuthContext = createContext<AuthContextType>({
   userToken: null,
   loading: true,
-  login: async () => {},
-  logout: async () => {},
+  login: async () => { },
+  logout: async () => { },
   apiData: null,
   apiLoading: false,
   apiError: null,
-  fetchApiData: async () => {},
+  fetchApiData: async () => { },
 });
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -59,7 +59,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const fetchApiData = async () => {
     try {
       const { data } = await api.get(
-        `http://192.168.1.15:5050/api/auth/profile-details`,
+        `http://192.168.1.46:5050/api/auth/profile-details`,
       );
       setApiData(data.data.user);
     } catch (error) {

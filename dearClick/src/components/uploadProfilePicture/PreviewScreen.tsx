@@ -38,10 +38,10 @@ export default function PreviewScreen({ media, onRetake, onUse }: PreviewProps) 
                     <Text style={styles.buttonText}>Retake</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.button} onPress={onUse}>
+                <TouchableOpacity style={styles.button} onPress={() => onUse()}>
                     <Text style={styles.buttonText}>Use</Text>
                 </TouchableOpacity>
-                
+
             </View>
         </View>
     );
