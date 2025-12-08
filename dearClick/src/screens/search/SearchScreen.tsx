@@ -15,6 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/core';
 import Interests from '../interests/Interests';
 import BackButton from '../../assets/svgs/Auth svg/BackButton';
+import Searchicon from '../../assets/svgs/home/Searchicon';
 
 export default function SearchScreen() {
   const [query, setQuery] = useState('');
@@ -82,21 +83,38 @@ export default function SearchScreen() {
     <SafeAreaView style={styles.container}>
       {/* Search Input */}
       <View>
-        <View style={styles.searchContainer}>
+        <View style={[styles.searchContainer, { alignItems: 'center' }]}>
           <TouchableOpacity
             style={styles.goBackBtn}
             onPress={() => navigation.goBack()}
           >
             <BackButton />
           </TouchableOpacity>
-          <TextInput
-            placeholder="Search users..."
-            placeholderTextColor="#999"
-            value={query}
-            onChangeText={setQuery}
-            style={styles.input}
-          />
+
+          {/* Search Box with Icons */}
+          <View style={styles.inputWrapper}>
+            <Searchicon width={18} height={18} color="#888" />
+
+            <TextInput
+              placeholder="Search users..."
+              placeholderTextColor="#999"
+              value={query}
+              onChangeText={setQuery}
+              style={styles.inputText}
+            />
+
+            {query.length > 0 && (
+              <TouchableOpacity onPress={() => setQuery('')}>
+                <Text
+                  style={{ color: '#999', fontSize: 18, paddingHorizontal: 4 }}
+                >
+                  ✕
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
+
         <View>
           <Interests />
         </View>
@@ -137,6 +155,23 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: '#1F1F1F',
   },
+  inputWrapper: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#262626',
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    height: 40,
+  },
+
+  inputText: {
+    flex: 1,
+    color: '#fff',
+    marginLeft: 8,
+  },
+
   searchContainer: {
     flexDirection: 'row',
   },

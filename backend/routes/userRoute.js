@@ -20,6 +20,11 @@ router.post(
   authMiddleware,
   followsController.respondToFollowRequest
 );
+router.post(
+  "/follow/:userId",
+  authMiddleware,
+  followsController.followController
+);
 
 // user interest routes
 router.get("/get-interest", interestController.getInterests);

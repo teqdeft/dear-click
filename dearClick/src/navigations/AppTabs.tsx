@@ -19,6 +19,7 @@ import PlusIcon from '../assets/svgs/home/Plusicon';
 import BottomModal from '../components/post/PostModal';
 import CameraWithSpinner from '../components/uploadProfilePicture/CameraScreen';
 import Profile from '../screens/profile/Profile';
+import ReelCard from '../components/post/ReelCard';
 
 const Tab = createBottomTabNavigator();
 
@@ -72,7 +73,7 @@ export default function AppTabs() {
           component={HomeScreen}
           listeners={{
             tabPress: e => {
-              e.preventDefault();
+              e.preventDefault();--
               openModal();
             },
           }}

@@ -20,14 +20,13 @@ const { height, width } = Dimensions.get('window');
 
 export default function ReelsScreen() {
   // for progress bar
-  const [progress, setProgress] = useState(0.4); // 40%
+  const [progress, setProgress] = useState(0.4);
 
   // post text read more and less
   const [expanded, setExpanded] = useState(false);
 
   const text =
     'Today I’m listening to my favorite music. Today I’m listening to my favorite music. Today I’m listening to my favorite music. Today I’m listening to my favorite music.';
-
   // toggle button
   const [activeTab, setActiveTab] = useState('For You');
 
@@ -418,7 +417,7 @@ const styles = StyleSheet.create({
   uploadUserImage: {
     height: '100%',
     width: '100%',
-    resizeMode: 'cover',
+    objectFit: 'cover',
   },
 
   userDetail: {

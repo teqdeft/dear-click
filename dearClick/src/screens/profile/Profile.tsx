@@ -128,7 +128,7 @@ export default function Profile() {
         </View>
       </View>
 
-      {/* <Highlights /> */}
+      <Highlights />
 
       {/* Tabs */}
       <View style={styles.tabRow}>
