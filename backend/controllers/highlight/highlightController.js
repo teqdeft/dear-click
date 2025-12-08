@@ -1,33 +1,14 @@
 const { success, error } = require("../../helpers/response");
 const db = require("../../db/db");
 
-const addToHighlight = async (req, res) => {
+const addHighlight = async (req, res) => {
   try {
     const userId = req.user.id;
-    let { highlightId, name, storyIds } = req.body;
-
-    if (typeof storyIds === "string") {
-      try {
-        storyIds = JSON.parse(storyIds);
-      } catch {
-        // If user provided a single value like "1"
-        storyIds = [storyIds];
-      }
-    }
-
-    // Ensure storyIds is always an array
-    if (!Array.isArray(storyIds)) {
-      storyIds = [storyIds];
-    }
-
-    // Convert all to integers
-    storyIds = storyIds.map((id) => Number(id)).filter((id) => !isNaN(id));
-
-    // storyIds must be an array
-    if (!storyIds || storyIds.length === 0) {
+    const { name, storyId } = req.body;
+    if (!name) {
       return error(
         res,
-        "At least one story must be provided",
+        "Highlight name is required",
         null,
         400,
         "INVALID_INPUT"
@@ -35,78 +16,82 @@ const addToHighlight = async (req, res) => {
     }
 
     let coverImage = req.file ? req.file.filename : null;
-    let createdNew = false;
-    // ----------------------------
-    // CASE 1: Create a new highlight
-    // ----------------------------
-    if (!highlightId) {
-      // highlight name required only when creating new
-      if (!name) {
-        return error(
-          res,
-          "Highlight name is required",
-          null,
-          400,
-          "INVALID_INPUT"
-        );
-      }
-
-      const [newHighlightId] = await db("highlights").insert({
-        user_id: userId,
-        name,
-        cover_image: coverImage,
-        created_at: new Date(),
-        updated_at: new Date(),
-      });
-
-      highlightId = newHighlightId; // set highlightId for mapping
-      createdNew = true;
+    // Ensure storyId is always an array
+    const storyIds = Array.isArray(storyId) ? storyId : [storyId];
+    const stories = await db("stories")
+      .whereIn("id", storyIds)
+      .andWhere("userId", userId);
+    if (!stories || stories.length === 0) {
+      return error(
+        res,
+        "Stories not found, At least one story must be provided",
+        null,
+        404,
+        "STORY_NOT_FOUND"
+      );
     }
-
-    // ----------------------------
-    // CASE 2: Add stories to existing highlight
-    // ----------------------------
-    const highlightExists = await db("highlights")
-      .where({ id: highlightId, user_id: userId })
-      .first();
-
-    if (!highlightExists) {
-      return error(res, "Highlight not found", null, 404, "NOT_FOUND");
-    }
-
-    // create story mappings
-    const mappings = storyIds.map((storyId) => ({
+    const [highlightId] = await db("highlights").insert({
+      userId,
+      name,
+      cover_image: coverImage,
+    });
+    const addStories = storyIds.map((st) => ({
       highlight_id: highlightId,
-      story_id: storyId,
-      added_at: new Date(),
+      story_id: st,
     }));
+    await db("highlight_stories").insert(addStories);
+    return success(res, { highlightId }, 201, "add  highlight Successfully!!!");
+  } catch (err) {
+    return error(res, "Failed to process highlight request", err.message, 500);
+  }
+};
 
-    await db("highlight_stories").insert(mappings);
+const existingHighlight = async (req, res) => {
+  try {
+    const userId = req.user.id;
 
+    const { highlightId, storyId } = req.body;
+    if (!highlightId) {
+      return error(res, "Highlight Id is required", null, 400, "INVALID_INPUT");
+    }
+    const storyIds = Array.isArray(storyId) ? storyId : [storyId];
+    const highlightExists = await db("highlights")
+      .where({ id: highlightId, userId })
+      .first();
+    if (!highlightExists) {
+      return error(
+        res,
+        "Highlight not exist , Create new One",
+        404,
+        "NOT_FOUND"
+      );
+    }
+    const addStories = storyIds.map((st) => ({
+      highlight_id: highlightId,
+      story_id: st,
+    }));
+    await db("highlight_stories").insert(addStories);
     return success(
       res,
-      { highlightId },
-      200,
-      createdNew
-        ? "Highlight created and stories added"
-        : "Stories added to existing highlight"
+      addStories,
+      201,
+      "add stories to existing highlight Successfully!!!"
     );
   } catch (err) {
     return error(
       res,
-      "Failed to process highlight request",
+      "Failed to add stories in existing highlight",
       err.message,
-      500,
-      "HIGHLIGHT_PROCESS_FAILED"
+      500
     );
   }
 };
 
-const gethighlight = async (req, res) => {
+const getHighlight = async (req, res) => {
   try {
     const userId = req.user.id;
     const highlights = await db("highlights")
-      .where({ user_id: userId })
+      .where({ userId })
       .where({ status: 0 })
       .orderBy("created_at", "desc");
 
@@ -117,12 +102,12 @@ const gethighlight = async (req, res) => {
       "Failed to fetch highlights",
       err.message,
       500,
-      "HIGHLITE_FETCH_FAILED"
+      "HIGHLIGHT_FETCH_FAILED"
     );
   }
 };
 
-const gethighilightStories = async (req, res) => {
+const getHighlightStories = async (req, res) => {
   try {
     const { highlightId } = req.params;
     const stories = await db("highlight_stories as hs")
@@ -144,52 +129,54 @@ const gethighilightStories = async (req, res) => {
   }
 };
 
-const edithighlight = async (req, res) => {
+const editHighlight = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { highlightId, name, removeStoryIds, addStoryIds } = req.body;
-    if (typeof removeStoryIds === "string")
-      removeStoryIds = removeStoryIds.split(",");
-    if (typeof addStoryIds === "string") addStoryIds = addStoryIds.split(",");
-    let coverImage = req.file ? req.file.filename : null;
+    const { highlightId, name, removeStoryId, addStoryId } = req.body;
+
+    const coverImage = req.file ? req.file.filename : null;
+    const removeStoryIds = Array.isArray(removeStoryId)
+      ? removeStoryId.filter((id) => id != null)
+      : removeStoryId != null
+      ? [removeStoryId]
+      : [];
+
+    const addStoryIds = Array.isArray(addStoryId)
+      ? addStoryId.filter((id) => id != null)
+      : addStoryId != null
+      ? [addStoryId]
+      : [];
+
     if (!highlightId) {
       return error(res, "Highlight Id is required", null, 404, "INVALID_INPUT");
     }
     const highlight = await db("highlights")
-      .where({ id: highlightId, user_id: userId })
+      .where({ id: highlightId, userId })
       .first();
     if (!highlight) {
       return error(res, "Highlight not found", null, 404, "NOT_FOUND");
     }
-    const updateData = {};
-    if (name) updateData.name = name;
-    if (coverImage) updateData.cover_image = coverImage;
-    updateData.updated_at = new Date();
-
     const updated = await db("highlights")
-      .where({ id: highlightId, user_id: userId })
-      .update(updateData);
+      .where({ id: highlightId, userId })
+      .update({ name, cover_image: coverImage, updated_at: new Date() });
     if (!updated) {
       return error(res, "Highlight not found", null, 404, "NOT_FOUND");
     }
-    if (
-      removeStoryIds &&
-      Array.isArray(removeStoryIds) &&
-      removeStoryIds.length
-    ) {
+
+    if (removeStoryIds && removeStoryIds.length) {
       await db("highlight_stories")
         .whereIn("story_id", removeStoryIds)
         .andWhere("highlight_id", highlightId)
         .update({ status: 1 });
     }
-    if (addStoryIds && Array.isArray(addStoryIds) && addStoryIds.length) {
-      const mappings = addStoryIds.map((storyId) => ({
+    if (addStoryIds && addStoryIds.length) {
+      const addStories = addStoryIds.map((st) => ({
         highlight_id: highlightId,
-        story_id: storyId,
+        story_id: st,
         added_at: new Date(),
       }));
 
-      await db("highlight_stories").insert(mappings);
+      await db("highlight_stories").insert(addStories);
     }
     return success(res, null, 200, "Highlight updated successfully");
   } catch (err) {
@@ -205,15 +192,14 @@ const edithighlight = async (req, res) => {
 
 const deleteHighlight = async (req, res) => {
   try {
-    const { highlightId, storyId } = req.body;
     const userId = req.user.id;
-
+    const { highlightId, storyId } = req.body;
     if (!highlightId) {
       return error(res, "Highlight Id is required", null, 404, "INVALID_INPUT");
     }
     // Check if highlight exists and belongs to user
     const highlight = await db("highlights")
-      .where({ id: highlightId, user_id: userId })
+      .where({ id: highlightId, userId })
       .first();
     if (!highlight) {
       return error(res, "Highlight not found", null, 404, "NOT_FOUND");
@@ -225,7 +211,7 @@ const deleteHighlight = async (req, res) => {
       if (!deleted) {
         return error(
           res,
-          "Highlight story not found in highlights",
+          "Highlight story not found in highlights_stories",
           null,
           404,
           "NOT_FOUND"
@@ -253,9 +239,10 @@ const deleteHighlight = async (req, res) => {
 };
 
 module.exports = {
-  addToHighlight,
-  gethighlight,
-  gethighilightStories,
-  edithighlight,
+  getHighlight,
+  getHighlightStories,
+  editHighlight,
   deleteHighlight,
+  addHighlight,
+  existingHighlight,
 };

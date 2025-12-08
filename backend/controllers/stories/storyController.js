@@ -3,7 +3,6 @@ const db = require("../../db/db");
 
 const uploadStory = async (req, res) => {
   try {
-
     const userId = req.user.id; // from auth middleware
     const { caption } = req.body;
 
@@ -56,35 +55,6 @@ const uploadStory = async (req, res) => {
       err.message,
       500,
       "STORY_UPLOAD_FAILED"
-    );
-  }
-};
-
-const getStory = async (req, res) => {
-  try {
-    const userId = req.user.id;
-
-    const stories = await db("stories")
-      .where({ userId })
-      .where({ status: 0 })
-      .orderBy("created_at", "desc");
-
-    const now = new Date();
-
-    const formattedStories = stories.map((story) => ({
-      ...story,
-      expired: new Date(story.expiry_at) < now,
-    }));
-
-    return success(res, formattedStories, 200, "Stories fetched successfully");
-  } catch (err) {
-    console.error(err);
-    return error(
-      res,
-      "Failed to fetch stories",
-      err.message,
-      500,
-      "STORY_FETCH_FAILED"
     );
   }
 };
@@ -320,236 +290,88 @@ const shareStory = async (req, res) => {
   }
 };
 
-const canUserViewStory = async (viewerId, ownerId) => {
-  if (viewerId === ownerId) {
-    return true;
-  }
-
-  const user = await db("users").where({ id: ownerId }).first();
-  if (!user) return false;
-
-  // Block check
-  const blocked = await db("blocked_users")
-    .where({ blocker_id: ownerId, blocked_id: viewerId })
-    .first();
-  if (blocked) return false;
-
-  // Public account → allowed
-  if (!user.is_private) return true;
-
-  // Private account → check followers table
-  const isFollower = await db("follows")
-    .where({
-      followerId: viewerId,
-      followingId: ownerId,
-      status: "accepted",
-    })
-    .first();
-
-  return !!isFollower;
-};
-
-const viewStory = async (req, res) => {
+const getMyStories = async (req, res) => {
   try {
-    const viewerId = req.user.id;
-    const ownerId = story.userId;
-    const { storyId } = req.params;
-
-    const story = await db("stories").where({ id: storyId }).first();
-    if (!story) {
-      return error(res, "Story not found", null, 404, "STORY_NOT_FOUND");
-    }
-
-    // Permission check (if needed)
-    const allowed = await canUserViewStory(viewerId, ownerId);
-    if (!allowed) {
-      return error(
-        res,
-        "Not allowed to view this story",
-        null,
-        403,
-        "STORY_VIEW_NOT_ALLOWED"
-      );
-    }
-
-    // Check duplicate view
-    const alreadyViewed = await db("story_views")
-      .where({ story_id: storyId, viewer_id: viewerId })
-      .first();
-
-    if (!alreadyViewed) {
-      await db("story_views").insert({
-        story_id: storyId,
-        viewer_id: viewerId,
-        userId: story.userId, // 👈 REQUIRED BY YOUR MIGRATION
-        viewed_at: new Date(),
-      });
-    }
-
-    return success(res, null, 200, "Story viewed successfully");
-  } catch (err) {
-    console.error(err);
-    return error(
-      res,
-      "Failed to record story view",
-      err.message,
-      500,
-      "VIEW_STORY_FAILED"
-    );
-  }
-};
-
-const getStoryViewers = async (req, res) => {
-  try {
+    const now = new Date();
     const userId = req.user.id;
-    const { storyId } = req.params;
 
-    const story = await db("stories").where({ id: storyId }).first();
-    if (!story) {
-      return error(res, "Story not found", null, 404, "STORY_NOT_FOUND");
-    }
+    const myStories = await db("stories")
+      .join("users", "stories.userId", "users.id")
+      .select("stories.*", "users.name", "users.username", "users.profile_pic")
+      .where("stories.userId", userId)
+      .andWhere("stories.status", 0)
+      .andWhere("stories.expiry_at", ">", now)
+      .orderBy("stories.created_at", "desc");
 
-    // Only owner can access viewer list
-    if (story.userId !== userId) {
-      return error(
-        res,
-        "You are not allowed to see viewers of this story",
-        null,
-        403,
-        "UNAUTHORIZED_VIEW"
-      );
-    }
-
-    const viewers = await db("story_views as sv")
-      .join("users as u", "u.id", "sv.viewer_id")
-      .select("u.id as viewerId", "u.username", "u.profile_pic", "sv.viewed_at")
-      .where("sv.story_id", storyId)
-      .orderBy("sv.viewed_at", "desc");
-
-    const responseData = {
-      storyId,
-      totalViewers: viewers,
-      viewers,
-    };
-
-    return success(res, responseData, 200, "Story viewers fetched");
+    return success(res, myStories, 200, "My stories fetched");
   } catch (err) {
-    console.error(err);
-    return error(
-      res,
-      "Failed to fetch story viewers",
-      err.message,
-      500,
-      "STORY_VIEWERS_FETCH_FAILED"
-    );
+    return error(res, "Something went wrong", err.message, 500);
   }
 };
 
-const getStoryCircles = async (req, res) => {
+const getFollowingStories = async (req, res) => {
   try {
     const userId = req.user.id;
     const now = new Date();
-    // 1️⃣ Get all users who posted unexpired stories (24 hours valid)
-    const storyUsers = await db("stories as s")
-      .join("users as u", "u.id", "s.userId")
-      .where("s.expiry_at", ">", now)
-      .select(
-        "u.id as userId",
-        "u.userName",
-        "u.profile_pic",
-        "s.userId",
-        db.raw("MAX(s.created_at) as latestStoryTime"),
-        db.raw("COUNT(s.id) as totalStories")
-      )
-      .groupBy("s.userId");
 
-    if (!storyUsers.length) {
-      return res.json([]);
-    }
-
-    // 2️⃣ Get all hidden users (people that current user has hidden)
-    const hiddenUsers = await db("stories_hides")
-      .where("userId", userId)
-      .pluck("hiddenUserId");
-
-    // 3️⃣ Get close friends of current user
-    const closeFriends = await db("close_friends")
-      .where("userId", userId)
-      .pluck("closeFriendId");
-
-    // 4️⃣ Logged-in user's followings
-    const followingList = await db("followers")
-      .where("followerId", userId)
+    // Find who the user follows
+    const followingIds = await db("follows")
+      .where({ followerId: userId })
       .pluck("followingId");
 
-    // 5️⃣ For each story poster → fetch all their active stories
-    const result = [];
-   
-    for (const user of storyUsers) {
-      // Skip if current user has hidden this user's story
-      if (hiddenUsers.includes(user.userId)) continue;
-
-      // 4.1 Fetch user stories
-      const stories = await db("stories")
-        .where("userId", user.userId)
-        .andWhere("expiry_at", ">", now)
-        .select("id", "media_url", "type", "created_at");
-
-      if (!stories.length) continue;
-
-      // 4.2 Check unseen/seen for circle color
-      const storyIds = stories.map((s) => s.id);
-
-      const seenStories = await db("story_status")
-        .whereIn("storyId", storyIds)
-        .andWhere("userId", userId)
-        .andWhere("seen", true)
-        .pluck("storyId");
-
-      const unseenCount = storyIds.length - seenStories.length;
-
-      // User is close-friend?
-      const isCloseFriend = closeFriends.includes(user.userId);
-
-      result.push({
-        userId: user.userId,
-        name: user.name,
-        profile_pic: user.profile_pic,
-        totalStories: stories.length,
-        unseenCount,
-        latestStoryTime: user.latestStoryTime,
-        isCloseFriend,
-        stories,
-      });
+    if (followingIds.length === 0) {
+      return success(res, [], 200, "No following stories found");
     }
 
-    // 5️⃣ Sort story circles exactly like Instagram:
-    // - Unseen first
-    // - Then based on latest story time
-    result.sort((a, b) => {
-      if (a.unseenCount > 0 && b.unseenCount === 0) return -1;
-      if (b.unseenCount > 0 && a.unseenCount === 0) return 1;
-      return new Date(b.latestStoryTime) - new Date(a.latestStoryTime);
-    });
+    const stories = await db("stories")
+      .join("users", "stories.userId", "users.id")
+      .select("stories.*", "users.name", "users.username", "users.profile_pic")
+      .whereIn("stories.userId", followingIds)
+      .andWhere("stories.status", 1)
+      .andWhere("stories.expiry_at", ">", now)
+      .orderBy("stories.created_at", "desc");
 
-    res.json(result);
+    return success(res, stories, 200, "Following stories fetched");
   } catch (err) {
-    console.error("getStoryCircles error:", err);
-    return res.status(500).json({
-      status: false,
-      message: "Internal server error",
-    });
+    return error(res, "Something went wrong", err.message, 500);
+  }
+};
+
+const getarchivedStories = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const now = new Date();
+    const getStories = await db("stories as s")
+      .join("users as u ", "s.userId", "u.id")
+      .where("s.userId", userId)
+      .andWhere("s.expiry_at", "<", now)
+      .andWhere("s.is_archived", 1)
+      .select(
+        "s.id",
+        "s.media_url",
+        "s.type",
+        "s.caption",
+        "s.status",
+        "s.is_close_friends",
+        "s.created_at",
+        "u.profile_pic"
+      );
+    if (!getStories) {
+      return error(res, "Stories not found", null, 404, "STORY_NOT_FOUND");
+    }
+    return success(res, getStories, 201, "get archive stories successfully!!!");
+  } catch {
+    return error(res, "Failed to get archive stories", err.message, 500);
   }
 };
 
 module.exports = {
   uploadStory,
-  getStory,
   storyHide,
   closeFriendStory,
   deleteStory,
   shareStory,
-  viewStory,
-  getStoryViewers,
-  getStoryCircles,
+  getMyStories,
+  getFollowingStories,
+  getarchivedStories,
 };

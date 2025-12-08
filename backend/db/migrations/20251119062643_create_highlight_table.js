@@ -2,7 +2,7 @@ exports.up = function (knex) {
   return knex.schema.createTable("highlights", function (table) {
     table.increments("id").primary();
     table
-      .integer("user_id")
+      .integer("userId")
       .unsigned()
       .notNullable()
       .references("id")

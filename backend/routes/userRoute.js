@@ -34,7 +34,6 @@ router.post(
   storyController.uploadStory
 );
 
-router.get("/get-story", authMiddleware, storyController.getStory);
 // user hide for stories
 router.post("/hide-story/:storyId", authMiddleware, storyController.storyHide);
 
@@ -55,6 +54,19 @@ router.delete(
 // share delete
 router.post("/story-share", authMiddleware, storyController.shareStory);
 
+// get stories
+router.get("/get-my-stories", authMiddleware, storyController.getMyStories);
+router.get(
+  "/get-following-stories",
+  authMiddleware,
+  storyController.getFollowingStories
+);
+router.get(
+  "/get-archive-stories",
+  authMiddleware,
+  storyController.getarchivedStories
+);
+
 router.get(
   "/fetch-follower-profile/:id",
   authMiddleware,
@@ -62,38 +74,44 @@ router.get(
 );
 
 //story views
-router.post("/view-story/:storyId", authMiddleware, storyController.viewStory);
+// router.post("/view-story/:storyId", authMiddleware, storyController.viewStory);
 
 //get story viewers
-router.get(
-  "/story-viewers/:storyId",
-  authMiddleware,
-  storyController.getStoryViewers
-);
+// router.get(
+//   "/story-viewers/:storyId",
+//   authMiddleware,
+//   storyController.getStoryViewers
+// );
 
 // add highlights
 router.post(
   "/add-highlight",
-  authMiddleware,
   uploadStoryMedia.single("coverImage"),
-  highlightController.addToHighlight
+  authMiddleware,
+  highlightController.addHighlight
+);
+
+router.post(
+  "/add-highlight-stories",
+  authMiddleware,
+  highlightController.existingHighlight
 );
 //get highlights
-router.get("/get-highlight", authMiddleware, highlightController.gethighlight);
+router.get("/get-highlight", authMiddleware, highlightController.getHighlight);
 
 //get highlight stories
 router.get(
   "/get-highlight-stories/:highlightId",
   authMiddleware,
-  highlightController.gethighilightStories
+  highlightController.getHighlightStories
 );
 
 //edit highlight
 router.put(
   "/update-highlight",
-  authMiddleware,
   uploadStoryMedia.single("coverImage"),
-  highlightController.edithighlight
+  authMiddleware,
+  highlightController.editHighlight
 );
 
 //delete highlight
