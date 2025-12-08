@@ -1,184 +1,91 @@
-import React, { useEffect, useRef, useState } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Pressable,
-  Animated,
-  Easing,
-  Platform,
-} from 'react-native';
-import {
-  Camera,
-  useCameraDevice,
-  CameraPermissionStatus,
-  VideoFile,
-} from 'react-native-vision-camera';
-import PreviewScreen from './PreviewScreen';
-import toast from '../utils/Toast';
-import { createPost } from '../../screens/post/services/services';
-import { useNavigation } from '@react-navigation/core';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { createStory } from '../../screens/stories/services';
-import { launchImageLibrary } from 'react-native-image-picker';
-import GalleryIcon from '../../assets/svgs/icons/GalleryIcon';
-import CameraFlashOff from '../../assets/svgs/icons/CameraFlashOff';
-import CameraFlahOn from '../../assets/svgs/icons/CameraFlahOn';
-import CameraFlip from '../../assets/svgs/icons/CameraFlip';
-import { useFocusEffect } from '@react-navigation/native';
-import { useCallback } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { View, Text, TouchableOpacity, StyleSheet, Platform, Alert } from "react-native";
+import { Camera, useCameraDevice, useCameraPermission, useMicrophonePermission } from "react-native-vision-camera";
+import PreviewScreen from "./PreviewScreen";
+import toast from "../utils/Toast";
+import { createPost } from "../../screens/post/services/services";
+import { createStory } from "../../screens/stories/services";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useFocusEffect, useNavigation } from "@react-navigation/core";
+import { launchImageLibrary } from "react-native-image-picker";
+import GalleryIcon from "../../assets/svgs/icons/GalleryIcon";
+import CameraFlahOn from "../../assets/svgs/icons/CameraFlahOn";
+import CameraFlip from "../../assets/svgs/icons/CameraFlip";
+import CameraFlashOff from "../../assets/svgs/icons/CameraFlashOff";
 
-export default function CameraWithSpinner() {
-  const [cameraPermission, setCameraPermission] =
-    useState<CameraPermissionStatus>('not-determined');
-  const [isFront, setIsFront] = useState(false);
-  const navigation = useNavigation<NativeStackNavigationProp<any>>();
-  const [flash, setFlash] = useState<'off' | 'on'>('off');
-  const [isRecording, setIsRecording] = useState(false);
-  const [recordTimeSec, setRecordTimeSec] = useState(0);
-  const [selectedTab, setSelectedTab] = useState('Story');
-  const tabs = ['Story', 'Post'];
-  const [photo, setPhoto] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
+const CameraScreen = () => {
+    const [capturedMedia, setCapturedMedia] = useState<null | {
+        type: "photo" | "video";
+        path: string;
+    }>(null);
+    const [isRecording, setIsRecording] = useState(false);
+    const [selectedTab, setSelectedTab] = useState("Story");
+    const [loading, setLoading] = useState(false);
+    const [photo, setPhoto] = useState<any>(null);
+    const [isFront, setIsFront] = useState(false)
+    const [flash, setFlash] = useState<"off" | "on">("off")
+    const [recordTimeSec, setRecordTimeSec] = useState(0);
+    const navigation = useNavigation<NativeStackNavigationProp<any>>();
+    const tabs = ["Story", "Post"];
+    const cameraRef = useRef<Camera>(null);
 
-  const [preview, setPreview] = useState<{
-    type: 'photo' | 'video';
-    path: string;
-  } | null>(null);
 
-  // handle camera access front and back
-  const device = useCameraDevice(isFront ? 'front' : 'back');
-  useFocusEffect(
-    useCallback(() => {
-      // RESET ALL STATES HERE
-      setPhoto(null);
-      setPreview(null);
-      setIsRecording(false);
-      setRecordTimeSec(0);
-      setFlash('off');
-      setIsFront(false);
-      setSelectedTab('Story');
+    // New VisionCamera permission API
+    const { hasPermission: camPermission, requestPermission: requestCam } = useCameraPermission();
+    const { hasPermission: micPermission, requestPermission: requestMic } = useMicrophonePermission();
 
-      // Stop timers/spinner if any
-      stopSpinnerAnimation();
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
-      }
+    // WAY to select camera
+    const device = useCameraDevice(isFront ? "front" : "back");
+    const timerRef = useRef<number | null>(null);
+    // Request permissions automatically
 
-      return () => {};
-    }, []),
-  );
-  const cameraRef = useRef<Camera | null>(null);
+    useFocusEffect(
+        useCallback(() => {
+            // RESET ALL STATES HERE
+            setPhoto(null);
+            setCapturedMedia(null)
+            setIsRecording(false);
+            setFlash('off');
+            setIsFront(false);
+            setSelectedTab('Story');
+            return () => { };
+        }, []),
+    );
 
-  // Animated rotation value for spinner ring
-  const rotateAnim = useRef(new Animated.Value(0)).current;
+    // ask for camera permission
+    useEffect(() => {
+        const askPermissions = async () => {
+            if (!camPermission) {
+                await requestCam();
+            }
+            if (!micPermission) {
+                await requestMic();
+            }
+        };
 
-  // Timer interval ref
-  const timerRef = useRef<number | null>(null);
+        askPermissions();
+    }, [camPermission, micPermission]);
 
-  useEffect(() => {
-    (async () => {
-      const status = await Camera.requestCameraPermission();
-      setCameraPermission(status);
-      // microphone needed for video
-      await Camera.requestMicrophonePermission();
-    })();
-
-    // <clean>                              </clean>up on unmount
-    return () => {
-      stopSpinnerAnimation();
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Start spinner animation loop
-  const startSpinnerAnimation = () => {
-    rotateAnim.setValue(0);
-    Animated.loop(
-      Animated.timing(rotateAnim, {
-        toValue: 1,
-        duration: 5000, // rotation speed
-        easing: Easing.linear,
-        useNativeDriver: true,
-      }),
-    ).start();
-  };
-
-  const stopSpinnerAnimation = () => {
-    rotateAnim.stopAnimation();
-    rotateAnim.setValue(0);
-  };
-
-  // Start recording
-  const startRecording = async () => {
-    try {
-      setIsRecording(true);
-      startSpinnerAnimation();
-      setRecordTimeSec(0);
-
-      // start a small timer to show seconds (optional)
-      timerRef.current = setInterval(() => {
-        setRecordTimeSec(s => s + 1);
-      }, 1000) as unknown as number;
-
-      cameraRef.current?.startRecording({
-        flash,
-        onRecordingFinished: (video: VideoFile) => {
-          setIsRecording(false);
-          stopSpinnerAnimation();
-          if (timerRef.current) clearInterval(timerRef.current);
-          const videoUri =
-            Platform.OS === 'android' ? 'file://' + video.path : video.path;
-          setPhoto({
-            uri: videoUri,
-            type: 'video/mp4',
-            fileName: `video_${Date.now()}.mp4`,
-          });
-          setPreview({
-            type: 'video',
-            path: video?.path ? 'file://' + video.path : '',
-          });
-        },
-        onRecordingError: error => {
-          console.error('Recording error:', error);
-          setIsRecording(false);
-          stopSpinnerAnimation();
-          if (timerRef.current) {
-            clearInterval(timerRef.current);
-            timerRef.current = null;
-          }
-        },
-      });
-    } catch (err) {
-      console.error('startRecording err:', err);
-      setIsRecording(false);
-      stopSpinnerAnimation();
+    // validation for denied camera 
+    if (!device) {
+        return (
+            <View >
+                <Text >Loading camera…</Text>
+            </View>
+        );
     }
-  };
 
-  // Stop recording
-  const stopRecording = async () => {
-    if (!isRecording) return;
-    try {
-      await cameraRef.current?.stopRecording();
-      // onRecordingFinished will handle resetting state
-    } catch (err) {
-      console.error('stopRecording err:', err);
-      setIsRecording(false);
-      stopSpinnerAnimation();
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
-      }
-    }
-  };
+    // capture image handle ios and android both
+    const capturePhoto = async () => {
+        if (isRecording || !cameraRef.current) return;
 
-  const capturePhoto = async () => {
-    if (isRecording || !cameraRef.current) return;
+        setRecordTimeSec(0);
+
+        clearTimer(); // ensure no old timer running
+
+        timerRef.current = setInterval(() => {
+            setRecordTimeSec((prev) => prev + 1);
+        }, 1000);
 
     try {
       const photo = await cameraRef.current.takePhoto({
@@ -186,10 +93,11 @@ export default function CameraWithSpinner() {
         enableAutoRedEyeReduction: true,
       });
 
-      if (!photo?.path) throw new Error('Photo path not found');
+            if (!photo?.path) throw new Error("Photo path not found");
 
-      const photoUri =
-        Platform.OS === 'android' ? 'file://' + photo.path : photo.path;
+            const photoUri = Platform.OS === 'android'
+                ? 'file://' + photo.path
+                : photo.path;
 
       setPhoto({
         uri: photoUri,
@@ -197,298 +105,318 @@ export default function CameraWithSpinner() {
         fileName: `photo_${Date.now()}.jpg`,
       });
 
-      setPreview({
-        type: 'photo',
-        path: photoUri,
-      });
-    } catch (err) {
-      console.error('capturePhoto error:', err);
-      toast.error('Photo is not capture yet!');
+            setCapturedMedia({
+                type: "photo",
+                path: photoUri,
+            });
+
+        } catch (err) {
+            console.error("capturePhoto error:", err);
+            toast.error("Photo is not capture yet!");
+        }
+    };
+
+    // open gallery function
+    const openGallery = async () => {
+        const result = await launchImageLibrary({
+            mediaType: 'mixed',
+            quality: 1,
+            selectionLimit: 10
+        });
+
+        if (result.assets && result.assets.length > 0) {
+            const asset = result.assets[0];
+            const fileType = asset.type;
+            let mediaType: "photo" | "video" = fileType?.startsWith("image") ? "photo" : "video";
+            setPhoto(asset);
+            setCapturedMedia({ type: mediaType, path: asset.uri!, });
+        }
+
+    };
+
+    // video recoarding function
+    const startVideoRecording = async () => {
+        try {
+            setIsRecording(true);
+            setRecordTimeSec(0);
+
+            clearTimer(); // ensure no old timer running
+
+            timerRef.current = setInterval(() => {
+                setRecordTimeSec((prev) => prev + 1);
+            }, 1000);
+
+            const video = await cameraRef.current?.startRecording({
+                fileType: "mp4",
+                flash: flash,
+                onRecordingFinished: (video) => {
+                    setIsRecording(false);
+                    const videoUri = Platform.OS === 'android'
+                        ? 'file://' + video.path
+                        : video.path;
+                    setPhoto({
+                        uri: videoUri,
+                        type: 'video/mp4',
+                        fileName: `video_${Date.now()}.mp4`,
+                    });
+                    setCapturedMedia({
+                        type: "video",
+                        path: video?.path ? "file://" + video.path : "",
+                    });
+                },
+                onRecordingError: (err) => {
+                    console.error("Video error:", err);
+                    setIsRecording(false);
+                },
+            });
+        } catch (error) {
+            console.log("Start recording error:", error);
+        }
+    };
+
+    // stop video recoarding
+    const stopVideoRecording = async () => {
+        try {
+            clearTimer();
+            await cameraRef.current?.stopRecording();
+        } catch (error) {
+            console.log("Stop recording error:", error);
+        }
+    };
+
+    const handleRetake = () => {
+        setCapturedMedia(null);
+    };
+
+    // handle post and story according to tab value
+    const handleAddStoryOrPost = async () => {
+        try {
+            setLoading(true);
+            let data;
+            if (selectedTab === "Post") {
+                data = await createPost(photo);
+            }
+            if (selectedTab === "Story") {
+                data = await createStory(photo);
+            }
+            if (!data?.success) {
+                toast.error(data?.error?.message || "Failed to submit");
+                return;
+            }
+            toast.success(data.message);
+            setCapturedMedia(null);
+            navigation.navigate('AppTabs', { screen: 'Home' });
+        } catch (err) {
+            toast.error("Something went wrong");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // photo and video preview component
+    if (capturedMedia) {
+        return (
+            <PreviewScreen
+                media={capturedMedia}
+                onRetake={handleRetake}
+                onUse={() => handleAddStoryOrPost()}
+            />
+        );
     }
-  };
 
-  // rotation interpolation
-  const spin = rotateAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '360deg'],
-  });
+    const formatTime = (sec: number) => {
+        const m = Math.floor(sec / 60).toString().padStart(2, "0");
+        const s = (sec % 60).toString().padStart(2, "0");
+        return `${m}:${s}`;
+    };
 
-  // Permission & device checks
-  if (cameraPermission !== 'granted') {
+    const clearTimer = () => {
+        if (timerRef.current) {
+            clearInterval(timerRef.current);
+            timerRef.current = null;
+        }
+    };
     return (
-      <View>
-        <Text>Camera permission required</Text>
-      </View>
-    );
-  }
+        <View style={styles.container}>
+            {/* CAMERA VIEW */}
+            <Camera
+                ref={cameraRef}
+                style={StyleSheet.absoluteFill}
+                device={device}
+                isActive={true}
+                photo={true}
+                video={true}
+            />
 
-  if (!device) {
-    return (
-      <View>
-        <Text>Loading camera...</Text>
-      </View>
-    );
-  }
+            {/* :top: TOP BAR */}
+            <View style={styles.topBar}>
+                <TouchableOpacity onPress={() => setFlash(f => (f === "off" ? "on" : "off"))}>
+                    {flash === "on" ? <CameraFlahOn /> : <CameraFlashOff />}
+                </TouchableOpacity>
 
-  const handleAddStoryOrPost = async () => {
-    try {
-      setLoading(true);
+                {isRecording && (
+                    <View style={styles.recordingTimerBox}>
+                        <View style={styles.recordingDot} />
+                        <Text style={styles.recordingText}>{formatTime(recordTimeSec)}</Text>
+                    </View>
+                )}
 
-      let data;
+                <TouchableOpacity onPress={() => setIsFront(p => !p)}>
+                    <CameraFlip />
+                </TouchableOpacity>
 
-      if (selectedTab === 'Post') {
-        data = await createPost(photo);
-      }
 
-      if (selectedTab === 'Story') {
-        data = await createStory(photo);
-      }
 
-      if (!data?.success) {
-        toast.error(data?.error?.message || 'Failed to submit');
-        return;
-      }
+            </View>
 
-      toast.success(data.message);
-      navigation.navigate('AppTabs', { screen: 'Home' });
-    } catch (err) {
-      toast.error('Something went wrong');
-    } finally {
-      setLoading(false);
-    }
-  };
+            {/* OTTOM SECTION */}
+            <View style={styles.bottomContainer}>
+                {/* GALLERY LEFT */}
+                <TouchableOpacity style={styles.galleryBtn} onPress={openGallery}>
+                    <GalleryIcon />
+                </TouchableOpacity>
+                {/* CAPTURE CENTER */}
+                <TouchableOpacity
+                    style={styles.captureBtn}
+                    onPress={capturePhoto}
+                    onLongPress={startVideoRecording}
+                    onPressOut={stopVideoRecording}
+                >
+                    <View
+                        style={[
+                            styles.innerCircle,
+                            isRecording && {
+                                backgroundColor: "red",
+                                width: 40,
+                                height: 40,
+                            },
+                        ]}
+                    />
+                </TouchableOpacity>
+            </View>
 
-  const openGallery = async () => {
-    const result = await launchImageLibrary({
-      mediaType: 'mixed',
-      quality: 1,
-      selectionLimit: 10,
-    });
+            {/* MODE TABS BELOW CAPTURE */}
+            <View style={styles.modeTabs}>
+                {tabs?.map((item, index) => (
+                    <TouchableOpacity
+                        key={index}
+                        onPress={() => setSelectedTab(item)}
+                        style={styles.modeItem}
+                    >
+                        <Text
+                            style={[
+                                styles.modeText,
+                                selectedTab === item && styles.modeTextActive,
+                            ]}
+                        >
+                            {item}
+                        </Text>
+                    </TouchableOpacity>
+                ))}
+            </View>
 
-    if (result.assets && result.assets.length > 0) {
-      const asset = result.assets[0];
-
-      const fileType = asset.type;
-      let mediaType: 'photo' | 'video' = fileType?.startsWith('image')
-        ? 'photo'
-        : 'video';
-
-      setPhoto(asset);
-
-      setPreview({ type: mediaType, path: asset.uri! });
-    }
-  };
-
-  if (preview) {
-    return (
-      <PreviewScreen
-        media={preview}
-        onRetake={() => setPreview(null)}
-        onUse={() => handleAddStoryOrPost()}
-      />
-    );
-  }
-
-  return (
-    <View style={styles.container}>
-      <Camera
-        ref={cameraRef}
-        style={StyleSheet.absoluteFill}
-        device={device}
-        isActive={true}
-        photo={true}
-        video={true}
-      />
-
-      {/* TOP BAR — Instagram Style */}
-      <View style={styles.topBar}>
-        <TouchableOpacity
-          onPress={() => setFlash(f => (f === 'off' ? 'on' : 'off'))}
-        >
-          {/* <EditIcon flash={flash} /> */}
-          {flash === 'on' ? <CameraFlahOn /> : <CameraFlashOff />}
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => setIsFront(p => !p)}>
-          <CameraFlip />
-        </TouchableOpacity>
-      </View>
-
-      {/* RECORDING TIMER */}
-      {isRecording && (
-        <View style={styles.recTimer}>
-          <View style={styles.recDot} />
-          <Text style={styles.recTimerText}>
-            {Math.floor(recordTimeSec / 60)
-              .toString()
-              .padStart(2, '0')}
-            :{(recordTimeSec % 60).toString().padStart(2, '0')}
-          </Text>
         </View>
-      )}
-
-      {/* BOTTOM AREA */}
-      <View style={styles.bottomContainer}>
-        {/* LEFT — Gallery Preview */}
-        <TouchableOpacity onPress={openGallery} style={styles.galleryBox}>
-          <GalleryIcon />
-        </TouchableOpacity>
-
-        {/* CENTER — SHUTTER BUTTON */}
-        <Pressable
-          onPress={capturePhoto}
-          onLongPress={startRecording}
-          onPressOut={stopRecording}
-          style={[
-            styles.captureButton,
-            isRecording && styles.captureButtonRecording,
-          ]}
-        />
-
-        {/* RIGHT SPACER */}
-        <View style={{ width: 60 }} />
-      </View>
-
-      {/* MODES BELOW SHUTTER → POST / STORY / REEL */}
-      <View style={styles.modeTabs}>
-        {tabs.map((item, index) => (
-          <TouchableOpacity
-            key={index}
-            onPress={() => setSelectedTab(item)}
-            style={styles.modeItem}
-          >
-            <Text
-              style={[
-                styles.modeText,
-                selectedTab === item && styles.modeTextActive,
-              ]}
-            >
-              {item}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-    </View>
-  );
-}
-const StyleSheet = {
-  absoluteFill: {
-    position: 'absolute' as const,
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
-  },
+    );
 };
 
-const styles = StyleSheetCreate();
+export default CameraScreen;
 
-function StyleSheetCreate() {
-  return {
+const styles = StyleSheet.create({
     container: {
-      flex: 1,
-      backgroundColor: 'black',
-    } as any,
-
-    /* ---- TOP BAR ---- */
+        flex: 1,
+        backgroundColor: "#000",
+    },
+    /* TOP BAR */
     topBar: {
-      position: 'absolute' as const,
-      top: Platform.OS === 'ios' ? 50 : 30,
-      left: 0,
-      right: 0,
-      flexDirection: 'row' as const,
-      justifyContent: 'space-between',
-      paddingHorizontal: 20,
-      zIndex: 20,
-    } as any,
+        position: "absolute",
+        top: 70,
+        left: 0,
+        right: 0,
+        paddingHorizontal: 20,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        zIndex: 20,
+    },
 
-    /* ---- RECORD TIMER ---- */
-    recTimer: {
-      position: 'absolute' as const,
-      top: Platform.OS === 'ios' ? 50 : 30,
-      alignSelf: 'center',
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingHorizontal: 10,
-      paddingVertical: 4,
-      backgroundColor: 'rgba(0,0,0,0.5)',
-      borderRadius: 20,
-      zIndex: 20,
-    } as any,
+    topBarCenter: {
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "center",
+    },
 
-    recDot: {
-      width: 10,
-      height: 10,
-      borderRadius: 5,
-      backgroundColor: 'red',
-      marginRight: 6,
-    } as any,
+    recordingTimerBox: {
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: "rgba(0,0,0,0.6)",
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 20,
+    },
 
-    recTimerText: {
-      color: 'white',
-      fontSize: 14,
-      fontWeight: '600',
-    } as any,
+    recordingDot: {
+        width: 10,
+        height: 10,
+        borderRadius: 5,
+        backgroundColor: "red",
+        marginRight: 8,
+    },
 
-    /* ---- BOTTOM BAR (GALLERY + SHUTTER) ---- */
+    recordingText: {
+        color: "white",
+        fontSize: 16,
+        fontWeight: "600",
+    },
+
+
+    /* BOTTOM SECTION */
     bottomContainer: {
-      width: '100%',
-      position: 'absolute' as const,
-      bottom: 110,
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      paddingHorizontal: 25,
-      zIndex: 20,
-    } as any,
-
-    galleryBox: {
-      width: 60,
-      height: 60,
-      alignItems: 'center',
-      justifyContent: 'center',
-      overflow: 'hidden',
-    } as any,
-
-    /* ---- SHUTTER BUTTON ---- */
-    captureButton: {
-      width: 80,
-      height: 80,
-      borderRadius: 40,
-      borderWidth: 6,
-      borderColor: 'white',
-      backgroundColor: 'transparent',
-    } as any,
-
-    captureButtonRecording: {
-      backgroundColor: 'red',
-      borderColor: 'red',
-    } as any,
-
-    /* ---- MODES UNDER SHUTTER (POST / STORY / REEL) ---- */
+        position: "absolute",
+        bottom: 120,
+        flexDirection: "row",
+        width: "100%",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    galleryBtn: {
+        position: "absolute",
+        left: 40,
+        bottom: 0,
+        zIndex: 30,
+    },
+    captureBtn: {
+        width: 80,
+        height: 80,
+        borderRadius: 50,
+        borderWidth: 4,
+        borderColor: "#fff",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    innerCircle: {
+        width: 60,
+        height: 60,
+        borderRadius: 50,
+        backgroundColor: "#fff",
+    },
+    /* BOTTOM TABS */
     modeTabs: {
-      position: 'absolute' as const,
-      bottom: 40,
-      width: '100%',
-      flexDirection: 'row',
-      justifyContent: 'center',
-      alignItems: 'center',
-      zIndex: 20,
-    } as any,
-
+        position: "absolute",
+        bottom: 40,
+        width: "100%",
+        flexDirection: "row",
+        justifyContent: "center",
+    },
     modeItem: {
-      marginHorizontal: 15,
-    } as any,
-
+        marginHorizontal: 15,
+    },
     modeText: {
-      color: '#b6b0b0ff',
-      fontSize: 16,
-      fontWeight: '500',
-    } as any,
-
+        color: "#b6b0b0ff",
+        fontSize: 16,
+        fontWeight: "500",
+    },
     modeTextActive: {
-      color: 'white',
-      fontWeight: '700',
-    } as any,
-  };
-}
+        color: "white",
+        fontWeight: "700",
+    },
+});

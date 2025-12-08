@@ -58,9 +58,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const fetchApiData = async () => {
     try {
-      const { data } = await api.get(
-        `http://192.168.1.15:5050/api/auth/profile-details`,
-      );
+      const { data } = await api.get(`${API_URL}/auth/profile-details`);
       setApiData(data.data.user);
     } catch (error) {
       console.error(error);
