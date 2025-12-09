@@ -1,18 +1,22 @@
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import Video from "react-native-video";
 import React from "react";
+import { useNavigation } from "@react-navigation/core";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 type PreviewProps = {
     media: {
         type: "photo" | "video";
         path: string;
     };
+    realFile: any;
     onRetake: () => void;
     onUse: () => void;
+    type: string
 };
 
-export default function PreviewScreen({ media, onRetake, onUse }: PreviewProps) {
-
+export default function PreviewScreen({ media, realFile, onRetake, onUse, type }: PreviewProps) {
+    const navigation = useNavigation<NativeStackNavigationProp<any>>();
     return (
         <View style={styles.container}>
             {/* Media preview */}
@@ -38,9 +42,14 @@ export default function PreviewScreen({ media, onRetake, onUse }: PreviewProps) 
                     <Text style={styles.buttonText}>Retake</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.button} onPress={() => onUse()}>
-                    <Text style={styles.buttonText}>Use</Text>
-                </TouchableOpacity>
+                {
+                    type == "Post" ? <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('PostAddesniaolScreen', { file: realFile })}>
+                        <Text style={styles.buttonText}>Next</Text>
+                    </TouchableOpacity> :
+                        <TouchableOpacity style={styles.button} onPress={() => onUse()}>
+                            <Text style={styles.buttonText}>Use</Text>
+                        </TouchableOpacity>
+                }
 
             </View>
         </View>

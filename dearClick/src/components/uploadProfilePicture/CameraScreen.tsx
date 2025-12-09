@@ -87,11 +87,11 @@ const CameraScreen = () => {
             setRecordTimeSec((prev) => prev + 1);
         }, 1000);
 
-    try {
-      const photo = await cameraRef.current.takePhoto({
-        flash: flash,
-        enableAutoRedEyeReduction: true,
-      });
+        try {
+            const photo = await cameraRef.current.takePhoto({
+                flash: flash,
+                enableAutoRedEyeReduction: true,
+            });
 
             if (!photo?.path) throw new Error("Photo path not found");
 
@@ -99,11 +99,11 @@ const CameraScreen = () => {
                 ? 'file://' + photo.path
                 : photo.path;
 
-      setPhoto({
-        uri: photoUri,
-        type: 'image/jpeg',
-        fileName: `photo_${Date.now()}.jpg`,
-      });
+            setPhoto({
+                uri: photoUri,
+                type: 'image/jpeg',
+                fileName: `photo_${Date.now()}.jpg`,
+            });
 
             setCapturedMedia({
                 type: "photo",
@@ -193,9 +193,9 @@ const CameraScreen = () => {
         try {
             setLoading(true);
             let data;
-            if (selectedTab === "Post") {
-                data = await createPost(photo);
-            }
+            // if (selectedTab === "Post") {
+            //     data = await createPost(photo);
+            // }
             if (selectedTab === "Story") {
                 data = await createStory(photo);
             }
@@ -217,7 +217,9 @@ const CameraScreen = () => {
     if (capturedMedia) {
         return (
             <PreviewScreen
+                type={selectedTab}
                 media={capturedMedia}
+                realFile={photo}
                 onRetake={handleRetake}
                 onUse={() => handleAddStoryOrPost()}
             />

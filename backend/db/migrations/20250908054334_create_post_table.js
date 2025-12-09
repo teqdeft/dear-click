@@ -2,6 +2,8 @@ exports.up = function (knex) {
   return knex.schema.createTable("posts", function (table) {
     table.increments("id").primary();
     table.integer("userId").unsigned().notNullable();
+    table.integer("tagId").unsigned().nullable().defaultTo(null);
+    table.integer("interestId").unsigned().nullable().defaultTo(null);
     table.text("caption").nullable();
     table.string("media_url").nullable();
     table.string("thumbnail_url").nullable().defaultTo(null);
@@ -18,6 +20,12 @@ exports.up = function (knex) {
     // Relations
     table
       .foreign("userId")
+      .references("id")
+      .inTable("users")
+      .onDelete("CASCADE");
+
+    table
+      .foreign("tagId")
       .references("id")
       .inTable("users")
       .onDelete("CASCADE");

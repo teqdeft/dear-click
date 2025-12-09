@@ -8,7 +8,7 @@ let path = require("path");
 // create post
 const createPost = async (req, res) => {
   try {
-    const { caption, location } = req.body;
+    const { caption, location, postInterest, tagId } = req.body;
     const userId = req.user.id; // assuming auth middleware sets req.user
 
     const mediaPath = path.join(process.cwd(), "public", req.filePath);
@@ -30,10 +30,17 @@ const createPost = async (req, res) => {
       );
     }
 
+    let getInterestId;
+    if (postInterest) {
+      getInterestId = await db("interests").where({ name: postInterest }).first()
+    }
+
     // Insert into DB
     await db("posts").insert({
       userId: userId,
       caption: caption || null,
+      interestId: getInterestId?.id || null,
+      tagId,
       location: location || null,
       media_url: req.file.filename || null,
       thumbnail_url: thumbnailPath || null,

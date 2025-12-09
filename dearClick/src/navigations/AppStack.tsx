@@ -16,6 +16,8 @@ import ProfileScreen from '../screens/profile/ProfileScreen';
 import StoryScreen from '../screens/stories/StoryScreen';
 import { RootStackParamList } from './types';
 import SearchedUser from '../screens/search/SearchedUser';
+import PostAddesniaolScreen from '../components/post/PostAddesniaolScreen';
+
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -35,6 +37,10 @@ export default function AppStack() {
       <Stack.Screen
         name="ProfilePicturePreview"
         component={ProfilePicturePreview}
+      />
+      <Stack.Screen
+        name="PostAddesniaolScreen"
+        component={PostAddesniaolScreen}
       />
       <Stack.Screen name="FollowerScreen" component={FollowerScreen} />
       <Stack.Screen name="ProfileInfo" component={ProfileInfo} />
