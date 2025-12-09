@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, RefreshControl, View } from 'react-native';
+import { FlatList, RefreshControl } from 'react-native';
 import ProfileSection from './ProfileSection';
 import Stories from '../stories/Stories';
 import Interests from '../interests/Interests';
 import PostCard from '../../components/post/PostCard';
-import { fetchPost } from '../post/services/services';
+import { fetchPost, fetchSinlgePost } from '../post/services/services';
 import DarkSkeletonSoft from './DarkSkeleton';
 import DarkSkeletonPosts from './DarkSkeletonPosts';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -29,28 +29,42 @@ export default function HomeScreen() {
       console.log(err);
     } finally {
       setLoading(false);
-      // setRefreshing(false);
+    }
+  };
+
+  const refreshSinglePost = async (postId: number) => {
+    try {
+      const result = await fetchSinlgePost(postId);
+
+      if (result.success) {
+        const updated = result.data;
+
+        setPosts(prev =>
+          prev.map(post => (post.id === postId ? updated : post)),
+        );
+      }
+    } catch (err) {
+      console.log(err);
     }
   };
 
   const onRefresh = async () => {
     setRefreshing(true);
-
     await loadFeed();
-    setStoriesRefreshKey(prev => prev + 1);
+    setStoriesRefreshKey(k => k + 1);
     setRefreshing(false);
   };
 
-  if (loading) {
-    return <DarkSkeletonSoft />;
-  }
+  if (loading) return <DarkSkeletonSoft />;
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#1F1F1F' }}>
       <FlatList
         data={posts}
         keyExtractor={item => item.id.toString()}
-        renderItem={({ item }) => <PostCard {...item} />}
+        renderItem={({ item }) => (
+          <PostCard {...item} onPostUpdated={refreshSinglePost} />
+        )}
         ListHeaderComponent={
           <>
             <ProfileSection />

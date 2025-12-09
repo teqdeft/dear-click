@@ -149,7 +149,6 @@ const getFeedPosts = async (req, res) => {
 
     return success(res, latestPosts, 200, "Feed fetched successfully");
   } catch (err) {
-    console.error("Error fetching feed:", err);
     return error(
       res,
       "Something went wrong",
@@ -160,4 +159,31 @@ const getFeedPosts = async (req, res) => {
   }
 };
 
-module.exports = { createPost, getFeedPosts, userPostInterest };
+const getSinglePost = async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const post = await db("posts")
+      .select(
+        "posts.*",
+        "users.id as user_id",
+        "users.name as user_name",
+        "users.userName as user_username",
+        "users.email as user_email",
+        "users.profile_pic as user_profile_pic"
+      )
+      .leftJoin("users", "posts.userId", "users.id")
+      .where("posts.id", postId)
+      .first();
+
+    return success(res, post, 200, "Feed fetched successfully");
+  } catch (err) {
+    return error(
+      res,
+      "Something went wrong",
+      err.message,
+      500,
+      "Failed to fetch feed"
+    );
+  }
+};
+module.exports = { createPost, getFeedPosts, userPostInterest, getSinglePost };

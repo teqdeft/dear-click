@@ -1,4 +1,3 @@
-// components/post/PostCard.tsx
 import {
   Image,
   StyleSheet,
@@ -6,8 +5,11 @@ import {
   TouchableOpacity,
   View,
   useColorScheme,
+  Modal,
+  TextInput,
+  FlatList,
 } from 'react-native';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import ThreeDots from '../../assets/svgs/icons/ThreeDots';
 import Like from '../../assets/svgs/icons/Like';
 import Comment from '../../assets/svgs/icons/Comment';
@@ -15,21 +17,20 @@ import Share from '../../assets/svgs/icons/Share';
 import Save from '../../assets/svgs/icons/Save';
 import { IMAGE_BASE_URL } from '@env';
 import { useNavigation } from '@react-navigation/core';
-
-type PostCardProps = {
-  user_id?: number;
-  user_name?: string;
-  user_username?: string;
-  user_profile_pic?: string;
-  caption?: string;
-  media_url?: string;
-  like_count?: number;
-  comment_count?: number;
-  share_count?: number;
-  created_at?: string;
-};
+import {
+  postLike,
+  fetchComments,
+  addComment,
+  getComments,
+  createComment,
+} from '../../screens/post/services/services';
+import { fetchSinlgePost } from '../../screens/post/services/services';
+import CommentsModal from './CommentsModal';
+import { deleteComment } from '../../screens/post/services/services';
+import { Pressable } from 'react-native';
 
 export default function PostCard({
+  id,
   user_id,
   user_name = 'John Doe',
   user_username = '@johndoerunner',
@@ -40,11 +41,18 @@ export default function PostCard({
   comment_count = 162,
   share_count = 35,
   created_at = new Date().toISOString(),
-}: PostCardProps) {
+  onUpdatePost,
+}) {
   const scheme = useColorScheme();
-  const isDark = scheme === 'dark';
   const navigation = useNavigation();
-  // Format time ago (simple version)
+
+  const [localLike, setLocalLike] = useState(like_count);
+
+  const [commentModal, setCommentModal] = useState(false);
+  const [comments, setComments] = useState([]);
+  const [commentText, setCommentText] = useState('');
+  const [loadingComments, setLoadingComments] = useState(false);
+
   const timeAgo = (() => {
     const now = new Date();
     const postDate = new Date(created_at);
@@ -61,19 +69,68 @@ export default function PostCard({
   })();
 
   const profilePicSource = user_profile_pic
-    ? { uri: `${IMAGE_BASE_URL}/profilePicture/${user_profile_pic}` } // Update base URL
+    ? { uri: `${IMAGE_BASE_URL}/profilePicture/${user_profile_pic}` }
     : require('../../assets/posts/profile.jpg');
 
   const postImageSource = media_url
-    ? { uri: `${IMAGE_BASE_URL}/posts/${media_url}` } // Update base URL
+    ? { uri: `${IMAGE_BASE_URL}/posts/${media_url}` }
     : require('../../assets/posts/postimg.png');
-  const handleClick = (id: number) => {
+
+  const handleLike = async () => {
+    try {
+      await postLike({ postId: id });
+      const updated = await fetchSinlgePost(id);
+
+      if (updated?.data) {
+        setLocalLike(updated.data.like_count);
+        onUpdatePost?.(updated.data);
+      }
+    } catch (err) {
+      console.log('like error', err);
+    }
+  };
+
+  const openComments = async () => {
+    try {
+      setCommentModal(true);
+      setLoadingComments(true);
+
+      const res = await getComments(id);
+
+      if (res?.data) {
+        setComments(res.data);
+      }
+    } catch (err) {
+      console.log('fetch comment error', err);
+    } finally {
+      setLoadingComments(false);
+    }
+  };
+
+  const handleSendComment = async () => {
+    if (!commentText.trim()) return;
+
+    try {
+      const res = await createComment(id, commentText);
+
+      if (res?.data) {
+        setComments([res.data, ...comments]); // add instantly
+        setCommentText('');
+        fetchSinlgePost(id);
+      }
+    } catch (err) {
+      console.log('add comment error', err);
+    }
+  };
+
+  const handleClick = id => {
     navigation.navigate('SearchedUser', { userId: id });
   };
+
   return (
     <View style={[styles.container, { backgroundColor: 'black' }]}>
       <View style={[styles.innnercontainer, { backgroundColor: '#1F1F1F' }]}>
-        {/* User Info Section */}
+        {/* USER INFO */}
         <View style={styles.userinfo}>
           <TouchableOpacity
             style={styles.profileDetails}
@@ -92,24 +149,27 @@ export default function PostCard({
           <ThreeDots />
         </View>
 
-        {/* Post Image */}
+        {/* POST IMAGE */}
         <View style={styles.postImage}>
           <Image source={postImageSource} style={styles.postMainImage} />
           <Text style={[styles.caption, { color: '#999999' }]}>{caption}</Text>
         </View>
 
-        {/* Reactions */}
+        {/* REACTIONS */}
         <View style={styles.bottomContainer}>
           <View style={styles.reactions}>
             <TouchableOpacity
+              onPress={handleLike}
               style={[styles.like, { borderColor: '#FFFFFF1A' }]}
             >
-              <Like />
+              <Like fill={'#FBC213'} />
               <Text style={[styles.reactionText, { color: '#fff' }]}>
-                {like_count}
+                {localLike}
               </Text>
             </TouchableOpacity>
+
             <TouchableOpacity
+              onPress={openComments}
               style={[styles.like, { borderColor: '#FFFFFF1A' }]}
             >
               <Comment />
@@ -117,6 +177,7 @@ export default function PostCard({
                 {comment_count}
               </Text>
             </TouchableOpacity>
+
             <TouchableOpacity
               style={[styles.like, { borderColor: '#FFFFFF1A' }]}
             >
@@ -136,13 +197,22 @@ export default function PostCard({
           </View>
         </View>
       </View>
+
+      <CommentsModal
+        visible={commentModal}
+        comments={comments}
+        loading={loadingComments}
+        commentText={commentText}
+        onClose={() => setCommentModal(false)}
+        onCommentTextChange={setCommentText}
+        onSendComment={handleSendComment}
+      />
     </View>
   );
 }
 
-// Keep all your existing styles unchanged
+// Styles unchanged
 const styles = StyleSheet.create({
-  // ... exactly same as before (no change needed)
   container: {
     padding: 10,
   },

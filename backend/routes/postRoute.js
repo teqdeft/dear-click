@@ -18,6 +18,11 @@ router.post(
 
 // fetch post
 router.get("/fetch-post", authMiddleware, postController.getFeedPosts);
+router.get(
+  "/get-single-story/:postId",
+  authMiddleware,
+  postController.getSinglePost
+);
 
 // like post
 router.post("/:postId/toggle-like", authMiddleware, toggleLike);
@@ -25,6 +30,11 @@ router.post(
   "/:postId/create-comment",
   authMiddleware,
   commentController.createComment
+);
+router.get(
+  "/:postId/get-comment",
+  authMiddleware,
+  commentController.getComments
 );
 router.delete(
   "/:commentId/delete-comment",

@@ -161,4 +161,52 @@ const deleteComment = async (req, res) => {
   }
 };
 
-module.exports = { createComment, deleteComment };
+//get comments
+const getComments = async (req, res) => {
+  const postId = Number(req.params.postId);
+
+  if (!Number.isInteger(postId) || postId <= 0) {
+    return error(
+      res,
+      "Invalid postId",
+      "postId must be a positive integer",
+      400,
+      "INVALID_POST_ID"
+    );
+  }
+
+  try {
+    //  Check if post exists
+    const post = await db("posts").select("id").where({ id: postId }).first();
+    if (!post) {
+      return error(res, "Post not found", null, 404, "POST_NOT_FOUND");
+    }
+
+    //  Fetch comments + user info
+    const comments = await db("comments")
+      .select(
+        "comments.id",
+        "comments.comment",
+        "comments.created_at",
+        "users.id as userId",
+        "users.username",
+        "users.name",
+        "users.profile_pic"
+      )
+      .leftJoin("users", "comments.userId", "users.id")
+      .where("comments.postId", postId)
+      .orderBy("comments.created_at", "desc");
+
+    return success(res, comments, 200, "Comments fetched successfully");
+  } catch (err) {
+    return error(
+      res,
+      "Failed to fetch comments",
+      err.message,
+      500,
+      "FETCH_COMMENTS_FAILED"
+    );
+  }
+};
+
+module.exports = { createComment, deleteComment, getComments };
